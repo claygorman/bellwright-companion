@@ -7,9 +7,12 @@ import { normalizeInjuries } from '@/lib/bw/injuries';
 import { ALL_SKILLS, shapeCell, professionOf, combatTotal, classifyRole, ROLE_COLORS, NOTABLE_COMBAT_TOTAL, npcName } from '@/lib/bw/model';
 import { InjuryBadge } from './injury-badge';
 import { Avatar } from './avatar';
+import { Icon } from './icons';
+import { ItemImg } from './item-img';
 import { C, MONO, avatarStyle, miniBar, rowBorder, thStyle } from './ui';
 
 export type SortState = { key: string; dir: 1 | -1 };
+type Carried = Record<string, { item: string; qty: number }[]>;
 
 type Props = {
   rows: Npc[];
@@ -17,6 +20,8 @@ type Props = {
   playtime: number | null; // save playtime, for injury heal countdowns
   ingestedAt: string | null; // ingest wall-clock, anchors live countdown ticking
   isMobile: boolean;
+  view: 'skills' | 'gear'; // gear view swaps skill columns for armor + inventory
+  carried?: Carried;       // actor guid -> carried items (gear view)
   compareMode: boolean;
   compareSet: string[];
   sort: SortState;
@@ -33,12 +38,13 @@ const skillTh = (active: boolean, divider: boolean): CSSProperties => ({
 
 export const guidOf = (v: Npc): string => v.guid ?? npcName(v);
 
-export const Roster = ({ rows, npcCol, playtime, ingestedAt, isMobile, compareMode, compareSet, sort, onSort, onOpen, onToggleCompare }: Props) => {
+export const Roster = ({ rows, npcCol, playtime, ingestedAt, isMobile, view, carried, compareMode, compareSet, sort, onSort, onOpen, onToggleCompare }: Props) => {
   if (isMobile) return <MobileCards rows={rows} npcCol={npcCol} onOpen={onOpen} />;
   const arrow = sort.dir > 0 ? '▲' : '▼';
+  const gearView = view === 'gear';
   return (
     <div className="bw-scroll" style={{ overflow: 'auto', height: '100%' }}>
-      <table style={{ borderCollapse: 'separate', borderSpacing: 0, width: '100%', minWidth: 1120, fontSize: 12.5 }}>
+      <table style={{ borderCollapse: 'separate', borderSpacing: 0, width: '100%', minWidth: gearView ? 900 : 1120, fontSize: 12.5 }}>
         <thead>
           <tr>
             {compareMode && <th style={{ ...thStyle, width: 36, padding: 0 }} />}
@@ -46,12 +52,14 @@ export const Roster = ({ rows, npcCol, playtime, ingestedAt, isMobile, compareMo
               Villager <span style={{ color: C.accent }}>{sort.key === 'name' ? arrow : ''}</span>
             </th>
             {npcCol && <th style={{ ...thStyle, padding: '8px 10px' }}>Archetype</th>}
-            {ALL_SKILLS.map(([key, abbr, name], i) => (
+            {!gearView && ALL_SKILLS.map(([key, abbr, name], i) => (
               <th key={key} onClick={() => onSort(key, -1)} data-tip={name} style={skillTh(sort.key === key, i === 7)}>
                 <span>{abbr}</span>
                 {sort.key === key && <span style={{ color: C.accent, fontSize: 8 }}> {arrow}</span>}
               </th>
             ))}
+            {gearView && <th style={{ ...thStyle, borderLeft: '1px solid #2A231A' }}>Armor</th>}
+            {gearView && <th style={{ ...thStyle, borderLeft: '1px solid #2A231A' }}>Inventory</th>}
             <th style={{ ...thStyle, borderLeft: '1px solid #2A231A' }}>Gear</th>
             <th onClick={() => onSort('morale', 1)} style={{ ...thStyle, cursor: 'pointer' }}>
               Morale <span style={{ color: C.accent }}>{sort.key === 'morale' ? arrow : ''}</span>
@@ -62,6 +70,7 @@ export const Roster = ({ rows, npcCol, playtime, ingestedAt, isMobile, compareMo
         </thead>
         <tbody>
           {rows.map(v => <Row key={guidOf(v)} v={v} npcCol={npcCol} playtime={playtime} ingestedAt={ingestedAt} compareMode={compareMode}
+            gearView={gearView} carried={carried}
             selected={compareSet.includes(guidOf(v))} onOpen={onOpen} onToggleCompare={onToggleCompare} />)}
         </tbody>
       </table>
@@ -69,8 +78,9 @@ export const Roster = ({ rows, npcCol, playtime, ingestedAt, isMobile, compareMo
   );
 };
 
-const Row = ({ v, npcCol, playtime, ingestedAt, compareMode, selected, onOpen, onToggleCompare }: {
-  v: Npc; npcCol: boolean; playtime: number | null; ingestedAt: string | null; compareMode: boolean; selected: boolean;
+const Row = ({ v, npcCol, playtime, ingestedAt, compareMode, gearView, carried, selected, onOpen, onToggleCompare }: {
+  v: Npc; npcCol: boolean; playtime: number | null; ingestedAt: string | null; compareMode: boolean;
+  gearView: boolean; carried?: Carried; selected: boolean;
   onOpen: (g: string) => void; onToggleCompare: (g: string) => void;
 }) => {
   const name = npcName(v);
@@ -123,7 +133,7 @@ const Row = ({ v, npcCol, playtime, ingestedAt, compareMode, selected, onOpen, o
           </span>
         </td>
       )}
-      {ALL_SKILLS.map(([key, , sname], i) => {
+      {!gearView && ALL_SKILLS.map(([key, , sname], i) => {
         const c = shapeCell(sname, v.skills[key]);
         const bar = miniBar(30, 3, c.barPct, c.numColor);
         return (
@@ -138,6 +148,59 @@ const Row = ({ v, npcCol, playtime, ingestedAt, compareMode, selected, onOpen, o
           </td>
         );
       })}
+      {gearView && (
+        <td style={{ padding: '6px 12px', ...rowBorder, borderLeft: `1px solid ${C.borderRow}` }}>
+          <div style={{ display: 'flex', gap: 5 }}>
+            {([['head', 'helm'], ['chest', 'torso'], ['gloves', 'gloves'], ['legs', 'legs'], ['boots', 'boots']] as const).map(([slot, ik]) => {
+              const raw = v.equipment[slot];
+              return (
+                <div key={slot} data-tip={raw ? itemLabel(raw) : `No ${slot}`} style={{
+                  position: 'relative', width: 34, height: 34, flex: '0 0 auto', borderRadius: 8,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  ...(raw
+                    ? { background: '#211C15', border: '1px solid #37301F' }
+                    : { background: 'repeating-linear-gradient(45deg,rgba(224,167,60,.05) 0 6px,transparent 6px 12px)', border: '1px dashed rgba(224,167,60,.35)' }),
+                }}>
+                  {raw
+                    ? <ItemImg cls={raw} size={26} fallback={<Icon name={ik} size={16} color="#D8CBB0" />} />
+                    : <Icon name={ik} size={16} color="#5f5849" />}
+                </div>
+              );
+            })}
+          </div>
+        </td>
+      )}
+      {gearView && (
+        <td style={{ padding: '6px 12px', ...rowBorder, borderLeft: `1px solid ${C.borderRow}` }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap', maxWidth: 360 }}>
+            {(v.guid ? carried?.[v.guid] ?? [] : []).slice(0, 8).map(x => (
+              <div key={x.item} data-tip={`${itemLabel(x.item)} × ${x.qty}`} style={{
+                position: 'relative', width: 30, height: 30, flex: '0 0 auto', borderRadius: 7,
+                background: '#211C15', border: '1px solid #322A20',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <ItemImg cls={x.item} size={22} fallback={<Icon name="pouch" size={14} color="#C6BBA4" />} />
+                {x.qty > 1 && (
+                  <span style={{
+                    position: 'absolute', bottom: -4, right: -4, minWidth: 14, height: 14, padding: '0 2px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: '#2A231A', border: '1px solid #3a3020', borderRadius: 4,
+                    fontFamily: MONO, fontSize: 8, fontWeight: 600, color: '#C6BBA4',
+                  }}>{x.qty}</span>
+                )}
+              </div>
+            ))}
+            {(v.guid ? carried?.[v.guid] ?? [] : []).length === 0 && (
+              <span style={{ fontSize: 11, color: C.textDisabled }}>Empty</span>
+            )}
+            {(v.guid ? carried?.[v.guid] ?? [] : []).length > 8 && (
+              <span style={{ fontFamily: MONO, fontSize: 10, color: C.textFaint }}>
+                +{(v.guid ? carried?.[v.guid] ?? [] : []).length - 8}
+              </span>
+            )}
+          </div>
+        </td>
+      )}
       <td style={{ padding: '6px 12px', ...rowBorder, borderLeft: `1px solid ${C.borderRow}`, whiteSpace: 'nowrap', lineHeight: 1.3 }}>
         <div style={{ color: '#DCD2BE', fontSize: 11.5 }}>{itemLabel(v.equipment.weapon) || 'Unarmed'}</div>
         <div style={{ fontSize: 10.5, color: v.equipment.offhand ? C.textDim : C.textDisabled }}>

@@ -76,6 +76,18 @@ export type World = {
   groups?: Group[]; // absent on pre-2026-07-22 snapshots
   gear_sets?: Record<string, string[]>; // npc guid -> assigned gear-preset item classes
   gear_presets?: GearPreset[]; // custom (player-named) preset definitions
+  player?: PlayerState; // the player pawn (absent on old snapshots)
+  carried?: Record<string, { item: string; qty: number }[]>; // actor guid -> inventory
+};
+
+export type PlayerState = {
+  guid: string | null;
+  position: number[] | null;
+  skills: Record<string, Skill>;
+  equipment: Record<string, string>;
+  carried: { item: string; qty: number }[];
+  coins: number;
+  appearance: Record<string, string>;
 };
 
 export type GearPreset = {

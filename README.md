@@ -157,6 +157,8 @@ starter); counts are extra copies to keep in storage beyond assigned gear.
 - [x] Gear presets decoded (custom preset names, ranked slot preferences,
       per-villager assignments) + craft list with `kits.json` reserves
 - [x] Recruit filters (village, specialty, worker/fighter/balanced)
+- [x] My-character tab (player pawn: skills, equipment, carried inventory)
+      + Population "Gear & inventory" view
 - [ ] Map base imagery + building/chest/camp layers (positions already decoded)
 - [ ] Ingest auth token (shared secret) for internet-exposed servers
 - [ ] Postgres backend behind `DATABASE_URL`

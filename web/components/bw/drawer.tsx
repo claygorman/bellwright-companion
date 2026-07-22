@@ -245,15 +245,16 @@ export const Drawer = ({ v, playtime, ingestedAt, squads, onOpen, isMobile, onCl
   );
 };
 
-const SlotLabel = ({ children }: { children: React.ReactNode }) => (
+export const SlotLabel = ({ children }: { children: React.ReactNode }) => (
   <div style={{
     fontSize: 10.5, letterSpacing: '.5px', textTransform: 'uppercase',
     color: C.textDim2, margin: '0 0 7px', fontWeight: 600,
   }}>{children}</div>
 );
 
-const SkillCol = ({ title, color, defs, v }: {
-  title: string; color: string; defs: (readonly [string, string, string])[]; v: Npc;
+export const SkillCol = ({ title, color, defs, v }: {
+  title: string; color: string; defs: (readonly [string, string, string])[];
+  v: Pick<Npc, 'skills'>;
 }) => (
   <div>
     <div style={{
@@ -285,8 +286,8 @@ const SkillCol = ({ title, color, defs, v }: {
   </div>
 );
 
-const Tile = ({ v, slot, label, icon, armorSlot = false }: {
-  v: Npc; slot: string; label: string; icon: string; armorSlot?: boolean;
+export const Tile = ({ v, slot, label, icon, armorSlot = false }: {
+  v: Pick<Npc, 'equipment'>; slot: string; label: string; icon: string; armorSlot?: boolean;
 }) => {
   const raw = v.equipment[slot];
   const filled = Boolean(raw);

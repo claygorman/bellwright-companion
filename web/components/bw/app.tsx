@@ -10,6 +10,7 @@ import { CompareModal, CompareTray } from './compare';
 import { Drawer } from './drawer';
 import { Insights } from './insights';
 import { MapTab } from './map-tab';
+import { MeTab } from './me';
 import { Roster, guidOf, type SortState } from './roster';
 import { SearchIcon } from './icons';
 import { StorageTab, storagePressure } from './storage-tab';
@@ -25,7 +26,8 @@ const MAX_COMPARE = 3;
 // open drawer — only the world prop changes)
 const VERSION_POLL_MS = 30_000;
 
-type TabKey = 'villagers' | 'npcs' | 'trends' | 'insights' | 'storage' | 'map';
+type TabKey = 'me' | 'villagers' | 'npcs' | 'trends' | 'insights' | 'storage' | 'map';
+export type RosterView = 'skills' | 'gear';
 
 export const CompanionApp = ({ world }: { world: World }) => {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -58,6 +60,7 @@ export const CompanionApp = ({ world }: { world: World }) => {
   }, [router, world.snapshot_id, world.ingested_at]);
 
   const [tab, setTab] = useState<TabKey>('villagers');
+  const [rosterView, setRosterView] = useState<RosterView>('skills');
   const [q, setQ] = useState('');
   const [sort, setSort] = useState<SortState>({ key: 'name', dir: 1 });
   const [selGuid, setSelGuid] = useState<string | null>(null);
@@ -155,6 +158,7 @@ export const CompanionApp = ({ world }: { world: World }) => {
   const sel = selGuid ? byGuid.get(selGuid) ?? null : null;
 
   const tabs: { key: TabKey; label: string; count: number | null; alert: boolean }[] = [
+    ...(world.player ? [{ key: 'me' as TabKey, label: world.meta.character ?? 'My character', count: null, alert: false }] : []),
     { key: 'villagers', label: 'Population', count: villagers.length, alert: villagerAlert },
     { key: 'npcs', label: 'Recruits', count: recruits.length, alert: false },
     { key: 'trends', label: 'Trends', count: null, alert: false },
@@ -261,6 +265,19 @@ export const CompanionApp = ({ world }: { world: World }) => {
               <input value={q} onChange={e => setQ(e.target.value)}
                 placeholder="Filter by name or archetype…" style={{ ...searchInputStyle, width: 190 }} />
             </div>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 7, height: 34, padding: '0 6px 0 12px',
+              background: C.inputBg, border: '1px solid #2E271E', borderRadius: 8,
+            }}>
+              <span style={{ fontSize: 10.5, letterSpacing: '.4px', textTransform: 'uppercase', color: C.textFaint }}>View</span>
+              <select value={rosterView} onChange={e => setRosterView(e.target.value as RosterView)} style={{
+                background: 'transparent', border: 'none', outline: 'none', color: C.text,
+                fontSize: 12.5, fontFamily: 'inherit', cursor: 'pointer', padding: '0 2px',
+              }}>
+                <option value="skills" style={{ background: C.cardBg }}>Skills</option>
+                <option value="gear" style={{ background: C.cardBg }}>Gear &amp; inventory</option>
+              </select>
+            </div>
             <button onClick={() => setCompareMode(m => { if (m) setCompareSet([]); return !m; })} style={{
               display: 'inline-flex', alignItems: 'center', gap: 7, height: 34, padding: '0 13px',
               borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', fontSize: 12.5, fontWeight: 500,
@@ -299,9 +316,13 @@ export const CompanionApp = ({ world }: { world: World }) => {
 
       {/* main */}
       <main className="bw-scroll" style={{ flex: '1 1 auto', overflow: 'auto', position: 'relative', minHeight: 0 }}>
+        {tab === 'me' && world.player && (
+          <MeTab player={world.player} meta={world.meta} villagerCount={villagers.length}
+            presetName={null} />
+        )}
         {isTable && (
           <Roster rows={rows} npcCol={tab === 'npcs'} playtime={world.meta.playtimeSeconds} ingestedAt={world.ingested_at}
-            isMobile={isMobile}
+            isMobile={isMobile} view={rosterView} carried={world.carried}
             compareMode={compareMode} compareSet={compareSet} sort={sort} onSort={onSort}
             onOpen={setSelGuid} onToggleCompare={toggleCompare} />
         )}
