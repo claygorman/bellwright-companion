@@ -6,6 +6,7 @@
 //              without exploding row counts (33 rows/snapshot, not 604).
 import { sqliteTable, integer, text, real, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
 import type { Npc, Storage, Meta, Group } from 'bellwright-parse/types';
+import type { GearPreset } from 'bellwright-parse/gearpresets';
 
 export type World = {
   ingested_at: string;
@@ -13,6 +14,8 @@ export type World = {
   npcs: Npc[];
   storage: Storage;
   groups?: Group[]; // absent on pre-2026-07-22 snapshots
+  gear_sets?: Record<string, string[]>;
+  gear_presets?: GearPreset[]; // custom preset definitions (named)
 };
 
 export const snapshots = sqliteTable(

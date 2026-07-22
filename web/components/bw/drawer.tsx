@@ -20,9 +20,12 @@ type Props = {
   v: Npc; playtime: number | null; ingestedAt: string | null;
   squads: DrawerSquad[]; onOpen: (guid: string) => void;
   isMobile: boolean; onClose: () => void;
+  // real in-game gear-preset name (custom presets only); falls back to the
+  // loadout heuristic when absent
+  presetName?: string | null;
 };
 
-export const Drawer = ({ v, playtime, ingestedAt, squads, onOpen, isMobile, onClose }: Props) => {
+export const Drawer = ({ v, playtime, ingestedAt, squads, onOpen, isMobile, onClose, presetName }: Props) => {
   const name = npcName(v);
   const first = v.first_name ?? name, last = v.last_name ?? '';
   const morale = v.morale != null ? Math.round(v.morale) : null;
@@ -36,7 +39,7 @@ export const Drawer = ({ v, playtime, ingestedAt, squads, onOpen, isMobile, onCl
       <div onClick={e => e.stopPropagation()} className="bw-scroll" style={{
         position: 'absolute', top: 0, right: 0, bottom: 0, width: isMobile ? '100%' : 440,
         background: C.panelBg, borderLeft: `1px solid ${C.border3}`,
-        boxShadow: '-14px 0 40px rgba(0,0,0,.5)', overflowY: 'auto',
+        boxShadow: '-14px 0 40px rgba(0,0,0,.5)', overflowY: 'auto', overflowX: 'hidden',
         animation: 'bwslide .22s cubic-bezier(.2,.8,.2,1)',
       }}>
         {/* header */}
@@ -163,16 +166,26 @@ export const Drawer = ({ v, playtime, ingestedAt, squads, onOpen, isMobile, onCl
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '0 0 12px', flexWrap: 'wrap' }}>
             <span style={{ fontSize: 10.5, letterSpacing: '.4px', textTransform: 'uppercase', color: C.textDim2 }}>Preset</span>
-            <span style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600,
-              color: !preset.combat ? C.textDim : preset.fit ? C.green : 'var(--accent)',
-              background: !preset.combat ? 'rgba(154,143,125,.12)' : preset.fit ? 'rgba(125,176,104,.14)' : 'rgba(224,167,60,.14)',
-              border: `1px solid ${!preset.combat ? 'rgba(154,143,125,.3)' : preset.fit ? 'rgba(125,176,104,.4)' : 'rgba(224,167,60,.4)'}`,
-              padding: '3px 10px', borderRadius: 6,
-            }}>{preset.preset}</span>
-            <span style={{ fontSize: 11.5, color: !preset.combat ? C.textDim : preset.fit ? C.green : 'var(--accent)' }}>
-              {preset.combat ? (preset.fit ? 'Matches loadout' : preset.reason) : 'Non-combat'}
-            </span>
+            {presetName ? (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600,
+                color: C.gold, background: 'rgba(224,167,60,.13)',
+                border: '1px solid rgba(224,167,60,.3)', padding: '3px 10px', borderRadius: 6,
+              }}>{presetName}</span>
+            ) : (
+              <>
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600,
+                  color: !preset.combat ? C.textDim : preset.fit ? C.green : 'var(--accent)',
+                  background: !preset.combat ? 'rgba(154,143,125,.12)' : preset.fit ? 'rgba(125,176,104,.14)' : 'rgba(224,167,60,.14)',
+                  border: `1px solid ${!preset.combat ? 'rgba(154,143,125,.3)' : preset.fit ? 'rgba(125,176,104,.4)' : 'rgba(224,167,60,.4)'}`,
+                  padding: '3px 10px', borderRadius: 6,
+                }}>{preset.preset}</span>
+                <span style={{ fontSize: 11.5, color: !preset.combat ? C.textDim : preset.fit ? C.green : 'var(--accent)' }}>
+                  {preset.combat ? (preset.fit ? 'Matches loadout' : preset.reason) : 'Non-combat'}
+                </span>
+              </>
+            )}
           </div>
           <SlotLabel>Weapons</SlotLabel>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>

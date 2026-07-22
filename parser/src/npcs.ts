@@ -151,6 +151,7 @@ export function extractNpcs(p: Payload): Npc[] {
 
     // names + faction + template + job priorities from MistTownNpc
     let firstName: string | null = null, lastName: string | null = null, faction: string | null = null, template: string | null = null;
+    let gearPreset: string | null = null;
     const jobPriorities: Record<string, number> = {};
     if (comps.MistTownNpc) {
       const t = comps.MistTownNpc;
@@ -167,6 +168,12 @@ export function extractNpcs(p: Payload): Npc[] {
         // per-NPC job priorities (default 5; absent = untouched; empty map =
         // non-worker/combat NPC). Job ids 8..14 track the work-skill enum;
         // low ids (1,2,6,7) are non-skill jobs (construction/delivery/etc).
+        // f30: assigned gear-preset GUID (4 varints) — matches GearPreset.key
+        // for custom presets; built-in presets have no definition in the save.
+        if (x.f === 30 && x.kind === 'len') {
+          const gv = (p.fields(x.v) ?? []).filter(y => y.kind === 'v').map(y => y.v);
+          if (gv.length === 4) gearPreset = gv.join(',');
+        }
         if (x.f === 34 && x.kind === 'len') {
           const rec = Object.fromEntries((p.fields(x.v) ?? [])
             .filter(y => y.kind === 'v').map(y => [y.f, y.v]));
@@ -191,6 +198,7 @@ export function extractNpcs(p: Payload): Npc[] {
       template, faction, is_player_npc: faction === 'Player',
       archetype, profession, tier, village,
       job_priorities: jobPriorities,
+      gear_preset: gearPreset,
       position: pos, skills, injuries,
       morale: ownerKey != null ? happinessByOwner.get(ownerKey) ?? null : null,
       equipment: ownerKey != null ? equipByOwner.get(ownerKey) ?? {} : {},

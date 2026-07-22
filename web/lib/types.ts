@@ -16,6 +16,9 @@ export type Npc = {
   tier: string | null;
   village: string | null;
   job_priorities: Record<string, number>;
+  // assigned gear-preset GUID key; matches GearPreset.key for custom presets.
+  // Absent on pre-2026-07-22 snapshots.
+  gear_preset?: string | null;
   position: number[] | null;
   skills: Record<string, Skill>;
   // new snapshots: {type, since}; pre-2026-07-22 snapshots: plain strings
@@ -71,4 +74,12 @@ export type World = {
   npcs: Npc[];
   storage: StorageData;
   groups?: Group[]; // absent on pre-2026-07-22 snapshots
+  gear_sets?: Record<string, string[]>; // npc guid -> assigned gear-preset item classes
+  gear_presets?: GearPreset[]; // custom (player-named) preset definitions
+};
+
+export type GearPreset = {
+  key: string; // preset guid key — matches Npc.gear_preset
+  name: string;
+  slots: Record<string, { item: string; rank: number }[]>;
 };

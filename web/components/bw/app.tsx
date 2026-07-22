@@ -166,12 +166,12 @@ export const CompanionApp = ({ world }: { world: World }) => {
   return (
     <div ref={rootRef} style={{
       '--accent': '#E0A73C', '--gold': '#F4C868', '--rowpad': '9px',
-      background: C.pageBg, color: C.text, height: '100dvh', display: 'flex', flexDirection: 'column',
+      background: C.pageBg, color: C.text, height: '100dvh', maxWidth: '100vw', overflowX: 'hidden', display: 'flex', flexDirection: 'column',
       fontFamily: SANS, WebkitFontSmoothing: 'antialiased',
     } as React.CSSProperties}>
       {/* header */}
       <header style={{
-        display: 'flex', alignItems: 'center', gap: 18, height: 56, padding: '0 18px',
+        display: 'flex', alignItems: 'center', gap: 18, height: 56, padding: '0 18px', minWidth: 0, overflow: 'hidden',
         borderBottom: '1px solid #2C251D', background: 'linear-gradient(180deg,#1B1712,#17130E)',
         flex: '0 0 auto', position: 'relative', zIndex: 20,
       }}>
@@ -225,12 +225,12 @@ export const CompanionApp = ({ world }: { world: World }) => {
         borderBottom: `1px solid ${C.border}`, background: '#18140F', flex: '0 0 auto',
         flexWrap: 'wrap', position: 'relative', zIndex: 15,
       }}>
-        <nav style={{ display: 'flex', gap: 3, background: C.inputBg, padding: 3, borderRadius: 9, border: '1px solid #2A2319' }}>
+        <nav className="bw-scroll" style={{ display: 'flex', gap: 3, background: C.inputBg, padding: 3, borderRadius: 9, border: '1px solid #2A2319', maxWidth: '100%', overflowX: 'auto', flexWrap: 'nowrap' }}>
           {tabs.map(t => {
             const active = tab === t.key;
             return (
               <button key={t.key} onClick={() => setTab(t.key)} style={{
-                display: 'inline-flex', alignItems: 'center', gap: 7, padding: '6px 13px', border: 'none',
+                display: 'inline-flex', alignItems: 'center', gap: 7, padding: '6px 13px', border: 'none', flex: '0 0 auto', whiteSpace: 'nowrap',
                 borderRadius: 7, cursor: 'pointer', fontFamily: 'inherit', fontSize: 13,
                 fontWeight: active ? 600 : 500, color: active ? '#1a150c' : C.textDim,
                 background: active ? 'var(--accent)' : 'transparent', transition: 'all .12s',
@@ -306,7 +306,7 @@ export const CompanionApp = ({ world }: { world: World }) => {
             onOpen={setSelGuid} onToggleCompare={toggleCompare} />
         )}
         {tab === 'trends' && <Trends />}
-        {tab === 'insights' && <Insights cards={insights} villagerCount={villagers.length} onOpen={setSelGuid} />}
+        {tab === 'insights' && <Insights cards={insights} villagerCount={villagers.length} snapshotId={world.snapshot_id} onOpen={setSelGuid} />}
         {tab === 'storage' && <StorageTab containers={containers} />}
         {tab === 'map' && (
           <MapTab villagers={villagers} recruits={recruits}
@@ -319,7 +319,9 @@ export const CompanionApp = ({ world }: { world: World }) => {
         <CompareTray npcs={compareNpcs} onRemove={toggleCompare}
           onClear={() => setCompareSet([])} onOpen={() => setShowCompare(true)} />
       )}
-      {sel && <Drawer v={sel} playtime={world.meta.playtimeSeconds} ingestedAt={world.ingested_at} squads={squadsOfSel(sel.guid)} onOpen={setSelGuid} isMobile={isMobile} onClose={() => setSelGuid(null)} />}
+      {sel && <Drawer v={sel} playtime={world.meta.playtimeSeconds} ingestedAt={world.ingested_at} squads={squadsOfSel(sel.guid)}
+        presetName={sel.gear_preset ? (world.gear_presets ?? []).find(p => p.key === sel.gear_preset)?.name ?? null : null}
+        onOpen={setSelGuid} isMobile={isMobile} onClose={() => setSelGuid(null)} />}
       {showCompare && <CompareModal npcs={compareNpcs} onClose={() => setShowCompare(false)} />}
     </div>
   );

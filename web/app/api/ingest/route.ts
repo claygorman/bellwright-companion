@@ -8,6 +8,8 @@ import { Payload } from 'bellwright-parse/payload';
 import { extractNpcs } from 'bellwright-parse/npcs';
 import { extractStorage } from 'bellwright-parse/storage';
 import { extractGroups } from 'bellwright-parse/groups';
+import { extractGearSets } from 'bellwright-parse/gearsets';
+import { extractGearPresets } from 'bellwright-parse/gearpresets';
 import { db, snapshots, npcHistory, pruneSnapshots, type World } from '@/db';
 import { eq } from 'drizzle-orm';
 
@@ -44,6 +46,8 @@ export const POST = async (req: Request) => {
     npcs,
     storage: extractStorage(p),
     groups: extractGroups(p),
+    gear_sets: extractGearSets(p),
+    gear_presets: extractGearPresets(p),
   };
   const mine = npcs.filter(n => n.is_player_npc);
 

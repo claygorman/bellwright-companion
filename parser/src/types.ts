@@ -27,6 +27,9 @@ export type Npc = {
   tier: string | null;
   village: string | null;
   job_priorities: Record<string, number>;
+  // assigned gear-preset GUID ('4xu32' join) — resolves to a GearPreset.key
+  // for custom presets; built-in presets exist only as unresolvable GUIDs
+  gear_preset: string | null;
   position: number[] | null;
   skills: Record<string, Skill>;
   injuries: Injury[];

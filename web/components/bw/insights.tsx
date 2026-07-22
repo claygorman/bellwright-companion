@@ -4,13 +4,15 @@ import { avatarColor, initials } from '@/lib/bw/format';
 import { npcName, type InsightCard } from '@/lib/bw/model';
 import { Icon } from './icons';
 import { Avatar } from './avatar';
+import { GearPanel } from './gear';
 import { C, MONO, SERIF, SEV, avatarStyle } from './ui';
 
-export const Insights = ({ cards, villagerCount, onOpen }: {
-  cards: InsightCard[]; villagerCount: number; onOpen: (guid: string) => void;
+export const Insights = ({ cards, villagerCount, snapshotId, onOpen }: {
+  cards: InsightCard[]; villagerCount: number; snapshotId?: number; onOpen: (guid: string) => void;
 }) => (
   <div className="bw-scroll" style={{ height: '100%', overflowY: 'auto' }}>
     <div style={{ padding: '22px 24px 44px' }}>
+      <GearPanel key={snapshotId ?? 0} onOpen={onOpen} />
       <div style={{ marginBottom: 16 }}>
         <h2 style={{ margin: 0, fontFamily: SERIF, fontSize: 20, fontWeight: 600, color: C.textBright }}>Settlement insights</h2>
         <p style={{ margin: '4px 0 0', fontSize: 12.5, color: C.textDim2 }}>

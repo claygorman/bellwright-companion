@@ -1,6 +1,6 @@
 {
   "name": "bellwright-parse",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Parse a decompressed Bellwright save payload into structured world data",
   "type": "module",
   "bin": {
@@ -16,6 +16,8 @@
     "./wire": "./src/wire.ts",
     "./fields": "./src/fields.ts",
     "./types": "./src/types.ts",
-    "./groups": "./src/groups.ts"
+    "./groups": "./src/groups.ts",
+    "./gearsets": "./src/gearsets.ts",
+    "./gearpresets": "./src/gearpresets.ts"
   }
 }

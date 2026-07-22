@@ -106,7 +106,20 @@ All configuration is via environment variables (and CLI flags on the publisher).
 | `DATA_DIR` | `./.data` | Ingest scratch files + default DB location |
 | `DUMP_BIN` | `../tools/dump/target/release/dump` | Save decompressor path (preset in Docker) |
 | `SNAPSHOT_KEEP` | unset (keep all) | Retention: prune to the newest N snapshots |
+| `KITS_FILE` | `$DATA_DIR/kits.json` | Optional gear-reserve targets (see below) |
 | `PORT` / `HOSTNAME` | `8710` / `0.0.0.0` in Docker | Server bind |
+
+**Gear reserves** (`kits.json`, optional): weapons and shields break, so the
+Insights tab's craft list can plan flat spare counts on top of what your gear
+presets demand. Drop a `kits.json` next to the database (or point `KITS_FILE`
+at one):
+
+```json
+{ "reserves": { "Warhammer_C": 2, "RoundShield_C": 4, "StrengthenShirt_C": 2 } }
+```
+
+Keys are item classes as shown in the save (`web/kits.example.json` has a
+starter); counts are extra copies to keep in storage beyond assigned gear.
 
 **Publisher** (flags override env vars; `--help` for details):
 
@@ -138,13 +151,16 @@ Both are per-player data and gitignored.
 - [x] Insights triage, live page refresh, injury countdowns
 - [x] Generated avatars from appearance data + real-portrait pipeline
 - [x] Self-contained publisher binaries (Linux/Windows/macOS)
+- [x] Trends tab: storage/morale/XP history, production rates, runway forecasts
+- [x] Gear presets decoded (custom preset names, ranked slot preferences,
+      per-villager assignments) + craft list with `kits.json` reserves
+- [x] Recruit filters (village, specialty, worker/fighter/balanced)
 - [ ] Map base imagery + building/chest/camp layers (positions already decoded)
 - [ ] Ingest auth token (shared secret) for internet-exposed servers
 - [ ] Postgres backend behind `DATABASE_URL`
 - [ ] Item icons extracted from game files (replacing wiki fetch)
 - [ ] Undecoded save fields: reservist/hold-ground toggles, housing/bed
-      assignment, squad raised-state, gear presets (partially located)
-- [ ] Historical trends from snapshot history ("what changed since yesterday")
+      assignment, squad raised-state, village liberation status
 - [ ] MCP server so AI assistants can query your settlement
 
 ## Contributing
