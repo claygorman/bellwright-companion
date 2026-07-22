@@ -30,9 +30,13 @@ type TrendsData = {
 const panel = 'rounded-xl border border-line-2 bg-[#1A160F] py-3.5 px-4';
 
 const chartTooltip = {
+  // zIndex lifts the tooltip above the legend (recharts renders the legend
+  // after the tooltip wrapper, so without it the legend paints on top);
+  // the shadow separates the panel from same-hue card backgrounds
+  wrapperStyle: { zIndex: 60 },
   contentStyle: {
-    background: '#201B14', border: '1px solid #39311F', borderRadius: 8,
-    fontSize: 12, color: '#EDE4D2',
+    background: '#221D15', border: '1px solid #453A25', borderRadius: 8,
+    fontSize: 12, color: '#EDE4D2', boxShadow: '0 10px 28px rgba(0,0,0,.55)',
   },
   labelStyle: { color: '#8a8069' },
 };

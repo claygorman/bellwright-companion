@@ -1,6 +1,6 @@
 {
   "name": "bellwright-parse",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Parse a decompressed Bellwright save payload into structured world data",
   "type": "module",
   "bin": {

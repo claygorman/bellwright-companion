@@ -1,6 +1,6 @@
 {
   "name": "bellwright-companion-web",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "type": "module",
   "private": true,
   "scripts": {
@@ -11,6 +11,7 @@
     "map": "node scripts/fetch-map.ts"
   },
   "dependencies": {
+    "@base-ui/react": "^1.6.0",
     "@tailwindcss/postcss": "^4.3.3",
     "bellwright-parse": "workspace:*",
     "better-sqlite3": "^13.0.1",

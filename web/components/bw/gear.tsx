@@ -14,10 +14,12 @@ type GearData = {
     key: string; name: string;
     members: { guid: string | null; name: string }[];
     picks: Record<string, string>;
+    slots: Record<string, { item: string; rank: number }[]>;
   }[];
   craft: { item: string; need: number; equipped: number; stored: number; reserve: number; target: number; have: number; deficit: number }[];
   items: GearData['craft'];
   reequip: { name: string; slot: string; worn: string | null; pick: string }[];
+  avail: Record<string, { stored: number; equipped: number; unlocked: boolean }>;
   has_reserves: boolean;
 };
 
@@ -101,13 +103,40 @@ export const GearPanel = ({ onOpen }: { onOpen: (guid: string) => void }) => {
         {data.presets.map(p => (
           <Card key={p.key} title={p.name} badge={p.members.length} badgeColor={C.gold as string}>
             <div className={cn('flex flex-col gap-[5px]', p.members.length > 0 && 'mb-2.5')}>
-              {SLOT_ORDER.filter(s => p.picks[s]).map(s => (
-                <div key={s} className="flex items-center gap-2">
-                  <span className="font-mono text-[10px] text-sand-700 uppercase w-[62px] flex-none">{s}</span>
-                  <ItemImg cls={p.picks[s]} size={18} fallback={<Icon name="pouch" size={13} color={C.textFaint} />} />
-                  <span className="text-xs text-sand-200 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{itemLabel(p.picks[s])}</span>
-                </div>
-              ))}
+              {SLOT_ORDER.filter(s => p.picks[s]).map(s => {
+                // the preset's full ranked chain (top preference → fallback):
+                // gold ring = effective pick (in use / craft planning),
+                // normal = fielded/available, dimmed = not fielded yet
+                const chain = p.slots?.[s] ?? [];
+                const eff = p.picks[s];
+                return (
+                  <div key={s} className="flex items-center gap-1.5 min-w-0">
+                    <span className="font-mono text-[10px] text-sand-700 uppercase w-[62px] flex-none">{s}</span>
+                    <span className="flex items-center gap-1 min-w-0 flex-wrap">
+                      {chain.map((r, i) => {
+                        const a = data.avail?.[r.item];
+                        const inUse = r.item === eff;
+                        const tip = `${itemLabel(r.item)} — ${inUse ? 'in use · ' : ''}${
+                          a?.unlocked ? `stored ${a.stored} · equipped ${a.equipped}` : 'not fielded yet'}`;
+                        return (
+                          <span key={r.item} className="inline-flex items-center gap-1">
+                            {i > 0 && <span className="text-[10px] text-sand-700">›</span>}
+                            <span data-tip={tip} className={cn(
+                              'inline-flex items-center justify-center w-[24px] h-[24px] rounded-md border flex-none',
+                              inUse ? 'border-gold bg-gold/[.14]'
+                                : a?.unlocked ? 'border-line-3 bg-[#1A160F]'
+                                  : 'border-line-2 bg-transparent opacity-40 grayscale',
+                            )}>
+                              <ItemImg cls={r.item} size={18} fallback={<Icon name="pouch" size={13} color={C.textFaint} />} />
+                            </span>
+                          </span>
+                        );
+                      })}
+                    </span>
+                    <span className="text-[11px] text-sand-300 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap ml-auto pl-1">{itemLabel(eff)}</span>
+                  </div>
+                );
+              })}
             </div>
             {p.members.length > 0 && (
               <div className="flex flex-wrap gap-[5px] border-t border-row pt-[9px]">

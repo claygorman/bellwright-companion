@@ -121,6 +121,7 @@ const Row = ({ v, npcCol, archCol, playtime, ingestedAt, compareMode, gearView, 
         <td className="py-1.5 px-2.5 border-b border-row whitespace-nowrap">
           <span className="inline-flex items-center gap-1.5">
             {notable && <span data-tip="High-value recruit" className="text-gold-bright">★</span>}
+            <TierBadge v={v} />
             <span className="text-[11.5px] text-sand-350">{archetypeLabel(v)}</span>
             <HireDiamonds v={v} />
             <span data-tip="Role by skill caps (potential)" className="text-[8.5px] font-bold tracking-[.4px] uppercase border py-px px-[5px] rounded-[4px]" style={{
@@ -223,6 +224,27 @@ const Row = ({ v, npcCol, archCol, playtime, ingestedAt, compareMode, gearView, 
         </td>
       )}
     </tr>
+  );
+};
+
+// Villager quality tier (template cap band) as a tinted badge:
+// High = green up-arrow, Medium = amber wave, Low = red down-arrow.
+const TIER_BADGE: Record<string, { path: string[]; color: string; cls: string; label: string }> = {
+  High: { path: ['M12 18V7', 'M7 12l5-5 5 5'], color: '#8FBF74', cls: 'bg-moss/[.14] border-moss/40', label: 'High' },
+  Medium: { path: ['M4 13c2-4 4-4 6 0s4 4 6 0'], color: '#C9A85E', cls: 'bg-brass/[.12] border-brass/35', label: 'Medium' },
+  Low: { path: ['M12 6v11', 'M7 12l5 5 5-5'], color: '#E0997F', cls: 'bg-rust/[.12] border-rust/35', label: 'Low' },
+};
+const TierBadge = ({ v }: { v: Npc }) => {
+  const t = v.archetype === 'villager' && v.tier ? TIER_BADGE[v.tier] : null;
+  if (!t) return null;
+  return (
+    <span data-tip={`${t.label} tier recruit`}
+      className={cn('inline-flex items-center justify-center w-[18px] h-[18px] rounded-md flex-none border', t.cls)}>
+      <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke={t.color}
+        strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        {t.path.map(d => <path key={d} d={d} />)}
+      </svg>
+    </span>
   );
 };
 

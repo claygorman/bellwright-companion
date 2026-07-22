@@ -10,6 +10,7 @@ import { combatTotal, npcName, playerNpcs, professionOf, recruitNpcs, archetypeL
 import { mapFor, project } from '@/lib/bw/map';
 import { shapeContainers } from '@/lib/bw/storage';
 import { cn } from '@/lib/utils';
+import { BwSelect } from '@/components/ui/dropdown-menu';
 import { Icon, SearchIcon } from './icons';
 import { C } from './ui';
 
@@ -344,20 +345,17 @@ export const MapTab = ({ world, region, onOpenProfile }: {
             </button>
             {planner && (
               <>
-                <select
-                  value={building}
-                  onChange={e => {
-                    const v = e.target.value;
-                    setBuilding(v);
-                    const b = BUILDINGS.find(([n]) => n === v);
-                    if (b) setPlanner(pl => pl && { ...pl, radius: b[1] });
-                  }}
-                  className="mt-2 w-full cursor-pointer rounded-[7px] border border-line-3 bg-ink py-[5px] px-1.5 font-sans text-[11px] text-sand-200 outline-none">
-                  <option value="custom" className="bg-iron-750">Custom radius…</option>
-                  {BUILDINGS.map(([n, r]) => (
-                    <option key={n} value={n} className="bg-iron-750">{n} — {r}m</option>
-                  ))}
-                </select>
+                <div className="mt-2">
+                  <BwSelect value={building} align="start"
+                    triggerClassName="w-full h-auto py-[5px] pl-1.5 pr-1.5 rounded-[7px] text-[11px]"
+                    options={[{ value: 'custom', label: 'Custom radius…' },
+                      ...BUILDINGS.map(([n, r]) => ({ value: n, label: `${n} — ${r}m` }))]}
+                    onChange={v => {
+                      setBuilding(v);
+                      const b = BUILDINGS.find(([n]) => n === v);
+                      if (b) setPlanner(pl => pl && { ...pl, radius: b[1] });
+                    }} />
+                </div>
                 <div className="mt-2 flex items-center gap-2">
                   <input type="range" min={10}
                     max={building !== 'custom' ? BUILDINGS.find(([n]) => n === building)?.[1] ?? 500 : 500}

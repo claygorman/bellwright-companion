@@ -145,9 +145,10 @@ export const specialtyOf = (v: Npc): string | null =>
 // Archetype cell label: "Novice Engineer" / "Expert Blacksmith" for
 // profession templates (the game's own tiers), "Commoner (High)" for generic
 // villagers where Low/Medium/High is the template's skill-cap quality.
+// (villager quality tier is rendered as a separate badge, not a suffix)
 export const archetypeLabel = (v: Npc): string => {
   const s = specialtyOf(v);
-  if (v.archetype === 'villager') return s ? (v.tier ? `${s} (${v.tier})` : s) : '—';
+  if (v.archetype === 'villager') return s ?? '—';
   if (v.tier && s) return `${v.tier} ${s}`;
   if (v.archetype === 'unique') return 'Unique';
   return s ?? tplLabel(v.template);

@@ -122,6 +122,19 @@ export const GET = async () => {
     }
   }
 
+  // availability for every item class referenced by a preset chain, so the
+  // UI can render ranked chains with in-use/available/locked states
+  const avail: Record<string, { stored: number; equipped: number; unlocked: boolean }> = {};
+  for (const p of presets) {
+    for (const ranked of Object.values(p.slots)) {
+      for (const r of ranked ?? []) {
+        avail[r.item] ??= {
+          stored: stored[r.item] ?? 0, equipped: equipped[r.item] ?? 0, unlocked: tierUnlocked(r.item),
+        };
+      }
+    }
+  }
+
   return Response.json(
     {
       presets: presets.map(p => ({
@@ -130,6 +143,7 @@ export const GET = async () => {
         picks: presetPicks.get(p.key) ?? {},
         slots: p.slots,
       })),
+      avail,
       craft,
       items,
       reequip,

@@ -7,6 +7,8 @@ import { agoLabel, playtimeLabel } from '@/lib/bw/format';
 import { classifyRole, hireGateOf, insightsFor, npcName, playerNpcs, recruitNpcs, ROLE_COLORS, specialtyOf, type RecruitRole } from '@/lib/bw/model';
 import { shapeContainers } from '@/lib/bw/storage';
 import { CompareModal, CompareTray } from './compare';
+import { UploadButton } from './upload-modal';
+import { BwSelect } from '@/components/ui/dropdown-menu';
 import { Drawer } from './drawer';
 import { Insights } from './insights';
 import { MapTab } from './map-tab';
@@ -242,6 +244,7 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
             {ago ? `Fresh · ingested ${ago}` : 'Fresh'}
           </span>
         </div>
+        <UploadButton onIngested={() => router.refresh()} />
       </header>
 
       {/* tabs + toolbar */}
@@ -278,14 +281,9 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
                 placeholder="Filter by name or archetype…"
                 className="bg-transparent border-none outline-none text-sand-200 text-[13px] w-[190px] font-sans" />
             </div>
-            <div className="flex items-center gap-[7px] h-[34px] pr-1.5 pl-3 bg-ink border border-line-3 rounded-lg">
-              <span className="text-[10.5px] tracking-[.4px] uppercase text-sand-600">View</span>
-              <select value={rosterView} onChange={e => setRosterView(e.target.value as RosterView)}
-                className="bg-transparent border-none outline-none text-sand-200 text-[12.5px] font-sans cursor-pointer px-0.5">
-                <option value="skills" className="bg-iron-750">Skills</option>
-                <option value="gear" className="bg-iron-750">Gear &amp; inventory</option>
-              </select>
-            </div>
+            <BwSelect label="View" value={rosterView}
+              options={[{ value: 'skills', label: 'Skills' }, { value: 'gear', label: 'Gear & inventory' }]}
+              onChange={v => setRosterView(v as RosterView)} />
             <button onClick={() => setCompareMode(m => { if (m) setCompareSet([]); return !m; })} className={cn(
               'inline-flex items-center gap-[7px] h-[34px] px-[13px] rounded-lg cursor-pointer font-sans text-[12.5px] font-medium border transition-colors',
               compareMode ? 'border-gold bg-gold/[.14] text-gold-bright' : 'border-line-3 bg-ink text-sand-400 hover:border-[#4a4030]',

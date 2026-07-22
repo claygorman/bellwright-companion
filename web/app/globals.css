@@ -135,3 +135,4 @@ tr.bw-row:hover { background: rgba(224, 167, 60, .05); }
 @keyframes bwpulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
 @keyframes bwslide { from { transform: translateX(30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes bwfade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes bwspin { to { transform: rotate(360deg); } }
