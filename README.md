@@ -132,16 +132,18 @@ starter); counts are extra copies to keep in storage beyond assigned gear.
 
 ## Portraits & item icons (optional)
 
-- **Item/building icons**: `pnpm icons` fetches images from the
-  [Bellwright wiki](https://bellwright.fandom.com) for every item in your save
-  (missing ones fall back to built-in line icons).
+- **Item/building icons**: a common set ships in `web/public/icons/bw/`
+  (fetched from the [Bellwright wiki](https://bellwright.fandom.com); these
+  images are Bellwright game assets © Donkey Crew, hosted by the wiki — they
+  are NOT covered by this repo's MIT license). If your save references items
+  the set is missing, `pnpm icons` fetches the gaps; anything unresolved falls
+  back to built-in line icons.
 - **Real NPC portraits**: faces are procedural in-engine (no image exists in
   the save), so the UI generates avatars from each NPC's stored appearance
   data. For the real thing, screenshot each villager's character panel, run
   `python3 tools/portrait-cropper.py`, and drop the named crops into
   `web/public/portraits/<name-slug>.png` — the UI prefers them per villager.
-
-Both are per-player data and gitignored.
+  Portraits are per-player data and gitignored.
 
 ## Roadmap
 

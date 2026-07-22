@@ -9,7 +9,6 @@ web/.data/
 .next/
 .env.local
 .env*.local
-web/public/icons/bw/
 .idea/
 publisher/dist/
 web/public/portraits/
