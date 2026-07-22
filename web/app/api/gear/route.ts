@@ -3,9 +3,10 @@
 // (DATA_DIR/kits.json):
 //   { "reserves": { "RoundShield_C": 4, "NomadHelm_C": 2, ... } }
 //
-// Craft targets use each preset's best AVAILABLE item per slot (highest rank
-// with any copy equipped or stored), so the list tracks the tier the player
-// actually fields — and flips to the next tier the moment one exists.
+// Craft targets use each preset's best tier-unlocked item per slot (highest
+// rank that's in storage or equipped by 2+ villagers), so the list tracks the
+// tier the player actually produces — a lone quest gift or loot drop doesn't
+// set the squad's target, and upgrades surface once a tier reaches storage.
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { desc } from 'drizzle-orm';
@@ -42,16 +43,19 @@ export const GET = async () => {
   for (const n of mine) {
     for (const cls of Object.values(n.equipment ?? {})) equipped[cls] = (equipped[cls] ?? 0) + 1;
   }
-  const available = (cls: string) => (equipped[cls] ?? 0) + (stored[cls] ?? 0);
+  // an item is part of the player's fielded tier only when it's in storage
+  // or equipped by 2+ villagers — a single equipped copy is usually a quest
+  // gift or loot one-off, and shouldn't set the craft target for the squad
+  const tierUnlocked = (cls: string) => (stored[cls] ?? 0) > 0 || (equipped[cls] ?? 0) >= 2;
 
-  // preset-level effective pick per slot: best-ranked item any copy of which
-  // exists; falls back to the top-ranked (ideal) item when none do
+  // preset-level effective pick per slot: best-ranked tier-unlocked item;
+  // falls back to the top-ranked (ideal) item when none qualify
   const picksOf = (p: GearPreset): Record<string, string> => {
     const picks: Record<string, string> = {};
     for (const slot of GEAR_SLOTS) {
       const ranked = p.slots[slot];
       if (!ranked?.length) continue;
-      picks[slot] = (ranked.find(r => available(r.item) > 0) ?? ranked[0]).item;
+      picks[slot] = (ranked.find(r => tierUnlocked(r.item)) ?? ranked[0]).item;
     }
     return picks;
   };
@@ -66,12 +70,19 @@ export const GET = async () => {
   const members = new Map<string, { guid: string | null; name: string }[]>();
   const overridden = (preset: GearPreset, slot: string, worn: string | null) =>
     worn != null && !(preset.slots[slot] ?? []).some(r => r.item === worn);
+  const rankOf = (preset: GearPreset, slot: string, cls: string | null) =>
+    (preset.slots[slot] ?? []).find(r => r.item === cls)?.rank ?? -1;
+  // slot already satisfied: worn item ranks at or above the effective pick
+  // (covers the quest-gift case — one NPC wearing above the fielded tier)
+  const satisfied = (preset: GearPreset, slot: string, worn: string | null, pick: string) =>
+    worn != null && rankOf(preset, slot, worn) >= rankOf(preset, slot, pick);
   for (const n of mine) {
     const preset = n.gear_preset ? presetByKey.get(n.gear_preset) : undefined;
     if (preset) {
       members.set(preset.key, [...(members.get(preset.key) ?? []), { guid: n.guid, name: npcName(n) }]);
       for (const [slot, cls] of Object.entries(presetPicks.get(preset.key) ?? {})) {
-        if (overridden(preset, slot, n.equipment?.[WORN_SLOT[slot]] ?? null)) continue;
+        const worn = n.equipment?.[WORN_SLOT[slot]] ?? null;
+        if (overridden(preset, slot, worn) || satisfied(preset, slot, worn, cls)) continue;
         need[cls] = (need[cls] ?? 0) + 1;
       }
     } else {
@@ -104,7 +115,7 @@ export const GET = async () => {
     if (!preset || !picks) continue;
     for (const [slot, pick] of Object.entries(picks)) {
       const worn = n.equipment?.[WORN_SLOT[slot]] ?? null;
-      if (overridden(preset, slot, worn)) continue;
+      if (overridden(preset, slot, worn) || satisfied(preset, slot, worn, pick)) continue;
       if (worn !== pick && (stored[pick] ?? 0) > 0) {
         reequip.push({ name: npcName(n), slot, worn, pick });
       }
