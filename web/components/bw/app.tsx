@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Npc, World } from '@/lib/types';
 import { agoLabel, playtimeLabel } from '@/lib/bw/format';
-import { insightsFor, npcName, playerNpcs, recruitNpcs } from '@/lib/bw/model';
+import { classifyRole, insightsFor, npcName, playerNpcs, recruitNpcs, ROLE_COLORS, type RecruitRole } from '@/lib/bw/model';
 import { shapeContainers } from '@/lib/bw/storage';
 import { CompareModal, CompareTray } from './compare';
 import { Drawer } from './drawer';
@@ -13,6 +13,7 @@ import { MapTab } from './map-tab';
 import { Roster, guidOf, type SortState } from './roster';
 import { SearchIcon } from './icons';
 import { StorageTab, storagePressure } from './storage-tab';
+import { Trends } from './trends';
 import { C, MONO, SANS, SERIF, searchBoxStyle, searchInputStyle } from './ui';
 import { useTooltips } from './use-tooltips';
 
@@ -24,7 +25,7 @@ const MAX_COMPARE = 3;
 // open drawer — only the world prop changes)
 const VERSION_POLL_MS = 30_000;
 
-type TabKey = 'villagers' | 'npcs' | 'insights' | 'storage' | 'map';
+type TabKey = 'villagers' | 'npcs' | 'trends' | 'insights' | 'storage' | 'map';
 
 export const CompanionApp = ({ world }: { world: World }) => {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -64,6 +65,9 @@ export const CompanionApp = ({ world }: { world: World }) => {
   const [compareSet, setCompareSet] = useState<string[]>([]);
   const [showCompare, setShowCompare] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [villageFilter, setVillageFilter] = useState<Set<string>>(new Set());
+  const [profFilter, setProfFilter] = useState<Set<string>>(new Set());
+  const [roleFilter, setRoleFilter] = useState<Set<RecruitRole>>(new Set());
   const [metaWide, setMetaWide] = useState(true);
   const [ago, setAgo] = useState<string | null>(null); // client-only (avoids hydration mismatch)
 
@@ -110,11 +114,20 @@ export const CompanionApp = ({ world }: { world: World }) => {
   const isTable = tab === 'villagers' || tab === 'npcs';
   const dataset = tab === 'npcs' ? recruits : villagers;
   const ql = q.trim().toLowerCase();
+  const villages = useMemo(() =>
+    [...new Set(recruits.map(v => v.village).filter((x): x is string => Boolean(x)))].sort(), [recruits]);
+  const professions = useMemo(() =>
+    [...new Set(recruits.map(v => v.profession).filter((x): x is string => Boolean(x)))].sort(), [recruits]);
   const rows = useMemo(() => {
     let list = dataset.filter(v => !ql
       || npcName(v).toLowerCase().includes(ql)
       || (v.template ?? '').toLowerCase().includes(ql)
       || (v.village ?? '').toLowerCase().includes(ql));
+    if (tab === 'npcs') {
+      if (villageFilter.size) list = list.filter(v => v.village != null && villageFilter.has(v.village));
+      if (profFilter.size) list = list.filter(v => v.profession != null && profFilter.has(v.profession));
+      if (roleFilter.size) list = list.filter(v => roleFilter.has(classifyRole(v)));
+    }
     const { key: k, dir } = sort;
     list = [...list].sort((a, b) => {
       if (k === 'name') {
@@ -130,7 +143,7 @@ export const CompanionApp = ({ world }: { world: World }) => {
       return (av - bv) * dir;
     });
     return list;
-  }, [dataset, ql, sort]);
+  }, [dataset, ql, sort, tab, villageFilter, profFilter, roleFilter]);
 
   const onSort = (key: string, defDir: 1 | -1) =>
     setSort(s => (s.key === key ? { key, dir: s.dir === 1 ? -1 : 1 } : { key, dir: defDir }));
@@ -144,6 +157,7 @@ export const CompanionApp = ({ world }: { world: World }) => {
   const tabs: { key: TabKey; label: string; count: number | null; alert: boolean }[] = [
     { key: 'villagers', label: 'Population', count: villagers.length, alert: villagerAlert },
     { key: 'npcs', label: 'Recruits', count: recruits.length, alert: false },
+    { key: 'trends', label: 'Trends', count: null, alert: false },
     { key: 'insights', label: 'Insights', count: insights.length, alert: false },
     { key: 'storage', label: 'Storage', count: containers.length, alert: storageAlert },
     { key: 'map', label: 'Map', count: null, alert: false },
@@ -266,6 +280,23 @@ export const CompanionApp = ({ world }: { world: World }) => {
         )}
       </div>
 
+      {tab === 'npcs' && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 6, padding: '7px 18px', flexWrap: 'wrap',
+          borderBottom: `1px solid ${C.border}`, background: '#15110C', fontSize: 11.5,
+        }}>
+          <FilterChips label="Village" all={villages} sel={villageFilter}
+            onToggle={v => setVillageFilter(s2 => { const n = new Set(s2); n.has(v) ? n.delete(v) : n.add(v); return n; })} />
+          <span style={{ width: 1, height: 16, background: '#2E271F' }} />
+          <FilterChips label="Specialty" all={professions} sel={profFilter}
+            onToggle={v => setProfFilter(s2 => { const n = new Set(s2); n.has(v) ? n.delete(v) : n.add(v); return n; })} />
+          <span style={{ width: 1, height: 16, background: '#2E271F' }} />
+          <FilterChips label="Role" all={['Fighter', 'Worker', 'Balanced']} sel={roleFilter as Set<string>}
+            colors={ROLE_COLORS as Record<string, string>}
+            onToggle={v => setRoleFilter(s2 => { const n = new Set(s2); n.has(v as RecruitRole) ? n.delete(v as RecruitRole) : n.add(v as RecruitRole); return n; })} />
+        </div>
+      )}
+
       {/* main */}
       <main className="bw-scroll" style={{ flex: '1 1 auto', overflow: 'auto', position: 'relative', minHeight: 0 }}>
         {isTable && (
@@ -274,6 +305,7 @@ export const CompanionApp = ({ world }: { world: World }) => {
             compareMode={compareMode} compareSet={compareSet} sort={sort} onSort={onSort}
             onOpen={setSelGuid} onToggleCompare={toggleCompare} />
         )}
+        {tab === 'trends' && <Trends />}
         {tab === 'insights' && <Insights cards={insights} villagerCount={villagers.length} onOpen={setSelGuid} />}
         {tab === 'storage' && <StorageTab containers={containers} />}
         {tab === 'map' && (
@@ -292,6 +324,27 @@ export const CompanionApp = ({ world }: { world: World }) => {
     </div>
   );
 };
+
+const FilterChips = ({ label, all, sel, onToggle, colors }: {
+  label: string; all: string[]; sel: Set<string>;
+  onToggle: (v: string) => void; colors?: Record<string, string>;
+}) => (
+  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
+    <span style={{ fontSize: 9.5, letterSpacing: '.5px', textTransform: 'uppercase', color: C.textFaint }}>{label}</span>
+    {all.map(v => {
+      const on = sel.has(v);
+      const color = colors?.[v] ?? '#C6BBA4';
+      return (
+        <button key={v} onClick={() => onToggle(v)} style={{
+          padding: '2px 9px', borderRadius: 999, cursor: 'pointer', fontFamily: 'inherit', fontSize: 11,
+          border: `1px solid ${on ? color : '#2E271E'}`,
+          background: on ? `${color}22` : 'transparent',
+          color: on ? '#EDE4D2' : C.textDim,
+        }}>{v}</button>
+      );
+    })}
+  </span>
+);
 
 const Meta = ({ k, v, mono = false }: { k: string; v: string; mono?: boolean }) => (
   <span style={{ display: 'inline-flex', gap: 6, color: '#9A8F7D', whiteSpace: 'nowrap' }}>

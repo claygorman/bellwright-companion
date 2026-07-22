@@ -41,6 +41,26 @@ export const npcName = (v: Npc): string =>
 export const combatTotal = (v: Npc): number =>
   COMBAT.reduce((a, [k]) => a + (v.skills[k]?.level ?? 0), 0);
 
+// Recruit role classification by CAPS (potential): a recruit with high combat
+// ceilings is a Fighter even if untrained today. Bands calibrated against a
+// real 65-recruit population (combat/work cap ratios ran 0.71-1.22,
+// median 0.87 — village recruits skew work-heavy).
+const FIGHTER_RATIO = 1.0;
+const WORKER_RATIO = 0.8;
+export type RecruitRole = 'Fighter' | 'Worker' | 'Balanced';
+export const classifyRole = (v: Npc): RecruitRole => {
+  const capSum = (defs: SkillDef[]) => defs.reduce((a, [k]) => a + (v.skills[k]?.cap ?? 0), 0);
+  const combat = capSum(COMBAT), work = capSum(WORK);
+  if (work === 0) return 'Fighter';
+  const r = combat / work;
+  if (r >= FIGHTER_RATIO) return 'Fighter';
+  if (r <= WORKER_RATIO) return 'Worker';
+  return 'Balanced';
+};
+export const ROLE_COLORS: Record<RecruitRole, string> = {
+  Fighter: '#C4776A', Worker: '#8FA05B', Balanced: '#9AB0C9',
+};
+
 // ---- skill cell ------------------------------------------------------------
 export type CellVM = {
   disp: string; numColor: string; showBar: boolean; barPct: number;

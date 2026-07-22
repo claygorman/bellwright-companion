@@ -21,7 +21,7 @@ import { existsSync, readdirSync, readFileSync, statSync, watch } from 'node:fs'
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
-const VERSION = '0.0.2'; // keep in sync with publisher/package.json
+const VERSION = '0.0.3'; // keep in sync with publisher/package.json
 
 const { values: flags, positionals } = parseArgs({
   args: process.argv.slice(2),

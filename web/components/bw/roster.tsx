@@ -4,7 +4,7 @@ import type { CSSProperties } from 'react';
 import type { Npc } from '@/lib/types';
 import { avatarColor, initials, itemLabel, moraleColor, tplLabel } from '@/lib/bw/format';
 import { normalizeInjuries } from '@/lib/bw/injuries';
-import { ALL_SKILLS, shapeCell, professionOf, combatTotal, NOTABLE_COMBAT_TOTAL, npcName } from '@/lib/bw/model';
+import { ALL_SKILLS, shapeCell, professionOf, combatTotal, classifyRole, ROLE_COLORS, NOTABLE_COMBAT_TOTAL, npcName } from '@/lib/bw/model';
 import { InjuryBadge } from './injury-badge';
 import { Avatar } from './avatar';
 import { C, MONO, avatarStyle, miniBar, rowBorder, thStyle } from './ui';
@@ -112,9 +112,14 @@ const Row = ({ v, npcCol, playtime, ingestedAt, compareMode, selected, onOpen, o
       </td>
       {npcCol && (
         <td style={{ padding: '6px 10px', ...rowBorder, whiteSpace: 'nowrap' }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             {notable && <span data-tip="High-value recruit" style={{ color: C.gold }}>★</span>}
             <span style={{ fontSize: 11.5, color: '#B3A88F' }}>{tplLabel(v.template)}</span>
+            <span data-tip="Role by skill caps (potential)" style={{
+              fontSize: 8.5, fontWeight: 700, letterSpacing: '.4px', textTransform: 'uppercase',
+              color: ROLE_COLORS[classifyRole(v)], border: `1px solid ${ROLE_COLORS[classifyRole(v)]}55`,
+              padding: '1px 5px', borderRadius: 4,
+            }}>{classifyRole(v)}</span>
           </span>
         </td>
       )}
