@@ -1,0 +1,12 @@
+[package]
+name = "bellwright-dump"
+version = "0.1.0"
+edition = "2021"
+description = "Decompress a Bellwright .sav (VSWB container) to its raw protobuf payload"
+
+[dependencies]
+bellwright_gold_editor = { git = "https://github.com/BradMoeller/bellwright-gold-editor", default-features = false }
+
+[[bin]]
+name = "dump"
+path = "src/bin/dump.rs"

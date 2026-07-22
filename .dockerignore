@@ -1,0 +1,15 @@
+.git
+node_modules
+**/node_modules
+**/.next
+**/.data
+**/target
+web/.env.local
+design
+docs
+tools/*.py
+*.sav
+payload.bin
+Dockerfile
+.dockerignore
+private

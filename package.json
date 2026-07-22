@@ -1,0 +1,16 @@
+{
+  "name": "bellwright-companion",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Self-hosted Bellwright save companion — monorepo (web, parser, publisher)",
+  "scripts": {
+    "dev": "pnpm --filter bellwright-companion-web dev",
+    "build": "pnpm --filter bellwright-companion-web build",
+    "start": "pnpm --filter bellwright-companion-web start",
+    "icons": "pnpm --filter bellwright-companion-web icons"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@9.15.3"
+}

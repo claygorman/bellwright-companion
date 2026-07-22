@@ -1,0 +1,48 @@
+# On version tags: build the self-contained publisher binaries (Node SEA —
+# players need NO Node install on the gaming box) and attach them to a
+# GitHub Release. The docker workflow publishes the ghcr.io image separately.
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  publisher-binaries:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest        # linux-x64 (Bazzite/SteamOS/desktop Linux)
+            artifact: bellwright-publisher-linux-x64
+          - os: windows-latest       # win-x64 (most Bellwright players)
+            artifact: bellwright-publisher-win32-x64.exe
+          - os: macos-latest         # darwin-arm64
+            artifact: bellwright-publisher-darwin-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4   # official build — required donor for SEA
+        with:
+          node-version: 24
+      - run: node publisher/scripts/build-sea.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: publisher/dist/bellwright-publisher-*
+          if-no-files-found: error
+
+  release:
+    needs: publisher-binaries
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
+          prerelease: true   # beta project — every 0.0.x release is a pre-release

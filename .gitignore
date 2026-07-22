@@ -1,0 +1,16 @@
+# personal save data — never commit
+*.sav
+*.sav_backup*
+payload.bin
+world.json
+target/
+node_modules/
+web/.data/
+.next/
+.env.local
+.env*.local
+web/public/icons/bw/
+.idea/
+publisher/dist/
+web/public/portraits/
+private/

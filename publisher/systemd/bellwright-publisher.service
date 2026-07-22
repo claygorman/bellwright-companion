@@ -1,0 +1,19 @@
+# systemd --user unit for the gaming box.
+# Install: cp to ~/.config/systemd/user/, then:
+#   systemctl --user daemon-reload && systemctl --user enable --now bellwright-publisher
+# (enable lingering so it runs without a login session: loginctl enable-linger)
+[Unit]
+Description=Bellwright save publisher -> companion ingest API
+After=network-online.target
+
+[Service]
+Environment=BW_INGEST_URL=https://bellwright.example.com/api/ingest
+# self-contained binary (publisher/scripts/build-sea.mjs) — no Node required
+ExecStart=%h/development/bellwright-companion/publisher/dist/bellwright-publisher-linux-x64 watch
+# alternative if Node >= 24 is installed:
+# ExecStart=/usr/bin/env node %h/development/bellwright-companion/publisher/src/publisher.ts watch
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=default.target
