@@ -30,7 +30,9 @@ game is running.
   names, category filters, and "storage hogs" analysis
 - **Insights** — automated triage: who's injured, unarmed, wrong loadout,
   under-prioritised, or about to level
-- **Map** — live villager/recruit positions from the save (base imagery WIP)
+- **Map** — the game's world map with your villagers, buildings, bandit camps,
+  wildlife spawns, and community-mapped resources as filterable layers, plus a
+  radius planner for placing work camps
 - **Live updates** — a small watcher on your gaming machine ships every save
   automatically; the page refreshes itself when new data lands
 - **Portraits** — generated avatars from each NPC's appearance data, or drop
