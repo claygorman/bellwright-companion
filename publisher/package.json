@@ -1,6 +1,6 @@
 {
   "name": "bellwright-companion-publisher",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "type": "module",
   "private": true,
   "description": "Ships Bellwright autosaves from the gaming box to the companion ingest API (push once or watch)",

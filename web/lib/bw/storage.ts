@@ -59,12 +59,13 @@ export const CATS: [string, string][] = [
   ['Weapons', '#C4553B'],
   ['Armor', '#5FA8CE'],
   ['Tools', '#C99A4B'],
-  ['Refuse', '#A6836A'],
   ['Misc', '#9A8F7D'],
 ];
 
 const CAT_RULES: [RegExp, string][] = [
-  [/Feathers|SpoiledFood|Refuse|Dung|Manure/, 'Refuse'],
+  // nothing is truly waste in Bellwright — spoiled food/dung/manure feed the
+  // fertilizer chain and feathers fletch arrows; they're production inputs
+  [/Feathers|SpoiledFood|Refuse|Dung|Manure|Fertili[sz]er/, 'Materials'],
   [/Sword|Axe(?!.*(Tool))|Mace|Spear|Halberd|Poleaxe|Bow(?!l)|Arrow|Dagger|Warhammer|Club|Knife(?!.*Skinning)|Falchion|Glaive|Pike/, 'Weapons'],
   [/Shield|Helm|Coif|Hood|Cuirass|Hauberk|Jerkin|Gambeson|Armor|Chausses|Trousers|Pants|Gloves|Mittens|Boots|Sabatons|Shirt|Tunic|Cloak|Gauntlet|Bracers|Cap$|Hat/, 'Armor'],
   [/Hatchet|Pickaxe|Sickle|Hammer|SkinningKnife|Hoe|Shovel|Saw|FishingRod|Scythe|Needle|Bucket(?!.*Mixing)|Torch/, 'Tools'],

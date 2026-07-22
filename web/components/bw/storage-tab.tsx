@@ -62,9 +62,6 @@ export const StorageTab = ({ containers }: { containers: ContainerVM[] }) => {
   const aggFill = aggCap ? aggUsed / aggCap : 0;
   const fullList = capped.filter(c => fillOf(c) >= FULL_FILL);
   const nearList = capped.filter(c => { const f = fillOf(c); return f >= NEAR_FILL && f < FULL_FILL; });
-  // refuse sitting in CAPPED storage — that's the reclaimable space
-  const refuseQty = capped.reduce((a, c) => a + c.items.filter(it => it.cat === 'Refuse').reduce((s, x) => s + x.qty, 0), 0);
-  const reclaimPct = aggUsed ? Math.round((refuseQty / aggUsed) * 100) : 0;
   const remote = containers.find(c => c.remote && used(c) > 0);
   const pressureList = [...fullList, ...nearList];
   const showPressure = pressureList.length > 0;
@@ -194,12 +191,6 @@ export const StorageTab = ({ containers }: { containers: ContainerVM[] }) => {
                 <div style={{ fontSize: 12.5, color: '#C9B3A4', marginTop: 2 }}>
                   {pressureDesc} — consider a clear-out or more storage.
                 </div>
-                {refuseQty > 0 && (
-                  <div style={{ fontSize: 12, color: '#C9A85E', marginTop: 6 }}>
-                    {refuseQty.toLocaleString()} of the items in storage are refuse (feathers, spoiled food) —
-                    purging them frees about {reclaimPct}% of the space in use.
-                  </div>
-                )}
               </div>
               <div style={{ textAlign: 'right', flex: '0 0 auto' }}>
                 <div style={{ fontFamily: MONO, fontSize: 18, fontWeight: 600, color: fillHex(aggFill) }}>{Math.round(aggFill * 100)}%</div>
@@ -245,8 +236,7 @@ export const StorageTab = ({ containers }: { containers: ContainerVM[] }) => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {hogs.map(h => {
                   const p = Math.round(h.pct * 100);
-                  const action = h.cat === 'Refuse'
-                    ? (h.name === 'Spoiled Food' ? 'Convert to fertiliser or trash' : 'Purge to reclaim space')
+                  const action = h.name === 'Spoiled Food' ? 'Convert to fertiliser'
                     : h.cat === 'Food' ? 'Cook or sell the surplus' : 'Sell or ease production';
                   return (
                     <div key={h.name} style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
