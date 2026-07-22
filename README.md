@@ -164,11 +164,15 @@ starter); counts are extra copies to keep in storage beyond assigned gear.
 - [x] Real map imagery with calibrated save-coordinate projection, 24 filter
       layers (save-sourced + community wiki data, provenance-labeled), and a
       draggable radius placement planner (`pnpm map` fetches the imagery)
+- [x] Deep-linkable tab routes (/population /recruits /map …)
 - [x] Tailwind v4 theme tokens across the UI (design-system handoff)
 - [ ] Ingest auth token (shared secret) for internet-exposed servers
 - [ ] Postgres backend behind `DATABASE_URL`
-- [ ] Game-pak extraction (CUE4Parse): verified building radii, first-party
-      icons, full resource-node tables, recipes
+- [x] Exact game data via the official Modkit (CUE4Parse over uncooked
+      assets): per-template hire gates (trust rank / liberation / renown)
+      and true building work radii in the map planner
+- [ ] More Modkit extraction: first-party icons, full resource-node tables,
+      recipes
 - [ ] Undecoded save fields: reservist/hold-ground toggles, housing/bed
       assignment, squad raised-state, village liberation status
 - [ ] MCP server so AI assistants can query your settlement

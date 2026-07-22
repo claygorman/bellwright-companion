@@ -4,10 +4,10 @@
 // armor values, durability, reservist/fallen chips (not present in save data).
 import type { Npc } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { itemLabel, moraleColor, tplLabel } from '@/lib/bw/format';
+import { itemLabel, moraleColor } from '@/lib/bw/format';
 import { normalizeInjuries } from '@/lib/bw/injuries';
 import { InjuryBadge } from './injury-badge';
-import { COMBAT, WORK, SKILL_ICON, shapeCell, presetFor, professionOf, npcName } from '@/lib/bw/model';
+import { COMBAT, WORK, SKILL_ICON, shapeCell, presetFor, professionOf, npcName, archetypeLabel } from '@/lib/bw/model';
 import { Icon, PinIcon } from './icons';
 import { ItemImg } from './item-img';
 import { Avatar } from './avatar';
@@ -60,7 +60,7 @@ export const Drawer = ({ v, playtime, ingestedAt, squads, onOpen, isMobile, onCl
               <div className="text-xs text-sand-400 mt-1">{v.gender ?? '—'} · {v.archetype}</div>
 
               <div className="text-[11.5px] text-[#7c715f] mt-px">
-                {tplLabel(v.template)}{v.village ? ` · from ${v.village}` : ''}
+                {archetypeLabel(v)}{v.village ? ` · from ${v.village}` : ''}
               </div>
               {v.position && (
                 <div className="text-[11.5px] text-sand-700 mt-[3px] flex items-center gap-[5px]">

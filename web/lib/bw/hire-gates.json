@@ -1,0 +1,632 @@
+{
+  "AdamBacaNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "AlanoOrdazNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "ApprenticeBlacksmithNPCTemplate_C": {
+    "trust": "Leader",
+    "diamonds": 4,
+    "liberation": true,
+    "renown": 300.0
+  },
+  "ApprenticeCarpenterNPCTemplate_C": {
+    "trust": "Leader",
+    "diamonds": 4,
+    "liberation": true,
+    "renown": 300.0
+  },
+  "ApprenticeEngineerNPCTemplate_C": {
+    "trust": "Leader",
+    "diamonds": 4,
+    "liberation": true,
+    "renown": 300.0
+  },
+  "ApprenticeFarmerNPCTemplate_C": {
+    "trust": "Leader",
+    "diamonds": 4,
+    "liberation": true,
+    "renown": 300.0
+  },
+  "ApprenticeHealerNPCTemplate_C": {
+    "trust": "Leader",
+    "diamonds": 4,
+    "liberation": true,
+    "renown": 300.0
+  },
+  "ApprenticeInkeeperNPCTemplate_C": {
+    "trust": "Leader",
+    "diamonds": 4,
+    "liberation": true,
+    "renown": 300.0
+  },
+  "ApprenticeLabourerNPCTemplate_C": {
+    "trust": "Leader",
+    "diamonds": 4,
+    "liberation": true,
+    "renown": 300.0
+  },
+  "ApprenticeWeaverNPCTemplate_C": {
+    "trust": "Leader",
+    "diamonds": 4,
+    "liberation": true,
+    "renown": 300.0
+  },
+  "ApprenticeWoodsmanNPCTemplate_C": {
+    "trust": "Leader",
+    "diamonds": 4,
+    "liberation": true,
+    "renown": 300.0
+  },
+  "BaltasarBlancoNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "BalzarMrazNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "BardNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "BartekGundarNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "BeggarNPCTemplate_C": {
+    "trust": "Stranger",
+    "diamonds": 0,
+    "liberation": false,
+    "renown": 20.0
+  },
+  "BeggarRMNPCTemplate_C": {
+    "trust": "Stranger",
+    "diamonds": 0,
+    "liberation": false,
+    "renown": 20.0
+  },
+  "BertholdKugNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "BertramGroosgNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "BogdanSlynn_WineShrine_NpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "BorkeSterle_TreasureGuard_NpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "CassandraKimNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "CassianShipCaptainNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "CassianTownsfolkNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "CastleHighbornNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "CathalDoyleiNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "CecilioBaezNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "CrasmereKlaraWinterburnNPcTemplate_C": {
+    "trust": "Stranger",
+    "diamonds": 0,
+    "liberation": false,
+    "renown": 25.0
+  },
+  "DainValdeNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "DarekVossNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "EdoardoPretoNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "EmilianoInterianoNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "ErykFiskeNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "ExpectingMotherNPCTemplate_C": {
+    "trust": "Stranger",
+    "diamonds": 0,
+    "liberation": false,
+    "renown": 40.0
+  },
+  "FarnworthExpertWeaverNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": true,
+    "renown": 150.0
+  },
+  "GarethVanderNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "GarrickDornNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "GavinCostumerNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "GenericShipCaptainNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "GregorySweatNPCTemplate_C": {
+    "trust": "Stranger",
+    "diamonds": 0,
+    "liberation": false,
+    "renown": 20.0
+  },
+  "HalmanianTownsfolkNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "HalmayanShipCaptainNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "HarkinKefaNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "HighNoTraitsVillagerIdleNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "HighVillagerIdleNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "HorndeanExpertBlacksmithNpcTemplate_C": {
+    "trust": "Stranger",
+    "diamonds": 0,
+    "liberation": false,
+    "renown": 40.0
+  },
+  "ImranTahirNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "InnkeeperNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "IsaCisneNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "JeffreyKlokNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "JorikMihailNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "KasiaRodinNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "KasimirKrauseNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "KessaOrlanisNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "KikolaiMoperniqNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "KristofToman_SeaShrine_NpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "KugsBodyguardAdditionalNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "KugsBodyguardNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "LeandroFerrosNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "LechHavel_WindShrine_NpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "LeonardGreenberggNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "LowBeggarNPCTemplate_C": {
+    "trust": "Stranger",
+    "diamonds": 0,
+    "liberation": false,
+    "renown": 20.0
+  },
+  "LowVillagerIdleNPCTemplate_C": {
+    "trust": "Associate",
+    "diamonds": 1,
+    "liberation": false,
+    "renown": 60.0
+  },
+  "LowVillagerIdleNoTraitsNPCTemplate_C": {
+    "trust": "Associate",
+    "diamonds": 1,
+    "liberation": false,
+    "renown": 60.0
+  },
+  "LuisFuenteNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "LyraZauharNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "LysaraNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "MarcosPetridesNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "MartiKostraNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "MediumNoTraitsVillagerIdleNPCTemplate_C": {
+    "trust": "Friend",
+    "diamonds": 2,
+    "liberation": false,
+    "renown": 150.0
+  },
+  "MediumVillagerIdleNPCTemplate_C": {
+    "trust": "Friend",
+    "diamonds": 2,
+    "liberation": false,
+    "renown": 150.0
+  },
+  "MikelTollerNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "MiraTelvanniNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "MirkoIlvesNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "MironJurasNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "NoviceBlacksmithNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": true,
+    "renown": 150.0
+  },
+  "NoviceCarpenterNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": true,
+    "renown": 150.0
+  },
+  "NoviceEngineerNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": true,
+    "renown": 150.0
+  },
+  "NoviceFarmerNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": true,
+    "renown": 150.0
+  },
+  "NoviceHealerNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": true,
+    "renown": 150.0
+  },
+  "NoviceInkeeperNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": true,
+    "renown": 150.0
+  },
+  "NoviceLabourerNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": true,
+    "renown": 150.0
+  },
+  "NoviceWeaverNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": true,
+    "renown": 150.0
+  },
+  "NoviceWoodsmanNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": true,
+    "renown": 150.0
+  },
+  "RaulLozarNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "RyderEasoneNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "SebastianMontverdeMayor_NpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "SilasVeldrinNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "SlaveNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "T0_ArcherMilitiaNPCTemplate_C": {
+    "trust": "Friend",
+    "diamonds": 2,
+    "liberation": false,
+    "renown": 0.0
+  },
+  "T0_HeavyInfantryMilitiaNPCTemplate_C": {
+    "trust": "Friend",
+    "diamonds": 2,
+    "liberation": false,
+    "renown": 0.0
+  },
+  "T0_LightInfantryMilitiaNPCTemplate_C": {
+    "trust": "Friend",
+    "diamonds": 2,
+    "liberation": false,
+    "renown": 0.0
+  },
+  "T1_ArcherMilitiaNPCTemplate_C": {
+    "trust": "Friend",
+    "diamonds": 2,
+    "liberation": false,
+    "renown": 0.0
+  },
+  "T1_HeavyInfantryMilitiaNPCTemplate_C": {
+    "trust": "Friend",
+    "diamonds": 2,
+    "liberation": false,
+    "renown": 0.0
+  },
+  "T1_LightInfantryMilitiaNPCTemplate_C": {
+    "trust": "Friend",
+    "diamonds": 2,
+    "liberation": false,
+    "renown": 0.0
+  },
+  "T2_ArcherMilitiaNPCTemplate_C": {
+    "trust": "Friend",
+    "diamonds": 2,
+    "liberation": false,
+    "renown": 0.0
+  },
+  "T2_HeavyInfantryMilitiaNPCTemplate_C": {
+    "trust": "Friend",
+    "diamonds": 2,
+    "liberation": false,
+    "renown": 0.0
+  },
+  "T2_LightInfantryMilitiaNPCTemplate_C": {
+    "trust": "Friend",
+    "diamonds": 2,
+    "liberation": false,
+    "renown": 0.0
+  },
+  "TheLessonTheyTaught_FalsgarSlave1NPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "TheLessonTheyTaught_FalsgarSlave2NPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "ValonPeresNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "VicenteVerdeNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "VillageTownsfolkNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "ZairaBeaconNpcTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  },
+  "ZakarLeontisNPCTemplate_C": {
+    "trust": "Protector",
+    "diamonds": 3,
+    "liberation": false,
+    "renown": 300.0
+  }
+}

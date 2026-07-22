@@ -6,7 +6,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Npc, World } from '@/lib/types';
 import { tplLabel } from '@/lib/bw/format';
-import { combatTotal, npcName, playerNpcs, professionOf, recruitNpcs } from '@/lib/bw/model';
+import { combatTotal, npcName, playerNpcs, professionOf, recruitNpcs, archetypeLabel } from '@/lib/bw/model';
 import { mapFor, project } from '@/lib/bw/map';
 import { shapeContainers } from '@/lib/bw/storage';
 import { cn } from '@/lib/utils';
@@ -121,17 +121,21 @@ export const MapTab = ({ world, region, onOpenProfile }: {
   // work-building max radii (meters). VERIFIED = read off the in-game
   // slider; others are community estimates (tier-1 camps ~175m, Mining Hut
   // ~200m, UI cap 500m) — correct these as real values get confirmed.
+  // Exact max work radii from the game's building actor blueprints
+  // (official Modkit data, MaxRadius in UE cm / 100 — see private/TASKS.md)
   const BUILDINGS: [string, number][] = [
-    ['Mining Camp (est.)', 175],
-    ['Mining Hut (est.)', 200],
-    ['Logging Camp (est.)', 175],
-    ['Lumberjack (est.)', 250],
-    ['Lumbermill (est.)', 300],
-    ['Foraging Hut (est.)', 175],
-    ['Foraging Lodge (est.)', 250],
-    ["Hunter's Camp (est.)", 250],
-    ['Fishing Hut (est.)', 150],
-    ['Herbalist Hut (est.)', 175],
+    ['Mining Camp', 150],
+    ['Mining Hut', 200],
+    ['Logging Camp', 150],
+    ["Lumberjack's Hut", 200],
+    ['Lumbermill', 250],
+    ['Foraging Camp', 150],
+    ['Foraging Hut', 200],
+    ['Foraging Lodge', 250],
+    ['Mud Collector', 150],
+    ['Pit', 200],
+    ['Village Hall', 150],
+    ['Town Hall', 150],
   ];
   const [building, setBuilding] = useState<string>('custom');
   const [planner, setPlanner] = useState<{ u: number; v: number; radius: number } | null>(null);
@@ -169,12 +173,12 @@ export const MapTab = ({ world, region, onOpenProfile }: {
     }
     for (const npc of villagers) {
       npcPin(npc, 'villagers',
-        [professionOf(npc), tplLabel(npc.template)].filter(Boolean).join(' · '),
+        [professionOf(npc), archetypeLabel(npc)].filter(Boolean).join(' · '),
         `Settlement member.${npc.morale != null ? ` Morale ${Math.round(npc.morale)}.` : ''}`);
     }
     for (const npc of recruits) {
       npcPin(npc, 'recruits',
-        `${tplLabel(npc.template)}${npc.village ? ` · near ${npc.village}` : ''}`,
+        `${archetypeLabel(npc)}${npc.village ? ` · near ${npc.village}` : ''}`,
         `Scouted recruit — combat rating ${combatTotal(npc)}.`);
     }
     for (const npc of world.npcs) {

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Npc, World } from '@/lib/types';
 import { agoLabel, playtimeLabel } from '@/lib/bw/format';
-import { classifyRole, insightsFor, npcName, playerNpcs, recruitNpcs, ROLE_COLORS, type RecruitRole } from '@/lib/bw/model';
+import { classifyRole, hireGateOf, insightsFor, npcName, playerNpcs, recruitNpcs, ROLE_COLORS, specialtyOf, type RecruitRole } from '@/lib/bw/model';
 import { shapeContainers } from '@/lib/bw/storage';
 import { CompareModal, CompareTray } from './compare';
 import { Drawer } from './drawer';
@@ -29,7 +29,16 @@ const VERSION_POLL_MS = 30_000;
 type TabKey = 'me' | 'villagers' | 'npcs' | 'trends' | 'insights' | 'storage' | 'map';
 export type RosterView = 'skills' | 'gear';
 
-export const CompanionApp = ({ world }: { world: World }) => {
+// tab <-> URL slug (deep-linkable routes served by app/[tab]/page.tsx)
+const TAB_SLUG: Record<TabKey, string> = {
+  me: 'me', villagers: 'population', npcs: 'recruits',
+  trends: 'trends', insights: 'insights', storage: 'storage', map: 'map',
+};
+const SLUG_TAB = Object.fromEntries(
+  Object.entries(TAB_SLUG).map(([k, s]) => [s, k as TabKey]),
+) as Record<string, TabKey>;
+
+export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug?: string }) => {
   const rootRef = useRef<HTMLDivElement>(null);
   useTooltips(rootRef);
   const router = useRouter();
@@ -59,7 +68,10 @@ export const CompanionApp = ({ world }: { world: World }) => {
     };
   }, [router, world.snapshot_id, world.ingested_at]);
 
-  const [tab, setTab] = useState<TabKey>('villagers');
+  const [tab, setTab] = useState<TabKey>(() => {
+    const t = SLUG_TAB[initialSlug ?? ''] ?? 'villagers';
+    return t === 'me' && !world.player ? 'villagers' : t;
+  });
   const [rosterView, setRosterView] = useState<RosterView>('skills');
   const [q, setQ] = useState('');
   const [sort, setSort] = useState<SortState>({ key: 'name', dir: 1 });
@@ -71,6 +83,7 @@ export const CompanionApp = ({ world }: { world: World }) => {
   const [villageFilter, setVillageFilter] = useState<Set<string>>(new Set());
   const [profFilter, setProfFilter] = useState<Set<string>>(new Set());
   const [roleFilter, setRoleFilter] = useState<Set<RecruitRole>>(new Set());
+  const [rankFilter, setRankFilter] = useState<Set<string>>(new Set());
   const [metaWide, setMetaWide] = useState(true);
   const [ago, setAgo] = useState<string | null>(null); // client-only (avoids hydration mismatch)
 
@@ -86,6 +99,24 @@ export const CompanionApp = ({ world }: { world: World }) => {
     const t = setInterval(tick, 30_000);
     return () => { window.removeEventListener('resize', onResize); clearInterval(t); };
   }, [world.ingested_at]);
+
+  useEffect(() => {
+    setVillageFilter(new Set()); setProfFilter(new Set()); setRoleFilter(new Set()); setRankFilter(new Set());
+  }, [tab]);
+
+  // switch tab + reflect it in the URL so refresh/back keep the active tab
+  const openTab = (k: TabKey) => {
+    setTab(k);
+    window.history.pushState(null, '', `/${TAB_SLUG[k]}`);
+  };
+  useEffect(() => {
+    const onPop = () => {
+      const t = SLUG_TAB[window.location.pathname.replace(/^\//, '')] ?? 'villagers';
+      setTab(t === 'me' && !world.player ? 'villagers' : t);
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [world.player]);
 
   const villagers = useMemo(() => playerNpcs(world), [world]);
   const recruits = useMemo(() => recruitNpcs(world), [world]);
@@ -118,19 +149,29 @@ export const CompanionApp = ({ world }: { world: World }) => {
   const dataset = tab === 'npcs' ? recruits : villagers;
   const ql = q.trim().toLowerCase();
   const villages = useMemo(() =>
-    [...new Set(recruits.map(v => v.village).filter((x): x is string => Boolean(x)))].sort(), [recruits]);
+    [...new Set(dataset.map(v => v.village).filter((x): x is string => Boolean(x)))].sort(), [dataset]);
   const professions = useMemo(() =>
-    [...new Set(recruits.map(v => v.profession).filter((x): x is string => Boolean(x)))].sort(), [recruits]);
+    [...new Set(dataset.map(v => specialtyOf(v)).filter((x): x is string => Boolean(x)))].sort(), [dataset]);
+  // profession specialties are liberation unlocks; Commoner/Beggar hire on
+  // village Trust — split the chip groups to mirror the game's system
+  const specialistChips = useMemo(() => professions.filter(p => p !== 'Commoner' && p !== 'Beggar'), [professions]);
+  const commonChips = useMemo(() => professions.filter(p => p === 'Commoner' || p === 'Beggar'), [professions]);
+  // trust ranks present in the dataset, in ladder order (exact hire-gate data)
+  const RANK_ORDER = ['Stranger', 'Associate', 'Friend', 'Protector', 'Leader'];
+  const ranks = useMemo(() => {
+    const present = new Set(dataset.map(v => hireGateOf(v)?.trust).filter((x): x is string => Boolean(x)));
+    return RANK_ORDER.filter(r => present.has(r));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataset]);
   const rows = useMemo(() => {
     let list = dataset.filter(v => !ql
       || npcName(v).toLowerCase().includes(ql)
       || (v.template ?? '').toLowerCase().includes(ql)
       || (v.village ?? '').toLowerCase().includes(ql));
-    if (tab === 'npcs') {
-      if (villageFilter.size) list = list.filter(v => v.village != null && villageFilter.has(v.village));
-      if (profFilter.size) list = list.filter(v => v.profession != null && profFilter.has(v.profession));
-      if (roleFilter.size) list = list.filter(v => roleFilter.has(classifyRole(v)));
-    }
+    if (villageFilter.size) list = list.filter(v => v.village != null && villageFilter.has(v.village));
+    if (profFilter.size) { const p = specialtyOf; list = list.filter(v => { const x = p(v); return x != null && profFilter.has(x); }); }
+    if (roleFilter.size) list = list.filter(v => roleFilter.has(classifyRole(v)));
+    if (rankFilter.size) list = list.filter(v => { const g = hireGateOf(v); return g != null && rankFilter.has(g.trust); });
     const { key: k, dir } = sort;
     list = [...list].sort((a, b) => {
       if (k === 'name') {
@@ -146,7 +187,7 @@ export const CompanionApp = ({ world }: { world: World }) => {
       return (av - bv) * dir;
     });
     return list;
-  }, [dataset, ql, sort, tab, villageFilter, profFilter, roleFilter]);
+  }, [dataset, ql, sort, tab, villageFilter, profFilter, roleFilter, rankFilter]);
 
   const onSort = (key: string, defDir: 1 | -1) =>
     setSort(s => (s.key === key ? { key, dir: s.dir === 1 ? -1 : 1 } : { key, dir: defDir }));
@@ -209,7 +250,7 @@ export const CompanionApp = ({ world }: { world: World }) => {
           {tabs.map(t => {
             const active = tab === t.key;
             return (
-              <button key={t.key} onClick={() => setTab(t.key)} className={cn(
+              <button key={t.key} onClick={() => openTab(t.key)} className={cn(
                 'inline-flex items-center gap-[7px] py-1.5 px-[13px] border-none flex-none whitespace-nowrap rounded-[7px] cursor-pointer font-sans text-[13px] transition-all duration-100',
                 active ? 'font-semibold text-[#1a150c] bg-gold' : 'font-medium text-sand-400 bg-transparent hover:text-[#EFE6D4] hover:bg-white/[.03]',
               )}>
@@ -261,14 +302,28 @@ export const CompanionApp = ({ world }: { world: World }) => {
         )}
       </div>
 
-      {tab === 'npcs' && (
+      {isTable && (
         <div className="flex items-center gap-1.5 py-[7px] px-[18px] flex-wrap border-b border-line bg-[#15110C] text-[11.5px]">
-          <FilterChips label="Village" all={villages} sel={villageFilter}
-            onToggle={v => setVillageFilter(s2 => { const n = new Set(s2); n.has(v) ? n.delete(v) : n.add(v); return n; })} />
-          <span className="w-px h-4 bg-line-3" />
-          <FilterChips label="Specialty" all={professions} sel={profFilter}
-            onToggle={v => setProfFilter(s2 => { const n = new Set(s2); n.has(v) ? n.delete(v) : n.add(v); return n; })} />
-          <span className="w-px h-4 bg-line-3" />
+          {villages.length > 0 && (<>
+            <FilterChips label="Village" all={villages} sel={villageFilter}
+              onToggle={v => setVillageFilter(s2 => { const n = new Set(s2); n.has(v) ? n.delete(v) : n.add(v); return n; })} />
+            <span className="w-px h-4 bg-line-3" />
+          </>)}
+          {specialistChips.length > 0 && (<>
+            <FilterChips label="Specialist (liberated)" all={specialistChips} sel={profFilter}
+              onToggle={v => setProfFilter(s2 => { const n = new Set(s2); n.has(v) ? n.delete(v) : n.add(v); return n; })} />
+            <span className="w-px h-4 bg-line-3" />
+          </>)}
+          {commonChips.length > 0 && (<>
+            <FilterChips label="Common" all={commonChips} sel={profFilter}
+              onToggle={v => setProfFilter(s2 => { const n = new Set(s2); n.has(v) ? n.delete(v) : n.add(v); return n; })} />
+            <span className="w-px h-4 bg-line-3" />
+          </>)}
+          {ranks.length > 0 && (<>
+            <FilterChips label="Trust" all={ranks} sel={rankFilter}
+              onToggle={v => setRankFilter(s2 => { const n = new Set(s2); n.has(v) ? n.delete(v) : n.add(v); return n; })} />
+            <span className="w-px h-4 bg-line-3" />
+          </>)}
           <FilterChips label="Role" all={['Fighter', 'Worker', 'Balanced']} sel={roleFilter as Set<string>}
             colors={ROLE_COLORS as Record<string, string>}
             onToggle={v => setRoleFilter(s2 => { const n = new Set(s2); n.has(v as RecruitRole) ? n.delete(v as RecruitRole) : n.add(v as RecruitRole); return n; })} />
@@ -282,7 +337,7 @@ export const CompanionApp = ({ world }: { world: World }) => {
             presetName={null} />
         )}
         {isTable && (
-          <Roster rows={rows} npcCol={tab === 'npcs'} playtime={world.meta.playtimeSeconds} ingestedAt={world.ingested_at}
+          <Roster rows={rows} npcCol={tab === 'npcs'} archCol playtime={world.meta.playtimeSeconds} ingestedAt={world.ingested_at}
             isMobile={isMobile} view={rosterView} carried={world.carried}
             compareMode={compareMode} compareSet={compareSet} sort={sort} onSort={onSort}
             onOpen={setSelGuid} onToggleCompare={toggleCompare} />

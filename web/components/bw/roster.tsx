@@ -2,9 +2,9 @@
 // Villagers/Recruits table (desktop) + cards (mobile).
 import type { Npc } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { avatarColor, initials, itemLabel, moraleColor, tplLabel } from '@/lib/bw/format';
+import { avatarColor, initials, itemLabel, moraleColor } from '@/lib/bw/format';
 import { normalizeInjuries } from '@/lib/bw/injuries';
-import { ALL_SKILLS, shapeCell, professionOf, combatTotal, classifyRole, ROLE_COLORS, NOTABLE_COMBAT_TOTAL, npcName } from '@/lib/bw/model';
+import { ALL_SKILLS, shapeCell, professionOf, combatTotal, classifyRole, ROLE_COLORS, NOTABLE_COMBAT_TOTAL, npcName, archetypeLabel, hireGateOf } from '@/lib/bw/model';
 import { InjuryBadge } from './injury-badge';
 import { Avatar } from './avatar';
 import { Icon } from './icons';
@@ -16,7 +16,8 @@ type Carried = Record<string, { item: string; qty: number }[]>;
 
 type Props = {
   rows: Npc[];
-  npcCol: boolean;         // recruits view: archetype + location columns
+  npcCol: boolean;         // recruits view: location column + "near village"
+  archCol?: boolean;       // archetype/background column + role chip (both tables)
   playtime: number | null; // save playtime, for injury heal countdowns
   ingestedAt: string | null; // ingest wall-clock, anchors live countdown ticking
   isMobile: boolean;
@@ -40,7 +41,7 @@ const skillTh = (active: boolean, divider: boolean): string => cn(
 
 export const guidOf = (v: Npc): string => v.guid ?? npcName(v);
 
-export const Roster = ({ rows, npcCol, playtime, ingestedAt, isMobile, view, carried, compareMode, compareSet, sort, onSort, onOpen, onToggleCompare }: Props) => {
+export const Roster = ({ rows, npcCol, archCol = false, playtime, ingestedAt, isMobile, view, carried, compareMode, compareSet, sort, onSort, onOpen, onToggleCompare }: Props) => {
   if (isMobile) return <MobileCards rows={rows} npcCol={npcCol} onOpen={onOpen} />;
   const arrow = sort.dir > 0 ? '▲' : '▼';
   const gearView = view === 'gear';
@@ -53,7 +54,7 @@ export const Roster = ({ rows, npcCol, playtime, ingestedAt, isMobile, view, car
             <th onClick={() => onSort('name', 1)} className={cn(TH, 'left-0 z-[7] cursor-pointer min-w-[190px] hover:text-sand-100')}>
               Villager <span className="text-gold">{sort.key === 'name' ? arrow : ''}</span>
             </th>
-            {npcCol && <th className={cn(TH, 'px-2.5')}>Archetype</th>}
+            {archCol && <th className={cn(TH, 'px-2.5')}>Archetype</th>}
             {!gearView && ALL_SKILLS.map(([key, abbr, name], i) => (
               <th key={key} onClick={() => onSort(key, -1)} data-tip={name} className={skillTh(sort.key === key, i === 7)}>
                 <span>{abbr}</span>
@@ -71,7 +72,7 @@ export const Roster = ({ rows, npcCol, playtime, ingestedAt, isMobile, view, car
           </tr>
         </thead>
         <tbody>
-          {rows.map(v => <Row key={guidOf(v)} v={v} npcCol={npcCol} playtime={playtime} ingestedAt={ingestedAt} compareMode={compareMode}
+          {rows.map(v => <Row key={guidOf(v)} v={v} npcCol={npcCol} archCol={archCol} playtime={playtime} ingestedAt={ingestedAt} compareMode={compareMode}
             gearView={gearView} carried={carried}
             selected={compareSet.includes(guidOf(v))} onOpen={onOpen} onToggleCompare={onToggleCompare} />)}
         </tbody>
@@ -80,8 +81,8 @@ export const Roster = ({ rows, npcCol, playtime, ingestedAt, isMobile, view, car
   );
 };
 
-const Row = ({ v, npcCol, playtime, ingestedAt, compareMode, gearView, carried, selected, onOpen, onToggleCompare }: {
-  v: Npc; npcCol: boolean; playtime: number | null; ingestedAt: string | null; compareMode: boolean;
+const Row = ({ v, npcCol, archCol, playtime, ingestedAt, compareMode, gearView, carried, selected, onOpen, onToggleCompare }: {
+  v: Npc; npcCol: boolean; archCol: boolean; playtime: number | null; ingestedAt: string | null; compareMode: boolean;
   gearView: boolean; carried?: Carried; selected: boolean;
   onOpen: (g: string) => void; onToggleCompare: (g: string) => void;
 }) => {
@@ -116,11 +117,12 @@ const Row = ({ v, npcCol, playtime, ingestedAt, compareMode, gearView, carried, 
           </div>
         </div>
       </td>
-      {npcCol && (
+      {archCol && (
         <td className="py-1.5 px-2.5 border-b border-row whitespace-nowrap">
           <span className="inline-flex items-center gap-1.5">
             {notable && <span data-tip="High-value recruit" className="text-gold-bright">★</span>}
-            <span className="text-[11.5px] text-sand-350">{tplLabel(v.template)}</span>
+            <span className="text-[11.5px] text-sand-350">{archetypeLabel(v)}</span>
+            <HireDiamonds v={v} />
             <span data-tip="Role by skill caps (potential)" className="text-[8.5px] font-bold tracking-[.4px] uppercase border py-px px-[5px] rounded-[4px]" style={{
               color: ROLE_COLORS[classifyRole(v)], borderColor: `${ROLE_COLORS[classifyRole(v)]}55`,
             }}>{classifyRole(v)}</span>
@@ -224,6 +226,23 @@ const Row = ({ v, npcCol, playtime, ingestedAt, compareMode, gearView, carried, 
   );
 };
 
+// Exact in-game hire gate (from hire-gates.json): trust-rank diamonds,
+// liberation requirement, renown cost.
+const HireDiamonds = ({ v }: { v: Npc }) => {
+  const g = hireGateOf(v);
+  if (!g) return null;
+  // base cost only — the game scales renown cost up as you hire more people
+  const tip = `Hire: ${g.trust} trust${g.liberation ? ' + village liberated' : ''} · base ${Math.round(g.renown)} renown (scales with hires)`;
+  return (
+    <span data-tip={tip} className="inline-flex items-center gap-1 cursor-default">
+      {/* the game's trust-rank badge (wiki-hosted first-party asset) */}
+      <img src={`/icons/bw/trust-${g.trust.toLowerCase()}.png`} alt={g.trust}
+        className="w-[18px] h-[18px] max-w-none object-contain" />
+      {g.liberation && <span className="text-[8px] font-bold tracking-[.4px] uppercase text-gold-bright/80">LIB</span>}
+    </span>
+  );
+};
+
 const MobileCards = ({ rows, npcCol, onOpen }: {
   rows: Npc[]; npcCol: boolean; onOpen: (g: string) => void;
 }) => (
@@ -242,7 +261,7 @@ const MobileCards = ({ rows, npcCol, onOpen }: {
             <Avatar v={v} size={36} radius={9} />
             <div className="flex-1 min-w-0">
               <div className="text-sand-100 font-semibold text-[15px]">{name}</div>
-              <div className="text-[11.5px] text-[#877C69]">{v.gender ?? ''} · {tplLabel(v.template)}</div>
+              <div className="text-[11.5px] text-[#877C69]">{v.gender ?? ''} · {archetypeLabel(v)}</div>
             </div>
             <div className="flex flex-col items-end gap-1">
               {morale != null && (

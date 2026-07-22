@@ -41,20 +41,21 @@ export const npcName = (v: Npc): string =>
 export const combatTotal = (v: Npc): number =>
   COMBAT.reduce((a, [k]) => a + (v.skills[k]?.level ?? 0), 0);
 
-// Recruit role classification by CAPS (potential): a recruit with high combat
-// ceilings is a Fighter even if untrained today. Bands calibrated against a
-// real 65-recruit population (combat/work cap ratios ran 0.71-1.22,
-// median 0.87 — village recruits skew work-heavy).
-const FIGHTER_RATIO = 1.0;
-const WORKER_RATIO = 0.8;
+// Recruit role by CAPS (potential), absolute not relative: someone good at
+// both is Balanced even if one side is technically higher — Worker/Fighter
+// only when the OTHER side is straight-up bad ("bad" = average cap below
+// BAD_AVG_CAP; calibrated on a real 152-recruit pool where side averages run
+// ~1.4 (beggars) to ~7+, natural break around 3.5 → 6 Fighters / 11 Workers /
+// 135 Balanced). Both sides bad (beggars, low commoners) = Balanced too:
+// nothing to suggest either way.
+const BAD_AVG_CAP = 3.5;
 export type RecruitRole = 'Fighter' | 'Worker' | 'Balanced';
 export const classifyRole = (v: Npc): RecruitRole => {
-  const capSum = (defs: SkillDef[]) => defs.reduce((a, [k]) => a + (v.skills[k]?.cap ?? 0), 0);
-  const combat = capSum(COMBAT), work = capSum(WORK);
-  if (work === 0) return 'Fighter';
-  const r = combat / work;
-  if (r >= FIGHTER_RATIO) return 'Fighter';
-  if (r <= WORKER_RATIO) return 'Worker';
+  const capAvg = (defs: SkillDef[]) =>
+    defs.reduce((a, [k]) => a + (v.skills[k]?.cap ?? 0), 0) / defs.length;
+  const combatBad = capAvg(COMBAT) < BAD_AVG_CAP, workBad = capAvg(WORK) < BAD_AVG_CAP;
+  if (combatBad && !workBad) return 'Worker';
+  if (workBad && !combatBad) return 'Fighter';
   return 'Balanced';
 };
 export const ROLE_COLORS: Record<RecruitRole, string> = {
@@ -129,8 +130,38 @@ export const presetFor = (v: Npc): PresetVM => {
 
 // Only the REAL designation from the recruit template (Innkeeper, Healer,
 // Blacksmith, …). No skill-derived guessing — the game shows no label for
-// plain villagers, so neither do we.
-export const professionOf = (v: Npc): string | null => v.profession;
+// plain villagers, so neither do we. The game assets misspell "Inkeeper";
+// fix it for display only.
+const PROF_FIX: Record<string, string> = { Inkeeper: 'Innkeeper' };
+export const professionOf = (v: Npc): string | null =>
+  v.profession ? (PROF_FIX[v.profession] ?? v.profession) : null;
+
+// Specialty for filtering/labeling: profession templates keep their game
+// designation; generic villagers group as Commoner (or Beggar).
+export const specialtyOf = (v: Npc): string | null =>
+  professionOf(v) ??
+  (v.archetype === 'villager' ? (/Beggar/i.test(v.template ?? '') ? 'Beggar' : 'Commoner') : null);
+
+// Archetype cell label: "Novice Engineer" / "Expert Blacksmith" for
+// profession templates (the game's own tiers), "Commoner (High)" for generic
+// villagers where Low/Medium/High is the template's skill-cap quality.
+export const archetypeLabel = (v: Npc): string => {
+  const s = specialtyOf(v);
+  if (v.archetype === 'villager') return s ? (v.tier ? `${s} (${v.tier})` : s) : '—';
+  if (v.tier && s) return `${v.tier} ${s}`;
+  if (v.archetype === 'unique') return 'Unique';
+  return s ?? tplLabel(v.template);
+};
+
+// Exact hire gates from the game's NPC template assets (official Modkit
+// export — web/lib/bw/hire-gates.json): required village Trust rank,
+// whether the village must be liberated, and the renown hiring cost.
+// Diamonds = trust rank index (Stranger 0 … Leader 4), matching the
+// in-game Villagers-for-Hire badge.
+import HIRE_GATES from './hire-gates.json';
+export type HireGate = { trust: string; diamonds: number; liberation: boolean; renown: number };
+export const hireGateOf = (v: Npc): HireGate | null =>
+  (HIRE_GATES as Record<string, HireGate>)[v.template ?? ''] ?? null;
 
 // ---- insights (only cards the save can actually answer)
 export type InsightItem = { guid: string; npc: Npc; detail: string };
@@ -209,5 +240,8 @@ export const insightsFor = (mine: Npc[]): InsightCard[] => {
 
 // ---- world helpers ---------------------------------------------------------
 export const playerNpcs = (w: World): Npc[] => w.npcs.filter(n => n.is_player_npc);
+// Generic villagers (VillagerIdle/Beggar templates) are recruitable in-game
+// too — they just carry no profession. Include them alongside the tiered
+// profession templates so the browser covers the full recruitable pool.
 export const recruitNpcs = (w: World): Npc[] =>
-  w.npcs.filter(n => !n.is_player_npc && n.archetype === 'recruitable');
+  w.npcs.filter(n => !n.is_player_npc && (n.archetype === 'recruitable' || n.archetype === 'villager'));
