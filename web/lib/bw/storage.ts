@@ -12,6 +12,7 @@ export type ContainerKind = {
 };
 
 const BARN_CAP = 2000;
+const FOOD_CELLAR_CAP = 1000;
 const SMALL_BARN_CAP = 400; // "storage shed"
 const STOCKPILE_CAP = 400;
 const SHARED_CHEST_CAP = 50;
@@ -20,6 +21,7 @@ const SHARED_CHEST_CAP = 50;
 const KIND_RULES: [RegExp, ContainerKind][] = [
   [/^Barn/, { type: 'Barn', icon: 'barn', cap: BARN_CAP }],
   [/^SmallBarn/, { type: 'Storage Shed', icon: 'barn', cap: SMALL_BARN_CAP }],
+  [/FoodCellar/, { type: 'Food Cellar', icon: 'pot', cap: FOOD_CELLAR_CAP }],
   [/^Stockpile/, { type: 'Stockpile', icon: 'home', cap: STOCKPILE_CAP }],
   [/Chest/, { type: 'Chest', icon: 'loot', cap: SHARED_CHEST_CAP }],
   [/^Well|WaterCollector/, { type: 'Well', icon: 'home', cap: null }],
@@ -89,7 +91,7 @@ export type ContainerVM = {
 
 // sidebar ordering: real storage first, then farms/stations/misc buffers
 const TYPE_ORDER: Record<string, number> = {
-  Barn: 0, 'Storage Shed': 1, Stockpile: 2, Chest: 3,
+  Barn: 0, 'Food Cellar': 1, 'Storage Shed': 2, Stockpile: 3, Chest: 4,
 };
 const typeRank = (type: string): number => TYPE_ORDER[type] ?? 4;
 
