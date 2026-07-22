@@ -195,18 +195,34 @@ empty. Also town-side: `MistTownLogicComponent` holds per-BUILDING-job records
 `{guid, class, name, f4: signed priority}` (99 seen; -100 = disabled, stored
 as u64 two's-complement 18446744073709551516).
 
-## Gear presets — LOCATED (structure sketched, not fully mapped)
+## Gear presets — ✅ DECODED (`parser/src/gearpresets.ts`, 2026-07-22)
 
-Custom gear-preset definitions live ~1.10–1.24MB into the payload (likely the
-top-level f11 region): each record = repeated `{f1: item class id → f8,
-f2: slot}` pairs + UE-string preset NAME ("Footman Sturdy") + owning SteamID64
-string + timestamps. Per-NPC assignment (Population screen's Worker /
-Companion-Guard preset columns) presumably references these records — map via
-differential saves (change one NPC's preset, diff). UI reference shots:
-docs/reference/game-ui/population-roles-presets.jpeg (preset columns),
-attributes-priorities-block-toggles.jpeg (the ⊘ block toggle = priority 0;
-blue-dot pips = priority level; thin blue bars = skill XP → matches skill f3),
-population-gear-strips.jpeg (per-NPC equipment strip view).
+Custom preset definitions are top-level **f11** records: descend single-f2
+wrappers to a node with both `f10` (len 24) and `f16`. Fields:
+
+- **slot fields** — ranked preferences per slot. `f1` entries = category
+  weights (OneHanded/Shields/MediumArmors/…), `f2` entries = specific items,
+  each `{f1: item class id → f8 table, f2: rank}` with **higher rank =
+  preferred** (e.g. Halmayan 9 > Heater 8 > … > Plank 5). Slot map:
+  f2 weapon, f3 shield, f4 head, f5 chest, f6 gloves, f7 legs, f8 boots,
+  f12 backpack, f13 cloak, f14 food, f15 meds.
+- **f10** — preset GUID as 4 varints (the stable key).
+- **f16** — `{f1.f1: UE-string name (13-byte header, u32le strlen at +9,
+  cstring at +13), f2: owner SteamID64 string, f3: same GUID}`. Only
+  present on CUSTOM presets.
+
+**Per-NPC assignment**: MistTownNpc component body field **30** (plus a
+duplicate f31) = assigned preset GUID (4 varints, matches f10). Built-in
+presets (Marksman, recruit/default kits) are referenced by GUID only — they
+have **no definition record** in the save (asset-side data), so only custom
+presets resolve to names. The armory decode (MistTownHouseComponent,
+`parser/src/gearsets.ts`) gives the RESOLVED per-slot items instead.
+
+UI reference shots: docs/reference/game-ui/population-roles-presets.jpeg
+(preset columns), attributes-priorities-block-toggles.jpeg (the ⊘ block
+toggle = priority 0; blue-dot pips = priority level; thin blue bars = skill
+XP → matches skill f3), population-gear-strips.jpeg (per-NPC equipment
+strip view).
 
 ## Storage / containers — ✅ DECODED (`parser/src/storage.js`)
 
