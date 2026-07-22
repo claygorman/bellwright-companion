@@ -266,3 +266,23 @@ Open question: does the checkbox even survive a save+reload? (Test: toggle
 OFF, save, quit to menu, load — still OFF?) If yes, the bit hides in a
 non-protobuf UE-serialized side section; next tool = gap-region byte differ
 over the unparsed spans between known regions.
+
+## Player pawn — ✅ DECODED (`parser/src/player.ts`, 2026-07-22)
+
+Exactly one actor with class `Player_C` (name-table `Player.Player_C`).
+Same component layout as TownNpcs: skills + appearance bag via its
+`MistHuman` component; equipment via owner-matched `MistEquipmentComponent`
+(owner = actor GUID as 4×u32 BE); carried inventory via owner-matched
+`MistContainerComponent`s (slot format `{f1: slot#, f2: count, f3: {f1:
+item class}}`). Coins are physical `OldCoin_C` items in the carried
+inventory — there is no separate currency field. The player has NO
+MistTownNpc / happiness / gear-preset components (no morale, no preset).
+
+**Renown**: NOT here. Top-level **f3** = `{f1: guid-string, f2:
+OasisPlayerState wrapper}` whose body is an ~8KB blob that wraps a
+base64-looking UE archive (`AQAAAAAAAACPcpA9...`) — this is the region
+bellwright-gold-editor byte-patches. Renown/kingdom stats presumably live
+inside; undecoded.
+
+Per-NPC carried inventory (the Population "Gear & inventory" view) uses the
+same container walk for every actor guid (`extractCarried`).
