@@ -15,7 +15,7 @@ import { Roster, guidOf, type SortState } from './roster';
 import { SearchIcon } from './icons';
 import { StorageTab, storagePressure } from './storage-tab';
 import { Trends } from './trends';
-import { C, MONO, SANS, SERIF, searchBoxStyle, searchInputStyle } from './ui';
+import { cn } from '@/lib/utils';
 import { useTooltips } from './use-tooltips';
 
 const MOBILE_BREAKPOINT = 760;
@@ -168,129 +168,93 @@ export const CompanionApp = ({ world }: { world: World }) => {
   ];
 
   return (
-    <div ref={rootRef} style={{
-      '--accent': '#E0A73C', '--gold': '#F4C868', '--rowpad': '9px',
-      background: C.pageBg, color: C.text, height: '100dvh', maxWidth: '100vw', overflowX: 'hidden', display: 'flex', flexDirection: 'column',
-      fontFamily: SANS, WebkitFontSmoothing: 'antialiased',
-    } as React.CSSProperties}>
+    <div ref={rootRef}
+      className="bg-iron-900 text-sand-200 h-dvh max-w-[100vw] overflow-x-hidden flex flex-col font-sans antialiased"
+      style={{ '--accent': '#E0A73C', '--gold': '#F4C868', '--rowpad': '9px' } as React.CSSProperties}>
       {/* header */}
-      <header style={{
-        display: 'flex', alignItems: 'center', gap: 18, height: 56, padding: '0 18px', minWidth: 0, overflow: 'hidden',
-        borderBottom: '1px solid #2C251D', background: 'linear-gradient(180deg,#1B1712,#17130E)',
-        flex: '0 0 auto', position: 'relative', zIndex: 20,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
-          <div style={{
-            width: 30, height: 30, borderRadius: 7,
-            background: 'radial-gradient(circle at 32% 28%, #F4C868, #C6892C)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 0 0 1px rgba(244,200,104,.25), 0 2px 8px rgba(0,0,0,.4)',
-          }}>
+      <header className="flex items-center gap-[18px] h-14 px-[18px] min-w-0 overflow-hidden border-b border-line-2 bg-gradient-to-b from-[#1B1712] to-[#17130E] flex-none relative z-20">
+        <div className="flex items-center gap-[11px]">
+          <div className="w-[30px] h-[30px] rounded-[7px] bg-[radial-gradient(circle_at_32%_28%,#F4C868,#C6892C)] flex items-center justify-center shadow-[0_0_0_1px_rgba(244,200,104,.25),0_2px_8px_rgba(0,0,0,.4)]">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
               <path d="M12 2 L14 8 L20 8 L15 12 L17 19 L12 15 L7 19 L9 12 L4 8 L10 8 Z" fill="#2a1e08" />
             </svg>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.05 }}>
-            <span style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 16, letterSpacing: '.3px', color: C.textBright }}>
-              Bellwright<span style={{ color: 'var(--accent)' }}> · Companion</span>
+          <div className="flex flex-col leading-[1.05]">
+            <span className="font-serif font-semibold text-base tracking-[.3px] text-sand-100">
+              Bellwright<span className="text-gold"> · Companion</span>
             </span>
-            <span style={{ fontSize: 10.5, color: '#8A7F6C', letterSpacing: '.4px' }}>
+            <span className="text-[10.5px] text-sand-500 tracking-[.4px]">
               {world.meta.character ?? 'Player'}&apos;s settlement ledger
             </span>
           </div>
         </div>
-        <div style={{ width: 1, height: 26, background: '#2E271F' }} />
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 14, fontSize: 11.5, flex: '1 1 auto',
-          minWidth: 0, flexWrap: 'wrap', maxHeight: 40, overflow: 'hidden',
-        }}>
+        <div className="w-px h-[26px] bg-line-3" />
+        <div className="flex items-center gap-[14px] text-[11.5px] flex-1 min-w-0 flex-wrap max-h-10 overflow-hidden">
           <Meta k="save" v={world.meta.saveName ?? '—'} />
           <Meta k="build" v={world.meta.savedBuild ?? '—'} mono />
           {metaWide && <Meta k="region" v={world.meta.region ?? '—'} />}
           {metaWide && <Meta k="played" v={playtimeLabel(world.meta.playtimeSeconds)} mono />}
         </div>
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 8, padding: '5px 11px', borderRadius: 999,
-          background: 'rgba(111,160,91,.1)', border: '1px solid rgba(111,160,91,.3)', flex: '0 0 auto',
-        }}>
-          <span style={{
-            width: 7, height: 7, borderRadius: '50%', background: '#7FB05B',
-            boxShadow: '0 0 6px #7FB05B', animation: 'bwpulse 2.4s ease-in-out infinite',
-          }} />
-          <span style={{ fontSize: 11.5, color: '#A9C293', whiteSpace: 'nowrap' }}>
+        <div className="flex items-center gap-2 py-[5px] px-[11px] rounded-full bg-moss-bright/10 border border-moss-bright/30 flex-none">
+          <span className="w-[7px] h-[7px] rounded-full bg-moss-bright shadow-[0_0_6px_#7FB05B] [animation:bwpulse_2.4s_ease-in-out_infinite]" />
+          <span className="text-[11.5px] text-[#A9C293] whitespace-nowrap">
             {ago ? `Fresh · ingested ${ago}` : 'Fresh'}
           </span>
         </div>
       </header>
 
       {/* tabs + toolbar */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 6, padding: '9px 18px',
-        borderBottom: `1px solid ${C.border}`, background: '#18140F', flex: '0 0 auto',
-        flexWrap: 'wrap', position: 'relative', zIndex: 15,
-      }}>
-        <nav className="bw-scroll" style={{ display: 'flex', gap: 3, background: C.inputBg, padding: 3, borderRadius: 9, border: '1px solid #2A2319', maxWidth: '100%', overflowX: 'auto', flexWrap: 'nowrap' }}>
+      <div className="flex items-center gap-1.5 py-[9px] px-[18px] border-b border-line bg-iron-800 flex-none flex-wrap relative z-[15]">
+        <nav className="bw-scroll flex gap-[3px] bg-ink p-[3px] rounded-[9px] border border-[#2A2319] max-w-full overflow-x-auto flex-nowrap">
           {tabs.map(t => {
             const active = tab === t.key;
             return (
-              <button key={t.key} onClick={() => setTab(t.key)} style={{
-                display: 'inline-flex', alignItems: 'center', gap: 7, padding: '6px 13px', border: 'none', flex: '0 0 auto', whiteSpace: 'nowrap',
-                borderRadius: 7, cursor: 'pointer', fontFamily: 'inherit', fontSize: 13,
-                fontWeight: active ? 600 : 500, color: active ? '#1a150c' : C.textDim,
-                background: active ? 'var(--accent)' : 'transparent', transition: 'all .12s',
-              }}>
+              <button key={t.key} onClick={() => setTab(t.key)} className={cn(
+                'inline-flex items-center gap-[7px] py-1.5 px-[13px] border-none flex-none whitespace-nowrap rounded-[7px] cursor-pointer font-sans text-[13px] transition-all duration-100',
+                active ? 'font-semibold text-[#1a150c] bg-gold' : 'font-medium text-sand-400 bg-transparent hover:text-[#EFE6D4] hover:bg-white/[.03]',
+              )}>
                 <span>{t.label}</span>
                 {t.count != null && (
-                  <span style={{
-                    fontFamily: MONO, fontSize: 11, padding: '1px 6px', borderRadius: 5,
-                    color: active ? '#1a150c' : C.textDim2,
-                    background: active ? 'rgba(0,0,0,.16)' : '#221D16',
-                  }}>{t.count}</span>
+                  <span className={cn(
+                    'font-mono text-[11px] py-px px-1.5 rounded-[5px]',
+                    active ? 'text-[#1a150c] bg-black/[.16]' : 'text-sand-400 bg-[#221D16]',
+                  )}>{t.count}</span>
                 )}
                 {t.alert && (
-                  <span data-tip={t.key === 'storage' ? 'Storage needs attention' : 'Villagers need attention'} style={{
-                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 15, height: 15,
-                    borderRadius: '50%', background: C.red, color: '#fff', fontSize: 10, fontWeight: 700, lineHeight: 1,
-                  }}>!</span>
+                  <span data-tip={t.key === 'storage' ? 'Storage needs attention' : 'Villagers need attention'}
+                    className="inline-flex items-center justify-center w-[15px] h-[15px] rounded-full bg-rust text-white text-[10px] font-bold leading-none">!</span>
                 )}
               </button>
             );
           })}
         </nav>
-        <div style={{ flex: '1 1 auto' }} />
+        <div className="flex-1" />
         {isTable && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-            <div style={searchBoxStyle(34)}>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <div className="flex items-center gap-2 px-[11px] h-[34px] bg-ink border border-line-3 rounded-lg">
               <SearchIcon />
               <input value={q} onChange={e => setQ(e.target.value)}
-                placeholder="Filter by name or archetype…" style={{ ...searchInputStyle, width: 190 }} />
+                placeholder="Filter by name or archetype…"
+                className="bg-transparent border-none outline-none text-sand-200 text-[13px] w-[190px] font-sans" />
             </div>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 7, height: 34, padding: '0 6px 0 12px',
-              background: C.inputBg, border: '1px solid #2E271E', borderRadius: 8,
-            }}>
-              <span style={{ fontSize: 10.5, letterSpacing: '.4px', textTransform: 'uppercase', color: C.textFaint }}>View</span>
-              <select value={rosterView} onChange={e => setRosterView(e.target.value as RosterView)} style={{
-                background: 'transparent', border: 'none', outline: 'none', color: C.text,
-                fontSize: 12.5, fontFamily: 'inherit', cursor: 'pointer', padding: '0 2px',
-              }}>
-                <option value="skills" style={{ background: C.cardBg }}>Skills</option>
-                <option value="gear" style={{ background: C.cardBg }}>Gear &amp; inventory</option>
+            <div className="flex items-center gap-[7px] h-[34px] pr-1.5 pl-3 bg-ink border border-line-3 rounded-lg">
+              <span className="text-[10.5px] tracking-[.4px] uppercase text-sand-600">View</span>
+              <select value={rosterView} onChange={e => setRosterView(e.target.value as RosterView)}
+                className="bg-transparent border-none outline-none text-sand-200 text-[12.5px] font-sans cursor-pointer px-0.5">
+                <option value="skills" className="bg-iron-750">Skills</option>
+                <option value="gear" className="bg-iron-750">Gear &amp; inventory</option>
               </select>
             </div>
-            <button onClick={() => setCompareMode(m => { if (m) setCompareSet([]); return !m; })} style={{
-              display: 'inline-flex', alignItems: 'center', gap: 7, height: 34, padding: '0 13px',
-              borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', fontSize: 12.5, fontWeight: 500,
-              border: `1px solid ${compareMode ? 'var(--accent)' : '#2E271E'}`,
-              background: compareMode ? 'rgba(224,167,60,.14)' : C.inputBg,
-              color: compareMode ? 'var(--gold)' : C.textDim,
-            }}>
+            <button onClick={() => setCompareMode(m => { if (m) setCompareSet([]); return !m; })} className={cn(
+              'inline-flex items-center gap-[7px] h-[34px] px-[13px] rounded-lg cursor-pointer font-sans text-[12.5px] font-medium border transition-colors',
+              compareMode ? 'border-gold bg-gold/[.14] text-gold-bright' : 'border-line-3 bg-ink text-sand-400 hover:border-[#4a4030]',
+            )}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path d="M9 3v18M15 3v18M3 9h18" />
               </svg>
               <span>Compare</span>
             </button>
-            <span style={{ fontSize: 12, color: C.textFaint, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+            <span className="text-xs text-sand-600 tabular-nums whitespace-nowrap">
               {rows.length} {tab === 'npcs' ? 'recruits' : 'villagers'}
             </span>
           </div>
@@ -298,16 +262,13 @@ export const CompanionApp = ({ world }: { world: World }) => {
       </div>
 
       {tab === 'npcs' && (
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 6, padding: '7px 18px', flexWrap: 'wrap',
-          borderBottom: `1px solid ${C.border}`, background: '#15110C', fontSize: 11.5,
-        }}>
+        <div className="flex items-center gap-1.5 py-[7px] px-[18px] flex-wrap border-b border-line bg-[#15110C] text-[11.5px]">
           <FilterChips label="Village" all={villages} sel={villageFilter}
             onToggle={v => setVillageFilter(s2 => { const n = new Set(s2); n.has(v) ? n.delete(v) : n.add(v); return n; })} />
-          <span style={{ width: 1, height: 16, background: '#2E271F' }} />
+          <span className="w-px h-4 bg-line-3" />
           <FilterChips label="Specialty" all={professions} sel={profFilter}
             onToggle={v => setProfFilter(s2 => { const n = new Set(s2); n.has(v) ? n.delete(v) : n.add(v); return n; })} />
-          <span style={{ width: 1, height: 16, background: '#2E271F' }} />
+          <span className="w-px h-4 bg-line-3" />
           <FilterChips label="Role" all={['Fighter', 'Worker', 'Balanced']} sel={roleFilter as Set<string>}
             colors={ROLE_COLORS as Record<string, string>}
             onToggle={v => setRoleFilter(s2 => { const n = new Set(s2); n.has(v as RecruitRole) ? n.delete(v as RecruitRole) : n.add(v as RecruitRole); return n; })} />
@@ -315,7 +276,7 @@ export const CompanionApp = ({ world }: { world: World }) => {
       )}
 
       {/* main */}
-      <main className="bw-scroll" style={{ flex: '1 1 auto', overflow: 'auto', position: 'relative', minHeight: 0 }}>
+      <main className="bw-scroll flex-1 overflow-auto relative min-h-0">
         {tab === 'me' && world.player && (
           <MeTab player={world.player} meta={world.meta} villagerCount={villagers.length}
             presetName={null} />
@@ -330,7 +291,7 @@ export const CompanionApp = ({ world }: { world: World }) => {
         {tab === 'insights' && <Insights cards={insights} villagerCount={villagers.length} snapshotId={world.snapshot_id} onOpen={setSelGuid} />}
         {tab === 'storage' && <StorageTab containers={containers} />}
         {tab === 'map' && (
-          <MapTab villagers={villagers} recruits={recruits}
+          <MapTab world={world}
             region={`${world.meta.map?.startsWith('Karvenia') ? 'Karvenia' : world.meta.map ?? ''} — ${world.meta.region ?? ''}`}
             onOpenProfile={setSelGuid} />
         )}
@@ -352,26 +313,27 @@ const FilterChips = ({ label, all, sel, onToggle, colors }: {
   label: string; all: string[]; sel: Set<string>;
   onToggle: (v: string) => void; colors?: Record<string, string>;
 }) => (
-  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
-    <span style={{ fontSize: 9.5, letterSpacing: '.5px', textTransform: 'uppercase', color: C.textFaint }}>{label}</span>
+  <span className="inline-flex items-center gap-[5px] flex-wrap">
+    <span className="text-[9.5px] tracking-[.5px] uppercase text-sand-600">{label}</span>
     {all.map(v => {
       const on = sel.has(v);
       const color = colors?.[v] ?? '#C6BBA4';
       return (
-        <button key={v} onClick={() => onToggle(v)} style={{
-          padding: '2px 9px', borderRadius: 999, cursor: 'pointer', fontFamily: 'inherit', fontSize: 11,
-          border: `1px solid ${on ? color : '#2E271E'}`,
-          background: on ? `${color}22` : 'transparent',
-          color: on ? '#EDE4D2' : C.textDim,
-        }}>{v}</button>
+        <button key={v} onClick={() => onToggle(v)}
+          className={cn(
+            'py-0.5 px-[9px] rounded-full cursor-pointer font-sans text-[11px] border',
+            on ? 'text-[#EDE4D2]' : 'border-line-3 bg-transparent text-sand-400',
+          )}
+          // active chip tint comes from the role/village color in data
+          style={on ? { borderColor: color, background: `${color}22` } : undefined}>{v}</button>
       );
     })}
   </span>
 );
 
 const Meta = ({ k, v, mono = false }: { k: string; v: string; mono?: boolean }) => (
-  <span style={{ display: 'inline-flex', gap: 6, color: '#9A8F7D', whiteSpace: 'nowrap' }}>
-    <span style={{ color: '#6a6152' }}>{k}</span>
-    <span style={mono ? { fontFamily: MONO } : undefined}>{v}</span>
+  <span className="inline-flex gap-1.5 text-sand-400 whitespace-nowrap">
+    <span className="text-sand-700">{k}</span>
+    <span className={mono ? 'font-mono' : undefined}>{v}</span>
   </span>
 );

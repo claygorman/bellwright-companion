@@ -87,6 +87,7 @@ export type ContainerVM = {
   icon: string;
   cap: number | null;
   remote: boolean;
+  position: number[] | null;
   items: { name: string; raw: string; cat: string; qty: number }[];
 };
 
@@ -128,6 +129,7 @@ export const shapeContainers = (storage: StorageData): ContainerVM[] => {
         icon: kind.icon,
         cap: kind.cap,
         remote: kind.remote ?? false,
+        position: c.position ?? null,
         items: Object.entries(c.items)
           .map(([raw, qty]) => ({ name: itemLabel(raw), raw, cat: categorize(raw), qty })),
       };

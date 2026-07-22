@@ -1,6 +1,6 @@
 {
   "name": "bellwright-parse",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Parse a decompressed Bellwright save payload into structured world data",
   "type": "module",
   "bin": {
@@ -19,6 +19,7 @@
     "./groups": "./src/groups.ts",
     "./gearsets": "./src/gearsets.ts",
     "./gearpresets": "./src/gearpresets.ts",
-    "./player": "./src/player.ts"
+    "./player": "./src/player.ts",
+    "./pois": "./src/pois.ts"
   }
 }

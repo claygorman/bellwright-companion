@@ -2,18 +2,20 @@
 // Detail drawer — skills, equipment paper-doll, job priorities.
 // Omitted vs the design (data not in the save): nourishment, innate traits,
 // armor values, durability, reservist/fallen chips (not present in save data).
-import type { CSSProperties } from 'react';
 import type { Npc } from '@/lib/types';
-import { avatarColor, initials, itemLabel, moraleColor, tplLabel } from '@/lib/bw/format';
+import { cn } from '@/lib/utils';
+import { itemLabel, moraleColor, tplLabel } from '@/lib/bw/format';
 import { normalizeInjuries } from '@/lib/bw/injuries';
 import { InjuryBadge } from './injury-badge';
 import { COMBAT, WORK, SKILL_ICON, shapeCell, presetFor, professionOf, npcName } from '@/lib/bw/model';
 import { Icon, PinIcon } from './icons';
 import { ItemImg } from './item-img';
 import { Avatar } from './avatar';
-import { C, MONO, SERIF, avatarStyle, miniBar, sectionH3 } from './ui';
+import { C } from './ui';
 
 const DEFAULT_PRIORITY = 5;
+
+const SECTION_H3 = 'font-serif text-[15px] font-semibold text-[#D9CBB2] tracking-[.3px]';
 
 export type DrawerSquad = { name: string; members: Npc[] };
 type Props = {
@@ -32,72 +34,56 @@ export const Drawer = ({ v, playtime, ingestedAt, squads, onOpen, isMobile, onCl
   const preset = presetFor(v);
   const hasPriorities = Object.keys(v.job_priorities).length > 0;
   return (
-    <div onClick={onClose} style={{
-      position: 'fixed', inset: 0, background: 'rgba(8,7,5,.6)', backdropFilter: 'blur(2px)',
-      zIndex: 60, animation: 'bwfade .16s ease',
-    }}>
-      <div onClick={e => e.stopPropagation()} className="bw-scroll" style={{
-        position: 'absolute', top: 0, right: 0, bottom: 0, width: isMobile ? '100%' : 440,
-        background: C.panelBg, borderLeft: `1px solid ${C.border3}`,
-        boxShadow: '-14px 0 40px rgba(0,0,0,.5)', overflowY: 'auto', overflowX: 'hidden',
-        animation: 'bwslide .22s cubic-bezier(.2,.8,.2,1)',
-      }}>
+    <div onClick={onClose} className="fixed inset-0 bg-[rgba(8,7,5,.6)] backdrop-blur-[2px] z-[60] [animation:bwfade_.16s_ease]">
+      <div onClick={e => e.stopPropagation()} className={cn(
+        'bw-scroll absolute top-0 right-0 bottom-0 bg-iron-850 border-l border-line-4',
+        'shadow-[-14px_0_40px_rgba(0,0,0,.5)] overflow-y-auto overflow-x-hidden',
+        '[animation:bwslide_.22s_cubic-bezier(.2,.8,.2,1)]',
+        isMobile ? 'w-full' : 'w-[440px]',
+      )}>
         {/* header */}
-        <div style={{
-          position: 'sticky', top: 0, zIndex: 5, padding: '18px 20px 14px',
-          background: 'linear-gradient(180deg,#1E1912,#16130E)', borderBottom: '1px solid #2A231A',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 13 }}>
-            <div style={{ borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,.4)', flex: '0 0 auto' }}>
+        <div className="sticky top-0 z-[5] pt-[18px] px-5 pb-3.5 bg-gradient-to-b from-[#1E1912] to-[#16130E] border-b border-[#2A231A]">
+          <div className="flex items-start gap-[13px]">
+            <div className="rounded-xl shadow-[0_2px_12px_rgba(0,0,0,.4)] flex-none">
               <Avatar v={v} size={52} radius={12} />
             </div>
-            <div style={{ flex: '1 1 auto', minWidth: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'wrap' }}>
-                <span style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: C.textSerifBright, lineHeight: 1.1 }}>{name}</span>
+            <div className="flex-auto min-w-0">
+              <div className="flex items-center gap-[9px] flex-wrap">
+                <span className="font-serif text-[22px] font-semibold text-sand-50 leading-[1.1]">{name}</span>
                 {professionOf(v) && (
-                  <span style={{
-                    fontSize: 11, fontWeight: 600, letterSpacing: '.3px', color: C.gold,
-                    background: 'rgba(224,167,60,.13)', border: '1px solid rgba(224,167,60,.3)',
-                    padding: '2px 9px', borderRadius: 6,
-                  }}>{professionOf(v)}</span>
+                  <span className="text-[11px] font-semibold tracking-[.3px] text-gold-bright bg-gold/[.13] border border-gold/30 py-0.5 px-[9px] rounded-md">{professionOf(v)}</span>
                 )}
                 {v.tier && (
-                  <span style={{
-                    fontSize: 11, fontWeight: 600, color: '#B3A88F', background: '#221D16',
-                    border: '1px solid #322A20', padding: '2px 9px', borderRadius: 6,
-                  }}>{v.tier}</span>
+                  <span className="text-[11px] font-semibold text-sand-350 bg-[#221D16] border border-line-4 py-0.5 px-[9px] rounded-md">{v.tier}</span>
                 )}
               </div>
-              <div style={{ fontSize: 12, color: C.textDim, marginTop: 4 }}>{v.gender ?? '—'} · {v.archetype}</div>
+              <div className="text-xs text-sand-400 mt-1">{v.gender ?? '—'} · {v.archetype}</div>
 
-              <div style={{ fontSize: 11.5, color: '#7c715f', marginTop: 1 }}>
+              <div className="text-[11.5px] text-[#7c715f] mt-px">
                 {tplLabel(v.template)}{v.village ? ` · from ${v.village}` : ''}
               </div>
               {v.position && (
-                <div style={{ fontSize: 11.5, color: C.textFainter, marginTop: 3, display: 'flex', alignItems: 'center', gap: 5 }}>
+                <div className="text-[11.5px] text-sand-700 mt-[3px] flex items-center gap-[5px]">
                   <PinIcon color="currentColor" />
                   {v.village ? `near ${v.village}` : v.is_player_npc ? 'at the settlement' : 'Karvenia'} ·{' '}
-                  <span style={{ fontFamily: MONO }}>[{Math.round(v.position[0])}, {Math.round(v.position[1])}]</span>
+                  <span className="font-mono">[{Math.round(v.position[0])}, {Math.round(v.position[1])}]</span>
                 </div>
               )}
             </div>
-            <button onClick={onClose} style={{
-              background: 'none', border: '1px solid #342C22', color: C.textDim, width: 30, height: 30,
-              borderRadius: 8, cursor: 'pointer', fontSize: 16, flex: '0 0 auto',
-            }}>×</button>
+            <button onClick={onClose} className="bg-transparent border border-[#342C22] text-sand-400 w-[30px] h-[30px] rounded-lg cursor-pointer text-base flex-none">×</button>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 14, flexWrap: 'wrap' }}>
+          <div className="flex items-center gap-3.5 mt-3.5 flex-wrap">
             {morale != null && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                <span style={{ fontSize: 11, color: C.textDim2, textTransform: 'uppercase', letterSpacing: '.5px' }}>Morale</span>
-                <div style={miniBar(90, 6, morale, moraleColor(morale)).outer}>
-                  <div style={miniBar(90, 6, morale, moraleColor(morale)).inner} />
+              <div className="flex items-center gap-[9px]">
+                <span className="text-[11px] text-[#8a8069] uppercase tracking-[.5px]">Morale</span>
+                <div className="w-[90px] h-1.5 rounded-[3px] bg-white/[.08] overflow-hidden">
+                  <div className="h-full" style={{ width: `${morale}%`, background: moraleColor(morale) }} />
                 </div>
-                <span style={{ fontFamily: MONO, fontSize: 13, color: moraleColor(morale) }}>{morale}</span>
+                <span className="font-mono text-[13px]" style={{ color: moraleColor(morale) }}>{morale}</span>
               </div>
             )}
             {v.injuries.length > 0 && (
-              <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+              <div className="flex gap-[5px] flex-wrap">
                 {normalizeInjuries(v.injuries).map(inj => (
                   <InjuryBadge key={inj.type} inj={inj} playtime={playtime} ingestedAt={ingestedAt} size="large" />
                 ))}
@@ -106,13 +92,13 @@ export const Drawer = ({ v, playtime, ingestedAt, squads, onOpen, isMobile, onCl
           </div>
         </div>
 
-        <div style={{ padding: '18px 20px 40px' }}>
+        <div className="pt-[18px] px-5 pb-10">
           {/* skills */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-            <h3 style={sectionH3}>Skills</h3>
-            <span style={{ fontSize: 11, color: C.textFainter }}>level / cap · XP to next</span>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className={SECTION_H3}>Skills</h3>
+            <span className="text-[11px] text-sand-700">level / cap · XP to next</span>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 22, marginBottom: 26 }}>
+          <div className="grid grid-cols-2 gap-[22px] mb-[26px]">
             <SkillCol title="Combat" color="var(--accent)" defs={COMBAT} v={v} />
             <SkillCol title="Work" color="#8FA05B" defs={WORK} v={v} />
           </div>
@@ -120,35 +106,29 @@ export const Drawer = ({ v, playtime, ingestedAt, squads, onOpen, isMobile, onCl
           {/* squads */}
           {squads.length > 0 && (
             <>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 11 }}>
-                <h3 style={sectionH3}>Squads</h3>
-                <span style={{ fontSize: 11, color: C.textFainter }}>Army tab · updates each save</span>
+              <div className="flex items-center justify-between mb-[11px]">
+                <h3 className={SECTION_H3}>Squads</h3>
+                <span className="text-[11px] text-sand-700">Army tab · updates each save</span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 26 }}>
+              <div className="flex flex-col gap-2 mb-[26px]">
                 {squads.map(sq => (
-                  <div key={sq.name} style={{
-                    border: '1px solid #2C251C', borderRadius: 9, padding: '10px 12px', background: '#1A160F',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <div key={sq.name} className="border border-line-2 rounded-[9px] py-2.5 px-3 bg-[#1A160F]">
+                    <div className="flex items-center gap-2 mb-2">
                       <Icon name="sword" size={13} color="#7FA8C9" />
-                      <span style={{ fontWeight: 600, color: '#F1E7D4', fontSize: 13, flex: '1 1 auto' }}>{sq.name}</span>
-                      <span style={{
-                        fontFamily: MONO, fontSize: 10.5, fontWeight: 600, padding: '1px 7px', borderRadius: 999,
-                        color: '#9AB0C9', background: 'rgba(127,168,201,.12)', border: '1px solid rgba(127,168,201,.32)',
-                      }}>{sq.members.length}</span>
+                      <span className="font-semibold text-sand-100 text-[13px] flex-auto">{sq.name}</span>
+                      <span className="font-mono text-[10.5px] font-semibold py-px px-[7px] rounded-full text-[#9AB0C9] bg-[rgba(127,168,201,.12)] border border-[rgba(127,168,201,.32)]">{sq.members.length}</span>
                     </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                    <div className="flex flex-wrap gap-1">
                       {sq.members.map(m => {
                         const mn = npcName(m);
                         const isSelf = m.guid === v.guid;
                         return (
                           <button key={m.guid ?? mn} data-tip={mn}
                             onClick={() => !isSelf && m.guid && onOpen(m.guid)}
-                            style={{
-                              background: 'none', borderRadius: 8, padding: 0, lineHeight: 0,
-                              border: isSelf ? '2px solid var(--gold)' : '2px solid transparent',
-                              cursor: isSelf ? 'default' : 'pointer',
-                            }}>
+                            className={cn(
+                              'bg-transparent rounded-lg p-0 leading-[0] border-2',
+                              isSelf ? 'border-gold-bright cursor-default' : 'border-transparent cursor-pointer',
+                            )}>
                             <Avatar v={m} size={24} radius={6} />
                           </button>
                         );
@@ -161,39 +141,35 @@ export const Drawer = ({ v, playtime, ingestedAt, squads, onOpen, isMobile, onCl
           )}
 
           {/* equipment */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 11 }}>
-            <h3 style={sectionH3}>Equipment</h3>
+          <div className="flex items-center justify-between mb-[11px]">
+            <h3 className={SECTION_H3}>Equipment</h3>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '0 0 12px', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 10.5, letterSpacing: '.4px', textTransform: 'uppercase', color: C.textDim2 }}>Preset</span>
+          <div className="flex items-center gap-2 mb-3 flex-wrap">
+            <span className="text-[10.5px] tracking-[.4px] uppercase text-[#8a8069]">Preset</span>
             {presetName ? (
-              <span style={{
-                display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600,
-                color: C.gold, background: 'rgba(224,167,60,.13)',
-                border: '1px solid rgba(224,167,60,.3)', padding: '3px 10px', borderRadius: 6,
-              }}>{presetName}</span>
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold-bright bg-gold/[.13] border border-gold/30 py-[3px] px-2.5 rounded-md">{presetName}</span>
             ) : (
               <>
-                <span style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600,
-                  color: !preset.combat ? C.textDim : preset.fit ? C.green : 'var(--accent)',
-                  background: !preset.combat ? 'rgba(154,143,125,.12)' : preset.fit ? 'rgba(125,176,104,.14)' : 'rgba(224,167,60,.14)',
-                  border: `1px solid ${!preset.combat ? 'rgba(154,143,125,.3)' : preset.fit ? 'rgba(125,176,104,.4)' : 'rgba(224,167,60,.4)'}`,
-                  padding: '3px 10px', borderRadius: 6,
-                }}>{preset.preset}</span>
-                <span style={{ fontSize: 11.5, color: !preset.combat ? C.textDim : preset.fit ? C.green : 'var(--accent)' }}>
+                <span
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold py-[3px] px-2.5 rounded-md border"
+                  style={{
+                    color: !preset.combat ? C.textDim : preset.fit ? C.green : 'var(--accent)',
+                    background: !preset.combat ? 'rgba(154,143,125,.12)' : preset.fit ? 'rgba(125,176,104,.14)' : 'rgba(224,167,60,.14)',
+                    borderColor: !preset.combat ? 'rgba(154,143,125,.3)' : preset.fit ? 'rgba(125,176,104,.4)' : 'rgba(224,167,60,.4)',
+                  }}>{preset.preset}</span>
+                <span className="text-[11.5px]" style={{ color: !preset.combat ? C.textDim : preset.fit ? C.green : 'var(--accent)' }}>
                   {preset.combat ? (preset.fit ? 'Matches loadout' : preset.reason) : 'Non-combat'}
                 </span>
               </>
             )}
           </div>
           <SlotLabel>Weapons</SlotLabel>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>
+          <div className="grid grid-cols-2 gap-2 mb-3.5">
             <Tile v={v} slot="weapon" label="Weapon" icon={v.equipment.weapon && /Bow/.test(v.equipment.weapon) ? 'bow' : 'sword'} />
             <Tile v={v} slot="offhand" label="Off-hand" icon="shield" />
           </div>
           <SlotLabel>Armor</SlotLabel>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 7, marginBottom: 14 }}>
+          <div className="grid grid-cols-5 gap-[7px] mb-3.5">
             <Tile v={v} slot="head" label="Head" icon="helm" armorSlot />
             <Tile v={v} slot="chest" label="Chest" icon="torso" armorSlot />
             <Tile v={v} slot="gloves" label="Gloves" icon="gloves" armorSlot />
@@ -201,7 +177,7 @@ export const Drawer = ({ v, playtime, ingestedAt, squads, onOpen, isMobile, onCl
             <Tile v={v} slot="boots" label="Boots" icon="boots" armorSlot />
           </div>
           <SlotLabel>Storage &amp; Tools</SlotLabel>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 7, marginBottom: 26 }}>
+          <div className="grid grid-cols-4 gap-[7px] mb-[26px]">
             <Tile v={v} slot="cloak" label="Cloak" icon="cloak" />
             <Tile v={v} slot="backpack" label="Backpack" icon="pack" />
             <Tile v={v} slot="food_bag" label="Food Bag" icon="pouch" />
@@ -211,28 +187,29 @@ export const Drawer = ({ v, playtime, ingestedAt, squads, onOpen, isMobile, onCl
           {/* job priorities (addition vs the design — real save data) */}
           {hasPriorities && (
             <>
-              <h3 style={{ ...sectionH3, marginBottom: 4 }}>Job priorities</h3>
-              <p style={{ margin: '0 0 12px', fontSize: 11, color: C.textFainter }}>
+              <h3 className={cn(SECTION_H3, 'mb-1')}>Job priorities</h3>
+              <p className="mb-3 text-[11px] text-sand-700">
                 Lower number = takes the job first · {DEFAULT_PRIORITY} is the default · 0 = disabled
               </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 26 }}>
+              <div className="flex flex-col gap-[7px] mb-[26px]">
                 {WORK.map(([key, , label]) => {
                   const p = v.job_priorities[key] ?? DEFAULT_PRIORITY;
                   const disabled = p === 0;
                   const emphasised = !disabled && p < DEFAULT_PRIORITY;
                   return (
-                    <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 9, fontSize: 12 }}>
-                      <span style={{ display: 'flex', opacity: .8 }}>
+                    <div key={key} className="flex items-center gap-[9px] text-xs">
+                      <span className="flex opacity-80">
                         <Icon name={SKILL_ICON[key]} size={13} color={C.textDim2} />
                       </span>
-                      <span style={{ flex: '1 1 auto', color: disabled ? C.textDisabled : '#C6BBA4' }}>{label}</span>
-                      <span style={{
-                        fontFamily: MONO, fontSize: 12, fontWeight: 600, minWidth: 26, textAlign: 'center',
-                        padding: '1px 7px', borderRadius: 5,
-                        color: disabled ? C.textDisabled : emphasised ? C.gold : '#C6BBA4',
-                        background: disabled ? 'transparent' : emphasised ? 'rgba(224,167,60,.13)' : '#221D16',
-                        border: `1px solid ${disabled ? '#2A231A' : emphasised ? 'rgba(224,167,60,.35)' : '#2E271E'}`,
-                      }}>{disabled ? '⊘' : p}</span>
+                      <span className={cn('flex-auto', disabled ? 'text-sand-800' : 'text-sand-300')}>{label}</span>
+                      <span className={cn(
+                        'font-mono text-xs font-semibold min-w-[26px] text-center py-px px-[7px] rounded-[5px] border',
+                        disabled
+                          ? 'text-sand-800 bg-transparent border-[#2A231A]'
+                          : emphasised
+                            ? 'text-gold-bright bg-gold/[.13] border-gold/35'
+                            : 'text-sand-300 bg-[#221D16] border-line-3',
+                      )}>{disabled ? '⊘' : p}</span>
                     </div>
                   );
                 })}
@@ -246,10 +223,7 @@ export const Drawer = ({ v, playtime, ingestedAt, squads, onOpen, isMobile, onCl
 };
 
 export const SlotLabel = ({ children }: { children: React.ReactNode }) => (
-  <div style={{
-    fontSize: 10.5, letterSpacing: '.5px', textTransform: 'uppercase',
-    color: C.textDim2, margin: '0 0 7px', fontWeight: 600,
-  }}>{children}</div>
+  <div className="text-[10.5px] tracking-[.5px] uppercase text-[#8a8069] mb-[7px] font-semibold">{children}</div>
 );
 
 export const SkillCol = ({ title, color, defs, v }: {
@@ -257,26 +231,24 @@ export const SkillCol = ({ title, color, defs, v }: {
   v: Pick<Npc, 'skills'>;
 }) => (
   <div>
-    <div style={{
-      fontSize: 11, letterSpacing: '.6px', textTransform: 'uppercase',
-      color, marginBottom: 9, fontWeight: 600,
-    }}>{title}</div>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+    <div className="text-[11px] tracking-[.6px] uppercase mb-[9px] font-semibold" style={{ color }}>{title}</div>
+    <div className="flex flex-col gap-[9px]">
       {defs.map(([key, , sname]) => {
         const s = v.skills[key];
         const c = shapeCell(sname, s);
-        const bar = miniBar('100%', 5, c.barPct, c.numColor);
         return (
           <div key={key}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, marginBottom: 3 }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#C6BBA4' }}>
-                <span style={{ display: 'flex', opacity: .8 }}><Icon name={SKILL_ICON[key]} size={13} color={C.textDim2} /></span>
+            <div className="flex justify-between items-center text-xs mb-[3px]">
+              <span className="inline-flex items-center gap-1.5 text-sand-300">
+                <span className="flex opacity-80"><Icon name={SKILL_ICON[key]} size={13} color={C.textDim2} /></span>
                 {sname}
               </span>
-              <span style={{ fontFamily: MONO, fontWeight: 500, color: c.numColor }}>{c.disp}</span>
+              <span className="font-mono font-medium" style={{ color: c.numColor }}>{c.disp}</span>
             </div>
-            <div style={bar.outer}><div style={bar.inner} /></div>
-            <div style={{ fontSize: 10, color: C.textFainter, marginTop: 2, textAlign: 'right' }}>
+            <div className="h-[5px] rounded-[3px] bg-white/[.08] overflow-hidden">
+              <div className="h-full" style={{ width: `${c.barPct}%`, background: c.numColor }} />
+            </div>
+            <div className="text-[10px] text-sand-700 mt-0.5 text-right">
               {!s || s.cap === 0 ? 'untrained' : c.atCap ? 'MAX' : `${c.pct}% to ${c.level + 1}`}
             </div>
           </div>
@@ -291,28 +263,25 @@ export const Tile = ({ v, slot, label, icon, armorSlot = false }: {
 }) => {
   const raw = v.equipment[slot];
   const filled = Boolean(raw);
-  const base: CSSProperties = {
-    position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center',
-    justifyContent: 'center', gap: 4, padding: '9px 5px 8px', borderRadius: 9, minHeight: 78,
-  };
-  const style: CSSProperties = filled
-    ? { ...base, background: '#211C15', border: '1px solid #37301F' }
-    : armorSlot
-      ? { ...base, background: 'repeating-linear-gradient(45deg,rgba(224,167,60,.05) 0 6px,transparent 6px 12px)', border: '1px dashed rgba(224,167,60,.4)' }
-      : { ...base, background: '#17140E', border: '1px dashed #332C21' };
   return (
-    <div data-tip={filled ? itemLabel(raw) : `Empty ${label.toLowerCase()} slot`} style={style}>
-      <span style={{ display: 'flex' }}>
+    <div data-tip={filled ? itemLabel(raw) : `Empty ${label.toLowerCase()} slot`} className={cn(
+      'relative flex flex-col items-center justify-center gap-1 pt-[9px] px-[5px] pb-2 rounded-[9px] min-h-[78px]',
+      filled
+        ? 'bg-iron-650 border border-[#37301F]'
+        : armorSlot
+          ? 'bg-[repeating-linear-gradient(45deg,rgba(224,167,60,.05)_0_6px,transparent_6px_12px)] border border-dashed border-gold/40'
+          : 'bg-[#17140E] border border-dashed border-[#332C21]',
+    )}>
+      <span className="flex">
         {filled
           ? <ItemImg cls={raw} size={30} fallback={<Icon name={icon} size={22} color="#D8CBB0" />} />
           : <Icon name={icon} size={22} color="#655c4c" />}
       </span>
-      <span style={{
-        fontSize: 9.5, lineHeight: 1.15, textAlign: 'center', maxWidth: '100%',
-        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-        color: filled ? '#DBCFB4' : C.textDisabled,
-      }}>{filled ? itemLabel(raw) : 'Empty'}</span>
-      <span style={{ fontSize: 8, letterSpacing: '.4px', textTransform: 'uppercase', color: C.textFainter }}>{label}</span>
+      <span className={cn(
+        'text-[9.5px] leading-[1.15] text-center max-w-full overflow-hidden text-ellipsis whitespace-nowrap',
+        filled ? 'text-[#DBCFB4]' : 'text-sand-800',
+      )}>{filled ? itemLabel(raw) : 'Empty'}</span>
+      <span className="text-[8px] tracking-[.4px] uppercase text-sand-700">{label}</span>
     </div>
   );
 };

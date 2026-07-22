@@ -159,10 +159,14 @@ starter); counts are extra copies to keep in storage beyond assigned gear.
 - [x] Recruit filters (village, specialty, worker/fighter/balanced)
 - [x] My-character tab (player pawn: skills, equipment, carried inventory)
       + Population "Gear & inventory" view
-- [ ] Map base imagery + building/chest/camp layers (positions already decoded)
+- [x] Real map imagery with calibrated save-coordinate projection, 24 filter
+      layers (save-sourced + community wiki data, provenance-labeled), and a
+      draggable radius placement planner (`pnpm map` fetches the imagery)
+- [x] Tailwind v4 theme tokens across the UI (design-system handoff)
 - [ ] Ingest auth token (shared secret) for internet-exposed servers
 - [ ] Postgres backend behind `DATABASE_URL`
-- [ ] Item icons extracted from game files (replacing wiki fetch)
+- [ ] Game-pak extraction (CUE4Parse): verified building radii, first-party
+      icons, full resource-node tables, recipes
 - [ ] Undecoded save fields: reservist/hold-ground toggles, housing/bed
       assignment, squad raised-state, village liberation status
 - [ ] MCP server so AI assistants can query your settlement

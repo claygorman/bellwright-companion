@@ -3,47 +3,36 @@
 // Section-header rows are a DISTINCT row type with no value getter — the
 // best-value pass never touches them (fix relayed from the design prototype).
 import type { Npc } from '@/lib/types';
-import { avatarColor, initials, itemLabel } from '@/lib/bw/format';
+import { itemLabel } from '@/lib/bw/format';
 import { COMBAT, WORK, npcName } from '@/lib/bw/model';
-import { C, MONO, SERIF, avatarStyle } from './ui';
+import { cn } from '@/lib/utils';
 import { Avatar } from './avatar';
 
 export const CompareTray = ({ npcs, onRemove, onClear, onOpen }: {
   npcs: Npc[]; onRemove: (guid: string) => void; onClear: () => void; onOpen: () => void;
 }) => (
-  <div style={{
-    flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: 12, padding: '10px 18px',
-    borderTop: `1px solid ${C.border3}`, background: '#1B1712', zIndex: 18,
-  }}>
-    <span style={{ fontSize: 11, letterSpacing: '.5px', textTransform: 'uppercase', color: C.textDim2, fontWeight: 600 }}>Compare</span>
-    <div style={{ display: 'flex', gap: 7, flex: '1 1 auto', flexWrap: 'wrap' }}>
+  <div className="flex-none flex items-center gap-3 py-2.5 px-[18px] border-t border-line-4 bg-[#1B1712] z-[18]">
+    <span className="text-[11px] tracking-[.5px] uppercase text-sand-400 font-semibold">Compare</span>
+    <div className="flex gap-[7px] flex-1 flex-wrap">
       {npcs.map(v => {
         const name = npcName(v);
         const first = v.first_name ?? name, last = v.last_name ?? '';
         return (
-          <span key={v.guid ?? name} style={{
-            display: 'inline-flex', alignItems: 'center', gap: 7, padding: '4px 6px 4px 4px',
-            background: '#231E16', border: '1px solid #342C22', borderRadius: 8,
-          }}>
+          <span key={v.guid ?? name} className="inline-flex items-center gap-[7px] py-1 pr-1.5 pl-1 bg-[#231E16] border border-[#342C22] rounded-lg">
             <Avatar v={v} size={22} radius={6} />
-            <span style={{ fontSize: 12, color: C.text }}>{name}</span>
-            <button onClick={() => onRemove(v.guid ?? name)} style={{
-              background: 'none', border: 'none', color: C.textFaint, cursor: 'pointer',
-              fontSize: 14, lineHeight: 1, padding: '0 2px',
-            }}>×</button>
+            <span className="text-xs text-sand-200">{name}</span>
+            <button onClick={() => onRemove(v.guid ?? name)}
+              className="bg-none border-none text-sand-600 cursor-pointer text-sm leading-none px-0.5 hover:text-[#EDA593]">×</button>
           </span>
         );
       })}
     </div>
-    <button onClick={onClear} style={{
-      background: 'none', border: '1px solid #342C22', color: C.textDim, padding: '7px 12px',
-      borderRadius: 8, fontSize: 12, cursor: 'pointer', fontFamily: 'inherit',
-    }}>Clear</button>
-    <button onClick={onOpen} disabled={npcs.length < 2} style={{
-      padding: '7px 14px', borderRadius: 8, border: '1px solid var(--accent)', background: 'var(--accent)',
-      color: '#1a150c', fontSize: 12.5, fontWeight: 600, fontFamily: 'inherit',
-      cursor: npcs.length > 1 ? 'pointer' : 'not-allowed', opacity: npcs.length > 1 ? 1 : .5,
-    }}>Compare ({npcs.length})</button>
+    <button onClick={onClear}
+      className="bg-none border border-[#342C22] text-sand-400 py-[7px] px-3 rounded-lg text-xs cursor-pointer font-sans hover:border-[#4a4030]">Clear</button>
+    <button onClick={onOpen} disabled={npcs.length < 2} className={cn(
+      'py-[7px] px-3.5 rounded-lg border border-gold bg-gold text-[#1a150c] text-[12.5px] font-semibold font-sans',
+      npcs.length > 1 ? 'cursor-pointer opacity-100' : 'cursor-not-allowed opacity-50',
+    )}>Compare ({npcs.length})</button>
   </div>
 );
 
@@ -72,41 +61,30 @@ const MATRIX: MatrixRow[] = [
 ];
 
 export const CompareModal = ({ npcs, onClose }: { npcs: Npc[]; onClose: () => void }) => (
-  <div onClick={onClose} style={{
-    position: 'fixed', inset: 0, background: 'rgba(8,7,5,.65)', backdropFilter: 'blur(2px)',
-    zIndex: 70, display: 'flex', alignItems: 'center', justifyContent: 'center',
-    padding: 24, animation: 'bwfade .16s ease',
-  }}>
-    <div onClick={e => e.stopPropagation()} className="bw-scroll" style={{
-      background: C.panelBg, border: `1px solid ${C.border3}`, borderRadius: 14,
-      maxWidth: 900, width: '100%', maxHeight: '88vh', overflowY: 'auto',
-      boxShadow: '0 24px 60px rgba(0,0,0,.6)',
-    }}>
-      <div style={{
-        position: 'sticky', top: 0, background: '#1B1712', borderBottom: '1px solid #2A231A',
-        padding: '15px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 5,
-      }}>
-        <h3 style={{ margin: 0, fontFamily: SERIF, fontSize: 17, fontWeight: 600, color: C.textSerifBright }}>Compare villagers</h3>
-        <button onClick={onClose} style={{
-          background: 'none', border: '1px solid #342C22', color: C.textDim, width: 30, height: 30,
-          borderRadius: 8, cursor: 'pointer', fontSize: 16,
-        }}>×</button>
+  <div onClick={onClose}
+    className="fixed inset-0 bg-[rgba(8,7,5,.65)] backdrop-blur-[2px] z-[70] flex items-center justify-center p-6 [animation:bwfade_.16s_ease]">
+    <div onClick={e => e.stopPropagation()}
+      className="bw-scroll bg-iron-850 border border-line-4 rounded-[14px] max-w-[900px] w-full max-h-[88vh] overflow-y-auto shadow-[0_24px_60px_rgba(0,0,0,.6)]">
+      <div className="sticky top-0 bg-[#1B1712] border-b border-[#2A231A] py-[15px] px-5 flex items-center justify-between z-[5]">
+        <h3 className="m-0 font-serif text-[17px] font-semibold text-sand-50">Compare villagers</h3>
+        <button onClick={onClose}
+          className="bg-none border border-[#342C22] text-sand-400 w-[30px] h-[30px] rounded-lg cursor-pointer text-base hover:border-[#4a4030] hover:text-[#EDA593]">×</button>
       </div>
-      <div style={{ padding: '18px 20px' }}>
-        <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, fontSize: 12.5 }}>
+      <div className="py-[18px] px-5">
+        <table className="w-full border-separate border-spacing-0 text-[12.5px]">
           <thead>
             <tr>
-              <th style={{ textAlign: 'left', padding: '6px 8px' }} />
+              <th className="text-left py-1.5 px-2" />
               {npcs.map(v => {
                 const name = npcName(v);
                 const first = v.first_name ?? name, last = v.last_name ?? '';
                 return (
-                  <th key={v.guid ?? name} style={{ padding: '6px 10px', textAlign: 'left', borderBottom: `1px solid ${C.border2}` }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <th key={v.guid ?? name} className="py-1.5 px-2.5 text-left border-b border-line-2">
+                    <div className="flex items-center gap-2">
                       <Avatar v={v} size={26} radius={7} />
-                      <span style={{ color: C.textBright, fontWeight: 600, fontFamily: SERIF, fontSize: 14 }}>{name}</span>
+                      <span className="text-sand-100 font-semibold font-serif text-sm">{name}</span>
                     </div>
-                    <div style={{ fontSize: 10.5, color: C.textDim2, fontWeight: 400, marginTop: 3 }}>
+                    <div className="text-[10.5px] text-sand-400 font-normal mt-[3px]">
                       {v.gender ?? ''}{v.village ? ` · ${v.village}` : ''}
                     </div>
                   </th>
@@ -119,11 +97,8 @@ export const CompareModal = ({ npcs, onClose }: { npcs: Npc[]; onClose: () => vo
               if (row.kind === 'section') {
                 return (
                   <tr key={`s-${row.label}`}>
-                    <td style={{
-                      padding: '12px 8px 5px', borderBottom: `1px solid ${C.borderRow}`, color: 'var(--accent)',
-                      fontWeight: 600, fontSize: 10, textTransform: 'uppercase', letterSpacing: '.5px',
-                    }}>{row.label}</td>
-                    {npcs.map((v, i) => <td key={i} style={{ borderBottom: `1px solid ${C.borderRow}` }} />)}
+                    <td className="py-[5px] pt-3 px-2 border-b border-row text-gold font-semibold text-[10px] uppercase tracking-[.5px]">{row.label}</td>
+                    {npcs.map((v, i) => <td key={i} className="border-b border-row" />)}
                   </tr>
                 );
               }
@@ -132,14 +107,14 @@ export const CompareModal = ({ npcs, onClose }: { npcs: Npc[]; onClose: () => vo
               const best = nums ? Math.max(...nums) : null;
               return (
                 <tr key={row.label}>
-                  <td style={{ padding: '5px 8px', borderBottom: `1px solid ${C.borderRow}`, color: '#B3A88F', fontSize: 12 }}>{row.label}</td>
+                  <td className="py-[5px] px-2 border-b border-row text-sand-350 font-normal text-xs">{row.label}</td>
                   {npcs.map((v, i) => {
                     const isBest = nums != null && best != null && best > 0 && nums[i] === best && npcs.length > 1;
                     return (
-                      <td key={i} style={{
-                        padding: '5px 10px', borderBottom: `1px solid ${C.borderRow}`, fontFamily: MONO,
-                        fontSize: 12, color: isBest ? 'var(--gold)' : '#D6CBB4', fontWeight: isBest ? 600 : 400,
-                      }}>{row.text(v)}</td>
+                      <td key={i} className={cn(
+                        'py-[5px] px-2.5 border-b border-row font-mono text-xs',
+                        isBest ? 'text-gold-bright font-semibold' : 'text-[#D6CBB4] font-normal',
+                      )}>{row.text(v)}</td>
                     );
                   })}
                 </tr>

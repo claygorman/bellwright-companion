@@ -1,13 +1,14 @@
 {
   "name": "bellwright-companion-web",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "type": "module",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start -p 8710",
-    "icons": "node scripts/fetch-icons.ts"
+    "icons": "node scripts/fetch-icons.ts",
+    "map": "node scripts/fetch-map.ts"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.3.3",

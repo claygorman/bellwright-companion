@@ -3,10 +3,11 @@
 // custom gear presets with their current effective picks, and re-equip
 // suggestions (preset pick sitting in storage while the NPC wears less).
 import { useEffect, useState } from 'react';
+import { cn } from '@/lib/utils';
 import { itemLabel } from '@/lib/bw/format';
 import { Icon } from './icons';
 import { ItemImg } from './item-img';
-import { C, MONO, SERIF } from './ui';
+import { C } from './ui';
 
 type GearData = {
   presets: {
@@ -25,14 +26,12 @@ const SLOT_ORDER = ['weapon', 'shield', 'head', 'chest', 'gloves', 'legs', 'boot
 const Card = ({ title, badge, badgeColor, children }: {
   title: string; badge?: string | number; badgeColor?: string; children: React.ReactNode;
 }) => (
-  <div style={{ border: `1px solid ${C.border2}`, background: C.cardBg, borderRadius: 12, padding: '14px 16px' }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 10 }}>
-      <span style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 600, color: C.textBright, flex: '1 1 auto' }}>{title}</span>
+  <div className="border border-line-2 bg-iron-750 rounded-xl py-3.5 px-4">
+    <div className="flex items-center gap-[9px] mb-2.5">
+      <span className="font-serif text-[15px] font-semibold text-sand-100 flex-auto">{title}</span>
       {badge != null && (
-        <span style={{
-          fontFamily: MONO, fontSize: 11, fontWeight: 600, padding: '1px 8px', borderRadius: 999,
-          color: badgeColor ?? C.textDim, border: `1px solid ${C.border3}`, background: C.cardBg2,
-        }}>{badge}</span>
+        <span className="font-mono text-[11px] font-semibold py-px px-2 rounded-full border border-line-4 bg-[#1A160F]"
+          style={{ color: badgeColor ?? C.textDim }}>{badge}</span>
       )}
     </div>
     {children}
@@ -53,32 +52,29 @@ export const GearPanel = ({ onOpen }: { onOpen: (guid: string) => void }) => {
   if (!hasAny) return null;
 
   return (
-    <div style={{ marginBottom: 20 }}>
-      <div style={{ marginBottom: 12 }}>
-        <h2 style={{ margin: 0, fontFamily: SERIF, fontSize: 20, fontWeight: 600, color: C.textBright }}>Gear &amp; kits</h2>
-        <p style={{ margin: '4px 0 0', fontSize: 12.5, color: C.textDim2 }}>
+    <div className="mb-5">
+      <div className="mb-3">
+        <h2 className="font-serif text-xl font-semibold text-sand-100">Gear &amp; kits</h2>
+        <p className="mt-1 text-[12.5px] text-[#8a8069]">
           Kit coverage from your gear presets — what to craft, and who can gear up from storage.
           {!data.has_reserves && (
-            <> Set flat spare targets in <span style={{ fontFamily: MONO, fontSize: 11.5 }}>kits.json</span> to plan for breakage.</>
+            <> Set flat spare targets in <span className="font-mono text-[11.5px]">kits.json</span> to plan for breakage.</>
           )}
         </p>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(330px,1fr))', gap: 12, alignItems: 'start' }}>
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(330px,1fr))] gap-3 items-start">
 
         {data.craft.length > 0 && (
           <Card title="Craft list" badge={data.craft.reduce((s, x) => s + x.deficit, 0)} badgeColor={C.redText}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div className="flex flex-col gap-1.5">
               {data.craft.map(x => (
-                <div key={x.item} style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+                <div key={x.item} className="flex items-center gap-[9px]">
                   <ItemImg cls={x.item} size={22} fallback={<Icon name="pouch" size={16} color={C.textFaint} />} />
-                  <span style={{ flex: '1 1 auto', fontSize: 12.5, color: C.text, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{itemLabel(x.item)}</span>
-                  <span style={{ fontFamily: MONO, fontSize: 10.5, color: C.textFaint, whiteSpace: 'nowrap' }}>
+                  <span className="flex-auto text-[12.5px] text-sand-200 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{itemLabel(x.item)}</span>
+                  <span className="font-mono text-[10.5px] text-sand-600 whitespace-nowrap">
                     {x.have}/{x.target}{x.reserve > 0 ? ` (+${x.reserve} spare)` : ''}
                   </span>
-                  <span style={{
-                    fontFamily: MONO, fontSize: 11, fontWeight: 600, color: C.redText,
-                    padding: '0 7px', borderRadius: 999, background: 'rgba(196,85,59,.12)', border: '1px solid rgba(196,85,59,.3)',
-                  }}>+{x.deficit}</span>
+                  <span className="font-mono text-[11px] font-semibold text-[#EDA593] px-[7px] rounded-full bg-rust/[.12] border border-rust/30">+{x.deficit}</span>
                 </div>
               ))}
             </div>
@@ -87,13 +83,13 @@ export const GearPanel = ({ onOpen }: { onOpen: (guid: string) => void }) => {
 
         {data.reequip.length > 0 && (
           <Card title="Gear up from storage" badge={data.reequip.length} badgeColor={C.blueText}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div className="flex flex-col gap-1.5">
               {data.reequip.map((r, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
-                  <span style={{ color: C.text, whiteSpace: 'nowrap' }}>{r.name}</span>
-                  <span style={{ fontFamily: MONO, fontSize: 10, color: C.textFainter, textTransform: 'uppercase' }}>{r.slot}</span>
-                  <span style={{ flex: '1 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: C.textDim, textAlign: 'right' }}>
-                    {r.worn ? itemLabel(r.worn) : 'empty'} → <span style={{ color: C.blueText }}>{itemLabel(r.pick)}</span>
+                <div key={i} className="flex items-center gap-2 text-xs">
+                  <span className="text-sand-200 whitespace-nowrap">{r.name}</span>
+                  <span className="font-mono text-[10px] text-sand-700 uppercase">{r.slot}</span>
+                  <span className="flex-auto min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-sand-400 text-right">
+                    {r.worn ? itemLabel(r.worn) : 'empty'} → <span className="text-sky-bright">{itemLabel(r.pick)}</span>
                   </span>
                   <ItemImg cls={r.pick} size={20} fallback={<Icon name="pouch" size={14} color={C.textFaint} />} />
                 </div>
@@ -104,22 +100,23 @@ export const GearPanel = ({ onOpen }: { onOpen: (guid: string) => void }) => {
 
         {data.presets.map(p => (
           <Card key={p.key} title={p.name} badge={p.members.length} badgeColor={C.gold as string}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginBottom: p.members.length ? 10 : 0 }}>
+            <div className={cn('flex flex-col gap-[5px]', p.members.length > 0 && 'mb-2.5')}>
               {SLOT_ORDER.filter(s => p.picks[s]).map(s => (
-                <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontFamily: MONO, fontSize: 10, color: C.textFainter, textTransform: 'uppercase', width: 62, flex: '0 0 auto' }}>{s}</span>
+                <div key={s} className="flex items-center gap-2">
+                  <span className="font-mono text-[10px] text-sand-700 uppercase w-[62px] flex-none">{s}</span>
                   <ItemImg cls={p.picks[s]} size={18} fallback={<Icon name="pouch" size={13} color={C.textFaint} />} />
-                  <span style={{ fontSize: 12, color: C.text, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{itemLabel(p.picks[s])}</span>
+                  <span className="text-xs text-sand-200 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{itemLabel(p.picks[s])}</span>
                 </div>
               ))}
             </div>
             {p.members.length > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, borderTop: `1px solid ${C.borderRow}`, paddingTop: 9 }}>
+              <div className="flex flex-wrap gap-[5px] border-t border-row pt-[9px]">
                 {p.members.map(m => (
-                  <button key={m.guid ?? m.name} onClick={() => m.guid && onOpen(m.guid)} style={{
-                    fontSize: 11, color: C.textDim, background: C.cardBg2, border: `1px solid ${C.border2}`,
-                    borderRadius: 999, padding: '2px 9px', cursor: m.guid ? 'pointer' : 'default', fontFamily: 'inherit',
-                  }}>{m.name}</button>
+                  <button key={m.guid ?? m.name} onClick={() => m.guid && onOpen(m.guid)}
+                    className={cn(
+                      'text-[11px] text-sand-400 bg-[#1A160F] border border-line-2 rounded-full py-0.5 px-[9px]',
+                      m.guid ? 'cursor-pointer' : 'cursor-default',
+                    )}>{m.name}</button>
                 ))}
               </div>
             )}

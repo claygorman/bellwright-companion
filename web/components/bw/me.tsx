@@ -4,22 +4,23 @@
 // Design omissions (data not in the save): renown (opaque player-state
 // blob), armor values, durability, nourishment buffs, traits.
 import type { PlayerState, WorldMeta } from '@/lib/types';
+import { cn } from '@/lib/utils';
 import { avatarColor, initials, itemLabel, playtimeLabel } from '@/lib/bw/format';
 import { COMBAT, WORK } from '@/lib/bw/model';
 import { SkillCol, SlotLabel, Tile } from './drawer';
 import { Icon } from './icons';
 import { ItemImg } from './item-img';
-import { C, MONO, SERIF, avatarStyle, sectionH3 } from './ui';
+import { C } from './ui';
 
 const StatCard = ({ label, value, color, serif }: {
   label: string; value: string; color?: string; serif?: boolean;
 }) => (
-  <div style={{ background: C.cardBg, border: `1px solid ${C.border2}`, borderRadius: 10, padding: '11px 15px', minWidth: 96 }}>
-    <div style={{
-      fontFamily: serif ? SERIF : MONO, fontSize: serif ? 18 : 19, fontWeight: 600,
-      color: color ?? C.text,
-    }}>{value}</div>
-    <div style={{ fontSize: 10, letterSpacing: '.4px', textTransform: 'uppercase', color: C.textDim2, marginTop: 2 }}>{label}</div>
+  <div className="bg-iron-750 border border-line-2 rounded-[10px] py-[11px] px-[15px] min-w-[96px]">
+    <div
+      className={cn('font-semibold', serif ? 'font-serif text-[18px]' : 'font-mono text-[19px]', !color && 'text-sand-200')}
+      style={color ? { color } : undefined}
+    >{value}</div>
+    <div className="text-[10px] tracking-[.4px] uppercase text-sand-400 mt-0.5">{label}</div>
   </div>
 );
 
@@ -31,32 +32,29 @@ export const MeTab = ({ player, meta, presetName, villagerCount }: {
   // coins anywhere in the world (carried + stored) would need storage totals;
   // the card shows what the character has on them
   return (
-    <div className="bw-scroll" style={{ height: '100%', overflowY: 'auto' }}>
-      <div style={{ padding: '24px 26px 48px', maxWidth: 1080 }}>
+    <div className="bw-scroll h-full overflow-y-auto">
+      <div className="pt-6 px-[26px] pb-12 max-w-[1080px]">
         {/* header */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap', marginBottom: 24 }}>
-          <div style={{
-            ...avatarStyle(64, avatarColor(first, last), 14),
-            fontSize: 24, boxShadow: '0 3px 16px rgba(0,0,0,.45)',
-          }}>{initials(first, last)}</div>
-          <div style={{ flex: '1 1 320px', minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-              <span style={{ fontFamily: SERIF, fontSize: 26, fontWeight: 700, color: C.textSerifBright, lineHeight: 1 }}>{name}</span>
-              <span style={{
-                fontSize: 11.5, fontWeight: 600, color: C.gold, background: 'rgba(224,167,60,.14)',
-                border: '1px solid rgba(224,167,60,.35)', padding: '2px 10px', borderRadius: 6,
-              }}>Bellwright{meta.region ? ` of ${meta.region}` : ''}</span>
+        <div className="flex items-start gap-4 flex-wrap mb-6">
+          <div
+            className="w-16 h-16 rounded-[14px] flex-none flex items-center justify-center text-2xl font-semibold text-[#0f0d0a] shadow-[0_3px_16px_rgba(0,0,0,.45)]"
+            style={{ background: avatarColor(first, last) }}
+          >{initials(first, last)}</div>
+          <div className="flex-1 basis-80 min-w-0">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <span className="font-serif text-[26px] font-bold text-sand-50 leading-none">{name}</span>
+              <span className="text-[11.5px] font-semibold text-gold-bright bg-gold/[.14] border border-gold/35 py-0.5 px-2.5 rounded-md">Bellwright{meta.region ? ` of ${meta.region}` : ''}</span>
             </div>
-            <div style={{ fontSize: 12.5, color: C.textDim, marginTop: 4 }}>
+            <div className="text-[12.5px] text-sand-400 mt-1">
               Player character{presetName ? ` · ${presetName}` : ''}
             </div>
             {player.position && (
-              <div style={{ fontSize: 11.5, color: C.textFainter, marginTop: 13, fontFamily: MONO }}>
+              <div className="font-mono text-[11.5px] text-sand-700 mt-[13px]">
                 [{Math.round(player.position[0])}, {Math.round(player.position[1])}]
               </div>
             )}
           </div>
-          <div style={{ display: 'flex', gap: 10, flex: '0 0 auto', flexWrap: 'wrap' }}>
+          <div className="flex gap-2.5 flex-none flex-wrap">
             <StatCard label="Coins carried" value={String(player.coins)} color="#E9C766" />
             <StatCard label="Played" value={playtimeLabel(meta.playtimeSeconds)} />
             <StatCard label="Villagers" value={String(villagerCount)} />
@@ -64,11 +62,11 @@ export const MeTab = ({ player, meta, presetName, villagerCount }: {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(320px,1fr))', gap: 26, alignItems: 'start' }}>
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-[26px] items-start">
           {/* skills */}
           <div>
-            <h3 style={{ ...sectionH3, marginBottom: 12 }}>Skills</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+            <h3 className="font-serif text-[15px] font-semibold text-[#D9CBB2] tracking-[.3px] mb-3">Skills</h3>
+            <div className="grid grid-cols-2 gap-5">
               <SkillCol title="Combat" color="var(--accent)" defs={COMBAT} v={player} />
               <SkillCol title="Work" color="#8FA05B" defs={WORK} v={player} />
             </div>
@@ -76,14 +74,14 @@ export const MeTab = ({ player, meta, presetName, villagerCount }: {
 
           {/* equipment + carried */}
           <div>
-            <h3 style={{ ...sectionH3, marginBottom: 11 }}>Equipment</h3>
+            <h3 className="font-serif text-[15px] font-semibold text-[#D9CBB2] tracking-[.3px] mb-[11px]">Equipment</h3>
             <SlotLabel>Weapons</SlotLabel>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>
+            <div className="grid grid-cols-2 gap-2 mb-3.5">
               <Tile v={player} slot="weapon" label="Weapon" icon={player.equipment.weapon && /Bow/.test(player.equipment.weapon) ? 'bow' : 'sword'} />
               <Tile v={player} slot="offhand" label="Off-hand" icon="shield" />
             </div>
             <SlotLabel>Armor</SlotLabel>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 7, marginBottom: 14 }}>
+            <div className="grid grid-cols-5 gap-[7px] mb-3.5">
               <Tile v={player} slot="head" label="Head" icon="helm" armorSlot />
               <Tile v={player} slot="chest" label="Chest" icon="torso" armorSlot />
               <Tile v={player} slot="gloves" label="Gloves" icon="gloves" armorSlot />
@@ -91,30 +89,26 @@ export const MeTab = ({ player, meta, presetName, villagerCount }: {
               <Tile v={player} slot="boots" label="Boots" icon="boots" armorSlot />
             </div>
             <SlotLabel>Storage &amp; Tools</SlotLabel>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 7, marginBottom: 22 }}>
+            <div className="grid grid-cols-4 gap-[7px] mb-[22px]">
               <Tile v={player} slot="cloak" label="Cloak" icon="cloak" />
               <Tile v={player} slot="backpack" label="Backpack" icon="pack" />
               <Tile v={player} slot="food_bag" label="Food Bag" icon="pouch" />
               <Tile v={player} slot="tool" label="Tool" icon="tool" />
             </div>
 
-            <h3 style={{ ...sectionH3, marginBottom: 3 }}>Carrying</h3>
-            <p style={{ margin: '0 0 10px', fontSize: 11, color: C.textFainter }}>
+            <h3 className="font-serif text-[15px] font-semibold text-[#D9CBB2] tracking-[.3px] mb-[3px]">Carrying</h3>
+            <p className="mb-2.5 text-[11px] text-sand-700">
               {player.carried.reduce((a, x) => a + x.qty, 0)} items in inventory
             </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+            <div className="flex flex-wrap gap-1.5">
               {player.carried.length === 0 && (
-                <span style={{ fontSize: 12, color: C.textFaint }}>Nothing carried.</span>
+                <span className="text-xs text-sand-600">Nothing carried.</span>
               )}
               {player.carried.map(x => (
-                <span key={x.item} data-tip={itemLabel(x.item)} style={{
-                  position: 'relative', display: 'inline-flex', alignItems: 'center', gap: 7,
-                  padding: '5px 10px 5px 6px', background: C.cardBg2, border: `1px solid ${C.border3}`,
-                  borderRadius: 8, fontSize: 12, color: C.text,
-                }}>
+                <span key={x.item} data-tip={itemLabel(x.item)} className="relative inline-flex items-center gap-[7px] py-[5px] pr-2.5 pl-1.5 bg-[#1A160F] border border-line-4 rounded-lg text-xs text-sand-200">
                   <ItemImg cls={x.item} size={20} fallback={<Icon name="pouch" size={14} color={C.textFaint} />} />
                   {itemLabel(x.item)}
-                  {x.qty > 1 && <span style={{ fontFamily: MONO, fontSize: 10.5, color: C.textDim2 }}>×{x.qty}</span>}
+                  {x.qty > 1 && <span className="font-mono text-[10.5px] text-[#8a8069]">×{x.qty}</span>}
                 </span>
               ))}
             </div>

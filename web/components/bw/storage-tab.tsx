@@ -2,9 +2,10 @@
 // Storage tab — container sidebar with fill bars + aggregate item census.
 import { useMemo, useState } from 'react';
 import { CATS, type ContainerVM } from '@/lib/bw/storage';
+import { cn } from '@/lib/utils';
 import { Icon, PinIcon, SearchIcon } from './icons';
 import { ItemImg } from './item-img';
-import { C, MONO, SERIF, miniBar, searchBoxStyle, searchInputStyle } from './ui';
+import { C } from './ui';
 
 const FULL_FILL = 0.95;   // effectively full — flag it
 const NEAR_FILL = 0.8;    // filling up — worth a look
@@ -89,14 +90,11 @@ export const StorageTab = ({ containers }: { containers: ContainerVM[] }) => {
   ];
 
   return (
-    <div style={{ height: '100%', display: 'flex' }}>
+    <div className="flex h-full">
       {/* sidebar */}
-      <div className="bw-scroll" style={{
-        width: 246, flex: '0 0 auto', borderRight: `1px solid ${C.border}`,
-        background: C.panelBg, overflowY: 'auto', padding: '12px 10px',
-      }}>
-        <div style={{ fontSize: 10, letterSpacing: '.7px', textTransform: 'uppercase', color: C.textDim2, fontWeight: 600, padding: '4px 8px 8px' }}>Containers</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <div className="bw-scroll w-[246px] flex-none overflow-y-auto border-r border-line bg-iron-850 py-3 px-2.5">
+        <div className="pt-1 px-2 pb-2 text-[10px] font-semibold uppercase tracking-[.7px] text-sand-400">Containers</div>
+        <div className="flex flex-col gap-[3px]">
           {[null, ...containers].map(c => {
             const isAll = c === null;
             const id = isAll ? 'all' : c.id;
@@ -106,53 +104,41 @@ export const StorageTab = ({ containers }: { containers: ContainerVM[] }) => {
             const pctR = Math.min(100, Math.round(f * 100));
             const hl = !isAll && highlight.includes(id);
             return (
-              <button key={id} onClick={() => { setSel(id); setCat('all'); }} style={{
-                display: 'flex', flexDirection: 'column', gap: 6, padding: '10px 11px', borderRadius: 9,
-                cursor: 'pointer', width: '100%', fontFamily: 'inherit', textAlign: 'left',
-                transition: 'box-shadow .2s,border-color .2s',
-                border: `1px solid ${hl ? 'var(--accent)' : on ? '#4a3f2a' : 'transparent'}`,
-                background: on ? 'rgba(224,167,60,.08)' : 'transparent',
-                ...(hl ? { boxShadow: '0 0 0 1px var(--accent),0 0 16px rgba(224,167,60,.35)' } : {}),
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                  <span style={{
-                    width: 26, height: 26, borderRadius: 7, flex: '0 0 auto', display: 'flex',
-                    alignItems: 'center', justifyContent: 'center',
-                    background: on ? 'rgba(224,167,60,.14)' : '#201B15',
-                  }}>{isAll
-                    ? <Icon name="home" size={15} color={on ? '#F4C868' : C.textDim} />
-                    : <ItemImg cls={c.cls} size={20} fallback={<Icon name={c.icon} size={15} color={on ? '#F4C868' : C.textDim} />} />
-                  }</span>
-                  <div style={{ flex: '1 1 auto', minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span style={{ fontSize: 13, color: C.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <button key={id} onClick={() => { setSel(id); setCat('all'); }} className={cn(
+                'flex w-full cursor-pointer flex-col gap-1.5 rounded-[9px] border py-2.5 px-[11px] text-left font-sans transition-[box-shadow,border-color] duration-200',
+                hl ? 'border-gold shadow-[0_0_0_1px_var(--color-gold),0_0_16px_rgba(224,167,60,.35)]'
+                  : on ? 'border-[#4a3f2a] bg-gold/[.08]' : 'border-transparent',
+              )}>
+                <div className="flex items-center gap-[9px]">
+                  <span className={cn('flex h-[26px] w-[26px] flex-none items-center justify-center rounded-[7px]', on ? 'bg-gold/[.14]' : 'bg-row')}>
+                    {isAll
+                      ? <Icon name="home" size={15} color={on ? '#F4C868' : C.textDim} />
+                      : <ItemImg cls={c.cls} size={20} fallback={<Icon name={c.icon} size={15} color={on ? '#F4C868' : C.textDim} />} />
+                    }</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="overflow-hidden text-ellipsis whitespace-nowrap text-[13px] text-sand-200">
                         {isAll ? 'All storage' : c.name}
                       </span>
                       {!isAll && c.cap != null && f >= FULL_FILL && (
-                        <span data-tip="At capacity" style={{
-                          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 14, height: 14,
-                          borderRadius: '50%', background: C.red, color: '#fff', fontSize: 9, fontWeight: 700, flex: '0 0 auto',
-                        }}>!</span>
+                        <span data-tip="At capacity" className="inline-flex h-3.5 w-3.5 flex-none items-center justify-center rounded-full bg-rust text-[9px] font-bold text-white">!</span>
                       )}
                     </div>
-                    <div style={{ fontSize: 10, color: C.textFaint }}>
+                    <div className="text-[10px] text-sand-600">
                       {isAll ? `Aggregate · ${agg.length}` : `${c.type} · ${c.items.length}`}
-                      {!isAll && c.remote && <span style={{ color: '#C99A4B' }}> · remote</span>}
+                      {!isAll && c.remote && <span className="text-brass"> · remote</span>}
                     </div>
                   </div>
                   {!isAll && c.cap == null && (
-                    <span style={{
-                      fontSize: 9, letterSpacing: '.4px', textTransform: 'uppercase', color: C.textDim2,
-                      border: '1px solid #37301F', borderRadius: 5, padding: '2px 6px', flex: '0 0 auto',
-                    }}>buffer</span>
+                    <span className="flex-none rounded-[5px] border border-[#37301F] py-0.5 px-1.5 text-[9px] uppercase tracking-[.4px] text-sand-400">buffer</span>
                   )}
                 </div>
                 {!isAll && c.cap != null && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                    <div style={{ flex: '1 1 auto', ...miniBar('100%', 4, pctR, fillHex(f)).outer }}>
-                      <div style={miniBar('100%', 4, pctR, fillHex(f)).inner} />
+                  <div className="flex items-center gap-[7px]">
+                    <div className="h-1 flex-1 overflow-hidden rounded-[2px] bg-white/[.08]">
+                      <div className="h-full" style={{ width: `${pctR}%`, background: fillHex(f) }} />
                     </div>
-                    <span style={{ fontSize: 9.5, fontFamily: MONO, color: C.textFaint, whiteSpace: 'nowrap' }}>{u} / {c.cap}</span>
+                    <span className="whitespace-nowrap font-mono text-[9.5px] text-sand-600">{u} / {c.cap}</span>
                   </div>
                 )}
               </button>
@@ -162,13 +148,13 @@ export const StorageTab = ({ containers }: { containers: ContainerVM[] }) => {
       </div>
 
       {/* main */}
-      <div className="bw-scroll" style={{ flex: '1 1 auto', overflowY: 'auto' }}>
-        <div style={{ padding: '20px 24px 44px' }}>
-          <div style={{ marginBottom: 14 }}>
-            <h2 style={{ margin: 0, fontFamily: SERIF, fontSize: 20, fontWeight: 600, color: C.textBright }}>
+      <div className="bw-scroll flex-1 overflow-y-auto">
+        <div className="pt-5 px-6 pb-11">
+          <div className="mb-3.5">
+            <h2 className="font-serif text-xl font-semibold text-sand-100">
               {container ? container.name : 'All storage'}
             </h2>
-            <p style={{ margin: '3px 0 0', fontSize: 12.5, color: C.textDim2 }}>
+            <p className="mt-[3px] text-[12.5px] text-sand-400">
               {container
                 ? `${container.type}${container.cap ? ` · cap ${container.cap}` : ' · buffer'} · ${container.items.length} item types`
                 : `${containers.length} containers · ${agg.length} unique items`}
@@ -176,79 +162,67 @@ export const StorageTab = ({ containers }: { containers: ContainerVM[] }) => {
           </div>
 
           {showPressure && (
-            <div style={{
-              display: 'flex', alignItems: 'flex-start', gap: 11, border: '1px solid rgba(196,85,59,.4)',
-              background: 'linear-gradient(180deg,rgba(196,85,59,.12),transparent)', borderRadius: 11,
-              padding: '13px 15px', marginBottom: 12,
-            }}>
-              <span style={{
-                width: 30, height: 30, borderRadius: 8, flex: '0 0 auto', display: 'flex', alignItems: 'center',
-                justifyContent: 'center', background: 'rgba(196,85,59,.16)', border: '1px solid rgba(196,85,59,.4)',
-                color: '#E0997F', fontSize: 16, fontWeight: 700,
-              }}>!</span>
-              <div style={{ flex: '1 1 auto', minWidth: 0 }}>
-                <div style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 600, color: '#EDBBA8' }}>{pressureTitle}</div>
-                <div style={{ fontSize: 12.5, color: '#C9B3A4', marginTop: 2 }}>
+            <div className="mb-3 flex items-start gap-[11px] rounded-[11px] border border-rust/40 bg-gradient-to-b from-rust/[.12] to-transparent py-[13px] px-[15px]">
+              <span className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-lg border border-rust/40 bg-rust/[.16] text-base font-bold text-rust-soft">!</span>
+              <div className="min-w-0 flex-1">
+                <div className="font-serif text-[15px] font-semibold text-[#EDBBA8]">{pressureTitle}</div>
+                <div className="mt-0.5 text-[12.5px] text-[#C9B3A4]">
                   {pressureDesc} — consider a clear-out or more storage.
                 </div>
               </div>
-              <div style={{ textAlign: 'right', flex: '0 0 auto' }}>
-                <div style={{ fontFamily: MONO, fontSize: 18, fontWeight: 600, color: fillHex(aggFill) }}>{Math.round(aggFill * 100)}%</div>
-                <div style={{ fontSize: 9.5, textTransform: 'uppercase', letterSpacing: '.4px', color: C.textDim2 }}>of total capacity used</div>
+              <div className="flex-none text-right">
+                <div className="font-mono text-lg font-semibold" style={{ color: fillHex(aggFill) }}>{Math.round(aggFill * 100)}%</div>
+                <div className="text-[9.5px] uppercase tracking-[.4px] text-sand-400">of total capacity used</div>
               </div>
             </div>
           )}
 
           {remote && (
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 9, fontSize: 12, color: C.textDim,
-              border: `1px solid ${C.border2}`, background: C.cardBg2, borderRadius: 9,
-              padding: '9px 13px', marginBottom: 12,
-            }}>
+            <div className="mb-3 flex items-center gap-[9px] rounded-[9px] border border-line-2 bg-[#1A160F] py-[9px] px-[13px] text-xs text-sand-400">
               <PinIcon size={14} color="#C99A4B" />
-              <span><span style={{ color: '#DCD2BE' }}>{used(remote)} items</span> sitting in the remote {remote.name} awaiting pickup.</span>
+              <span><span className="text-[#DCD2BE]">{used(remote)} items</span> sitting in the remote {remote.name} awaiting pickup.</span>
             </div>
           )}
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10, marginBottom: 16 }}>
+          <div className="mb-4 grid grid-cols-4 gap-2.5">
             {[
               { label: 'Total items', val: totalQty.toLocaleString(), color: C.textBright },
               { label: 'Unique items', val: String(agg.length), color: C.textBright },
               { label: 'Containers', val: String(containers.length), color: C.textBright },
               { label: 'Full / near', val: `${fullList.length} / ${nearList.length}`, color: fullList.length > 0 ? '#E0997F' : C.textBright },
             ].map(s => (
-              <div key={s.label} style={{ background: C.cardBg, border: `1px solid ${C.border2}`, borderRadius: 10, padding: '11px 13px' }}>
-                <div style={{ fontFamily: MONO, fontSize: 20, fontWeight: 600, color: s.color }}>{s.val}</div>
-                <div style={{ fontSize: 10.5, letterSpacing: '.4px', textTransform: 'uppercase', color: C.textDim2, marginTop: 2 }}>{s.label}</div>
+              <div key={s.label} className="rounded-[10px] border border-line-2 bg-iron-750 py-[11px] px-[13px]">
+                <div className="font-mono text-xl font-semibold" style={{ color: s.color }}>{s.val}</div>
+                <div className="mt-0.5 text-[10.5px] uppercase tracking-[.4px] text-sand-400">{s.label}</div>
               </div>
             ))}
           </div>
 
           {hogs.length > 0 && (
-            <div style={{ border: `1px solid ${C.border2}`, background: C.cardBg2, borderRadius: 11, padding: '13px 15px', marginBottom: 14 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <div className="mb-3.5 rounded-[11px] border border-line-2 bg-[#1A160F] py-[13px] px-[15px]">
+              <div className="mb-3 flex items-center gap-2">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#E0A73C" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                   <path d="M3 3v18h18" /><rect x="7" y="9" width="3" height="9" /><rect x="12" y="5" width="3" height="13" /><rect x="17" y="12" width="3" height="6" />
                 </svg>
-                <span style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 600, color: '#D9CBB2' }}>Storage hogs</span>
-                <span style={{ fontSize: 11.5, color: C.textDim2 }}>— items eating the most space</span>
+                <span className="font-serif text-[15px] font-semibold text-[#D9CBB2]">Storage hogs</span>
+                <span className="text-[11.5px] text-sand-400">— items eating the most space</span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div className="flex flex-col gap-2.5">
                 {hogs.map(h => {
                   const p = Math.round(h.pct * 100);
                   const action = h.name === 'Spoiled Food' ? 'Convert to fertiliser'
                     : h.cat === 'Food' ? 'Cook or sell the surplus' : 'Sell or ease production';
                   return (
-                    <div key={h.name} style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
+                    <div key={h.name} className="flex items-center gap-[11px]">
                       <ItemImg cls={h.raw} size={20}
-                        fallback={<span style={{ width: 8, height: 8, borderRadius: 2, background: catColor[h.cat] ?? C.textDim, flex: '0 0 auto' }} />} />
-                      <span style={{ width: 112, flex: '0 0 auto', fontSize: 13, color: C.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{h.name}</span>
-                      <div style={{ flex: '1 1 auto', minWidth: 40, height: 7, borderRadius: 4, background: 'rgba(255,255,255,.07)', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: `${Math.min(100, p)}%`, background: p >= 20 ? '#C4553B' : p >= 12 ? '#E0A73C' : '#B08D57' }} />
+                        fallback={<span className="h-2 w-2 flex-none rounded-[2px]" style={{ background: catColor[h.cat] ?? C.textDim }} />} />
+                      <span className="w-[112px] flex-none overflow-hidden text-ellipsis whitespace-nowrap text-[13px] text-sand-200">{h.name}</span>
+                      <div className="h-[7px] min-w-[40px] flex-1 overflow-hidden rounded-[4px] bg-white/[.07]">
+                        <div className="h-full" style={{ width: `${Math.min(100, p)}%`, background: p >= 20 ? '#C4553B' : p >= 12 ? '#E0A73C' : '#B08D57' }} />
                       </div>
-                      <span style={{ width: 52, flex: '0 0 auto', textAlign: 'right', fontFamily: MONO, fontSize: 12, color: '#DCD2BE' }}>{h.qty.toLocaleString()}</span>
-                      <span style={{ width: 96, flex: '0 0 auto', fontSize: 11, color: C.textDim2 }}>{p}% of capacity</span>
-                      <span style={{ flex: '0 0 auto', fontSize: 11, color: '#C9A85E', whiteSpace: 'nowrap' }}>{action}</span>
+                      <span className="w-[52px] flex-none text-right font-mono text-xs text-[#DCD2BE]">{h.qty.toLocaleString()}</span>
+                      <span className="w-[96px] flex-none text-[11px] text-sand-400">{p}% of capacity</span>
+                      <span className="flex-none whitespace-nowrap text-[11px] text-[#C9A85E]">{action}</span>
                     </div>
                   );
                 })}
@@ -256,65 +230,60 @@ export const StorageTab = ({ containers }: { containers: ContainerVM[] }) => {
             </div>
           )}
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 9, flexWrap: 'wrap', marginBottom: 14 }}>
-            <div style={searchBoxStyle(32)}>
+          <div className="mb-3.5 flex flex-wrap items-center gap-[9px]">
+            <div className="flex h-8 items-center gap-2 rounded-lg border border-line-3 bg-ink px-[11px]">
               <SearchIcon size={13} />
               <input value={q} onChange={e => setQ(e.target.value)} placeholder="Find item…"
-                style={{ ...searchInputStyle, fontSize: 12.5, width: 120 }} />
+                className="w-[120px] border-none bg-transparent font-sans text-[12.5px] text-sand-200 outline-none" />
             </div>
             {chips.map(ch => (
-              <button key={ch.key} onClick={() => setCat(ch.key)} style={{
-                display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 11px', borderRadius: 999,
-                cursor: 'pointer', fontFamily: 'inherit', fontSize: 12,
-                border: `1px solid ${cat === ch.key ? ch.color : '#2E271E'}`,
-                background: cat === ch.key ? `${ch.color}22` : C.inputBg,
-                color: cat === ch.key ? '#EDE4D2' : C.textDim,
-              }}>
-                <span style={{ width: 8, height: 8, borderRadius: 2, background: ch.color }} />
+              <button key={ch.key} onClick={() => setCat(ch.key)}
+                className={cn(
+                  'inline-flex cursor-pointer items-center gap-1.5 rounded-full border py-[5px] px-[11px] font-sans text-xs',
+                  cat === ch.key ? 'text-[#EDE4D2]' : 'border-line-3 bg-ink text-sand-400',
+                )}
+                style={cat === ch.key ? { borderColor: ch.color, background: `${ch.color}22` } : undefined}>
+                <span className="h-2 w-2 rounded-[2px]" style={{ background: ch.color }} />
                 {ch.label}
-                <span style={{ fontFamily: MONO, fontSize: 10.5, opacity: .7 }}>{ch.qty}</span>
+                <span className="font-mono text-[10.5px] opacity-70">{ch.qty}</span>
               </button>
             ))}
           </div>
 
           {items.length > 0 ? (
-            <div style={{ border: '1px solid #241E17', borderRadius: 11, overflow: 'hidden' }}>
-              <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, fontSize: 13 }}>
+            <div className="overflow-hidden rounded-[11px] border border-[#241E17]">
+              <table className="w-full border-separate border-spacing-0 text-[13px]">
                 <thead>
                   <tr>
                     {['Item', 'Category', 'Qty', ...(sel === 'all' ? ['Location'] : [])].map((h, i) => (
-                      <th key={h} style={{
-                        textAlign: i === 2 ? 'right' : 'left', padding: '9px 14px', background: C.headBg,
-                        borderBottom: `1px solid ${C.border2}`, color: '#B7A98F', fontSize: 10.5,
-                        letterSpacing: '.5px', textTransform: 'uppercase', fontWeight: 600,
-                      }}>{h}</th>
+                      <th key={h} className={cn(
+                        'border-b border-line-2 bg-iron-700 py-[9px] px-3.5 text-[10.5px] font-semibold uppercase tracking-[.5px] text-sand-350',
+                        i === 2 ? 'text-right' : 'text-left',
+                      )}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {items.map(it => (
-                    <tr key={it.name} onClick={() => doHighlight(it.locs)} className="bw-row"
-                      style={{ borderBottom: `1px solid ${C.borderRow}`, cursor: 'pointer' }}>
-                      <td style={{ padding: '8px 14px', color: C.text, borderBottom: `1px solid ${C.borderRow}` }}>
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 9 }}>
+                    <tr key={it.name} onClick={() => doHighlight(it.locs)} className="bw-row cursor-pointer">
+                      <td className="border-b border-row py-2 px-3.5 text-sand-200">
+                        <span className="inline-flex items-center gap-[9px]">
                           <ItemImg cls={it.raw} size={22}
-                            fallback={<span style={{ width: 22, height: 22, borderRadius: 4, background: '#211C15', display: 'inline-block' }} />} />
+                            fallback={<span className="inline-block h-[22px] w-[22px] rounded bg-iron-650" />} />
                           {it.name}
                         </span>
                       </td>
-                      <td style={{ padding: '8px 14px', borderBottom: `1px solid ${C.borderRow}` }}>
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11.5, color: catColor[it.cat] ?? C.textDim }}>
-                          <span style={{ width: 8, height: 8, borderRadius: 2, background: catColor[it.cat] ?? C.textDim }} />
+                      <td className="border-b border-row py-2 px-3.5">
+                        <span className="inline-flex items-center gap-1.5 text-[11.5px]" style={{ color: catColor[it.cat] ?? C.textDim }}>
+                          <span className="h-2 w-2 rounded-[2px]" style={{ background: catColor[it.cat] ?? C.textDim }} />
                           {it.cat}
                         </span>
                       </td>
-                      <td style={{ padding: '8px 14px', textAlign: 'right', fontFamily: MONO, color: '#DCD2BE', borderBottom: `1px solid ${C.borderRow}` }}>{it.qty}</td>
+                      <td className="border-b border-row py-2 px-3.5 text-right font-mono text-[#DCD2BE]">{it.qty}</td>
                       {sel === 'all' && (
-                        <td style={{ padding: '8px 14px', borderBottom: `1px solid ${C.borderRow}` }}>
-                          <span data-tip={it.locs.map(l => `${l.name} (${l.qty})`).join(', ')} style={{
-                            display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#C6BBA4',
-                            border: '1px solid #37301F', background: '#211C15', borderRadius: 999, padding: '3px 10px',
-                          }}>
+                        <td className="border-b border-row py-2 px-3.5">
+                          <span data-tip={it.locs.map(l => `${l.name} (${l.qty})`).join(', ')}
+                            className="inline-flex items-center gap-1.5 rounded-full border border-[#37301F] bg-iron-650 py-[3px] px-2.5 text-xs text-sand-300">
                             <PinIcon />
                             {it.locs.length === 1 ? it.locs[0].name : `${it.locs.length} containers`}
                           </span>
@@ -326,7 +295,7 @@ export const StorageTab = ({ containers }: { containers: ContainerVM[] }) => {
               </table>
             </div>
           ) : (
-            <div style={{ textAlign: 'center', padding: '52px 20px', color: C.textFaint, fontSize: 13 }}>
+            <div className="py-[52px] px-5 text-center text-[13px] text-sand-600">
               No items match this filter.
             </div>
           )}

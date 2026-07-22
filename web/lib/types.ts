@@ -78,7 +78,10 @@ export type World = {
   gear_presets?: GearPreset[]; // custom (player-named) preset definitions
   player?: PlayerState; // the player pawn (absent on old snapshots)
   carried?: Record<string, { item: string; qty: number }[]>; // actor guid -> inventory
+  pois?: Poi[]; // camps/chests/shrines/wildlife-spawner map points
 };
+
+export type Poi = { cls: string; layer: string; position: number[] };
 
 export type PlayerState = {
   guid: string | null;

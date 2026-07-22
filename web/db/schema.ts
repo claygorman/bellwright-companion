@@ -8,6 +8,7 @@ import { sqliteTable, integer, text, real, index, uniqueIndex } from 'drizzle-or
 import type { Npc, Storage, Meta, Group } from 'bellwright-parse/types';
 import type { GearPreset } from 'bellwright-parse/gearpresets';
 import type { PlayerState } from 'bellwright-parse/player';
+import type { Poi } from 'bellwright-parse/pois';
 
 export type World = {
   ingested_at: string;
@@ -19,6 +20,7 @@ export type World = {
   gear_presets?: GearPreset[]; // custom preset definitions (named)
   player?: PlayerState; // the player pawn (absent on old snapshots)
   carried?: Record<string, { item: string; qty: number }[]>; // actor guid -> inventory
+  pois?: Poi[]; // camps/chests/shrines/wildlife-spawner map points
 };
 
 export const snapshots = sqliteTable(

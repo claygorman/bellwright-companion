@@ -1,58 +1,50 @@
 'use client';
 // Insights tab — automated triage cards (real-data subset of the design).
-import { avatarColor, initials } from '@/lib/bw/format';
 import { npcName, type InsightCard } from '@/lib/bw/model';
 import { Icon } from './icons';
 import { Avatar } from './avatar';
 import { GearPanel } from './gear';
-import { C, MONO, SERIF, SEV, avatarStyle } from './ui';
+import { SEV } from './ui';
 
 export const Insights = ({ cards, villagerCount, snapshotId, onOpen }: {
   cards: InsightCard[]; villagerCount: number; snapshotId?: number; onOpen: (guid: string) => void;
 }) => (
-  <div className="bw-scroll" style={{ height: '100%', overflowY: 'auto' }}>
-    <div style={{ padding: '22px 24px 44px' }}>
+  <div className="bw-scroll h-full overflow-y-auto">
+    <div className="pt-[22px] px-6 pb-11">
       <GearPanel key={snapshotId ?? 0} onOpen={onOpen} />
-      <div style={{ marginBottom: 16 }}>
-        <h2 style={{ margin: 0, fontFamily: SERIF, fontSize: 20, fontWeight: 600, color: C.textBright }}>Settlement insights</h2>
-        <p style={{ margin: '4px 0 0', fontSize: 12.5, color: C.textDim2 }}>
+      <div className="mb-4">
+        <h2 className="font-serif text-xl font-semibold text-sand-100">Settlement insights</h2>
+        <p className="mt-1 text-[12.5px] text-[#8a8069]">
           Automated triage &amp; suggestions across your {villagerCount} villagers.
         </p>
       </div>
       {cards.length > 0 ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(330px,1fr))', gap: 12, alignItems: 'start' }}>
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(330px,1fr))] gap-3 items-start">
           {cards.map(c => {
             const s = SEV[c.severity];
             return (
-              <div key={c.title} style={{
-                border: `1px solid ${s.bd}`, background: `linear-gradient(180deg,${s.bg},transparent)`,
-                borderRadius: 12, padding: '14px 16px',
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 11, marginBottom: 4 }}>
-                  <span style={{
-                    width: 30, height: 30, borderRadius: 8, flex: '0 0 auto', display: 'flex',
-                    alignItems: 'center', justifyContent: 'center', background: s.bg, border: `1px solid ${s.bd}`,
-                  }}><Icon name={c.icon} size={15} color={s.a} /></span>
-                  <span style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 600, flex: '1 1 auto', color: s.c }}>{c.title}</span>
-                  <span style={{
-                    fontFamily: MONO, fontSize: 11, fontWeight: 600, padding: '1px 8px',
-                    borderRadius: 999, color: s.a, background: s.bg, border: `1px solid ${s.bd}`,
-                  }}>{c.items.length}</span>
+              <div key={c.title} className="rounded-xl py-3.5 px-4 border"
+                style={{ borderColor: s.bd, background: `linear-gradient(180deg,${s.bg},transparent)` }}>
+                <div className="flex items-center gap-[11px] mb-1">
+                  <span className="w-[30px] h-[30px] rounded-lg flex-none flex items-center justify-center border"
+                    style={{ background: s.bg, borderColor: s.bd }}>
+                    <Icon name={c.icon} size={15} color={s.a} />
+                  </span>
+                  <span className="font-serif text-[15px] font-semibold flex-auto" style={{ color: s.c }}>{c.title}</span>
+                  <span className="font-mono text-[11px] font-semibold py-px px-2 rounded-full border"
+                    style={{ color: s.a, background: s.bg, borderColor: s.bd }}>{c.items.length}</span>
                 </div>
-                <p style={{ margin: '0 0 11px', fontSize: 12, color: C.textDim, paddingLeft: 41 }}>{c.desc}</p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, paddingLeft: 41 }}>
+                <p className="mb-[11px] text-xs text-sand-400 pl-[41px]">{c.desc}</p>
+                <div className="flex flex-wrap gap-[7px] pl-[41px]">
                   {c.items.map(it => {
                     const name = npcName(it.npc);
                     const first = it.npc.first_name ?? name, last = it.npc.last_name ?? '';
                     return (
-                      <button key={it.guid} onClick={() => onOpen(it.guid)} style={{
-                        display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 11px 5px 5px',
-                        background: C.cardBg, border: '1px solid #2E271E', borderRadius: 999,
-                        cursor: 'pointer', fontFamily: 'inherit',
-                      }}>
+                      <button key={it.guid} onClick={() => onOpen(it.guid)}
+                        className="inline-flex items-center gap-2 py-[5px] pr-[11px] pl-[5px] bg-iron-750 border border-line-3 rounded-full cursor-pointer">
                         <Avatar v={it.npc} size={22} radius={6} />
-                        <span style={{ fontSize: 12, color: C.text, whiteSpace: 'nowrap' }}>{name}</span>
-                        <span style={{ fontSize: 10.5, fontFamily: MONO, color: s.a }}>{it.detail}</span>
+                        <span className="text-xs text-sand-200 whitespace-nowrap">{name}</span>
+                        <span className="text-[10.5px] font-mono" style={{ color: s.a }}>{it.detail}</span>
                       </button>
                     );
                   })}
@@ -62,9 +54,9 @@ export const Insights = ({ cards, villagerCount, snapshotId, onOpen }: {
           })}
         </div>
       ) : (
-        <div style={{ textAlign: 'center', padding: '64px 20px' }}>
-          <div style={{ fontFamily: SERIF, fontSize: 18, color: C.greenText, marginBottom: 6 }}>All clear</div>
-          <div style={{ fontSize: 13, color: C.textFaint }}>
+        <div className="text-center py-16 px-5">
+          <div className="font-serif text-lg text-[#8FBF74] mb-1.5">All clear</div>
+          <div className="text-[13px] text-sand-600">
             No warnings or suggestions right now — the settlement is in good order.
           </div>
         </div>

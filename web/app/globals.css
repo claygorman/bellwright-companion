@@ -76,6 +76,48 @@
   body { @apply bg-background text-foreground; }
 }
 
+/* ---- Bellwright palette (Claude Design token handoff) ---- */
+@theme {
+  --font-serif: var(--font-spectral), 'Spectral', serif;
+  --font-sans: var(--font-plex-sans), 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), 'IBM Plex Mono', monospace;
+  --color-iron-950: #100E0B;
+  --color-iron-900: #15120E;
+  --color-iron-850: #16130E;
+  --color-iron-800: #18140F;
+  --color-iron-750: #1B1711;
+  --color-iron-700: #1C1811;
+  --color-iron-650: #211C15;
+  --color-ink: #0F0D0A;
+  --color-line: #241E18;
+  --color-line-2: #2C251D;
+  --color-line-3: #2E271E;
+  --color-line-4: #322A20;
+  --color-row: #201B15;
+  --color-gold: #E0A73C;
+  --color-gold-bright: #F4C868;
+  --color-gold-deep: #C6892C;
+  --color-sand-50: #F4EBD8;
+  --color-sand-100: #F1E7D4;
+  --color-sand-200: #E9E1D2;
+  --color-sand-300: #C6BBA4;
+  --color-sand-350: #B3A88F;
+  --color-sand-400: #9A8F7D;
+  --color-sand-500: #8A7F6C;
+  --color-sand-600: #7A7060;
+  --color-sand-700: #6A6152;
+  --color-sand-800: #5F5849;
+  --color-moss: #7DB068;
+  --color-moss-bright: #7FB05B;
+  --color-moss-soft: #8FA05B;
+  --color-rust: #C4553B;
+  --color-rust-bright: #D9614A;
+  --color-rust-soft: #E0997F;
+  --color-sky: #5FA8CE;
+  --color-sky-bright: #5FB4D6;
+  --color-brass: #C99A4B;
+}
+
 /* ---- Bellwright Companion design chrome (Claude Design port) ---- */
 body { background: #100E0B; overflow-x: hidden; }
 /* the design's 11-13px type runs small on desktop — scale the whole UI up a

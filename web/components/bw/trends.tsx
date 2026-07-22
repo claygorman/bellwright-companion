@@ -8,7 +8,7 @@ import {
   ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
 import { itemLabel } from '@/lib/bw/format';
-import { C, MONO, SERIF } from './ui';
+import { cn } from '@/lib/utils';
 
 const SERIES_COLORS = ['#E0A73C', '#7FA8C9', '#7DB068', '#D9614A', '#B08D57', '#9AD0E6', '#C99A4B', '#A6836A'];
 const RUNWAY_WARN_HOURS = 24;
@@ -27,9 +27,7 @@ type TrendsData = {
   } | null;
 };
 
-const panel: React.CSSProperties = {
-  border: `1px solid ${C.border2}`, background: C.cardBg2, borderRadius: 12, padding: '14px 16px',
-};
+const panel = 'rounded-xl border border-line-2 bg-[#1A160F] py-3.5 px-4';
 
 const chartTooltip = {
   contentStyle: {
@@ -47,13 +45,13 @@ export const Trends = () => {
     fetch('/api/trends', { cache: 'no-store' }).then(r => r.json()).then(setData).catch(() => {});
   }, []);
 
-  if (!data) return <div style={{ padding: 40, color: C.textFaint, fontSize: 13 }}>Loading history…</div>;
+  if (!data) return <div className="p-10 text-[13px] text-sand-600">Loading history…</div>;
   const { points, top_items, deltas } = data;
   if (points.length < 2) {
     return (
-      <div style={{ textAlign: 'center', padding: '64px 20px' }}>
-        <div style={{ fontFamily: SERIF, fontSize: 18, color: C.textDim, marginBottom: 6 }}>Not enough history yet</div>
-        <div style={{ fontSize: 13, color: C.textFaint }}>Trends appear after a few saves have been ingested.</div>
+      <div className="py-16 px-5 text-center">
+        <div className="mb-1.5 font-serif text-lg text-sand-400">Not enough history yet</div>
+        <div className="text-[13px] text-sand-600">Trends appear after a few saves have been ingested.</div>
       </div>
     );
   }
@@ -78,41 +76,41 @@ export const Trends = () => {
   const drainers = deltas ? Object.entries(deltas.items).filter(([, v]) => v.delta < 0).slice(0, 6) : [];
 
   return (
-    <div className="bw-scroll" style={{ height: '100%', overflowY: 'auto' }}>
-      <div style={{ padding: '22px 24px 44px' }}>
-        <div style={{ marginBottom: 16 }}>
-          <h2 style={{ margin: 0, fontFamily: SERIF, fontSize: 20, fontWeight: 600, color: C.textBright }}>Trends</h2>
-          <p style={{ margin: '4px 0 0', fontSize: 12.5, color: C.textDim2 }}>
+    <div className="bw-scroll h-full overflow-y-auto">
+      <div className="pt-[22px] px-6 pb-11">
+        <div className="mb-4">
+          <h2 className="font-serif text-xl font-semibold text-sand-100">Trends</h2>
+          <p className="mt-1 text-[12.5px] text-sand-400">
             {points.length} snapshots · {deltas ? `${deltas.hours_played.toFixed(1)}h of tracked playtime` : ''}
           </p>
         </div>
 
         {/* runway alerts */}
         {runway.length > 0 && (
-          <div style={{ ...panel, marginBottom: 14, borderColor: runway[0].hours < RUNWAY_WARN_HOURS ? 'rgba(196,85,59,.4)' : C.border2 }}>
-            <div style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 600, color: '#D9CBB2', marginBottom: 10 }}>
+          <div className={cn(panel, 'mb-3.5', runway[0].hours < RUNWAY_WARN_HOURS && 'border-rust/40')}>
+            <div className="mb-2.5 font-serif text-[15px] font-semibold text-[#D9CBB2]">
               Runway — consumables trending down
             </div>
-            <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap' }}>
+            <div className="flex flex-wrap gap-[18px]">
               {runway.map(r => (
                 <div key={r.item}>
-                  <div style={{ fontFamily: MONO, fontSize: 17, fontWeight: 600, color: r.hours < RUNWAY_WARN_HOURS ? '#E0997F' : C.gold }}>
+                  <div className={cn('font-mono text-[17px] font-semibold', r.hours < RUNWAY_WARN_HOURS ? 'text-rust-soft' : 'text-gold-bright')}>
                     ~{r.hours < 48 ? `${Math.round(r.hours)}h` : `${Math.round(r.hours / 24)}d`}
                   </div>
-                  <div style={{ fontSize: 11, color: C.textDim2 }}>{r.item} ({r.to} left)</div>
+                  <div className="text-[11px] text-sand-400">{r.item} ({r.to} left)</div>
                 </div>
               ))}
             </div>
-            <div style={{ fontSize: 10.5, color: C.textFaint, marginTop: 8 }}>
+            <div className="mt-2 text-[10.5px] text-sand-600">
               Hours of playtime until empty at the current net rate.
             </div>
           </div>
         )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(420px,1fr))', gap: 12, marginBottom: 14 }}>
+        <div className="mb-3.5 grid grid-cols-[repeat(auto-fit,minmax(420px,1fr))] gap-3">
           {/* storage over time */}
-          <div style={panel}>
-            <div style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 600, color: '#D9CBB2', marginBottom: 10 }}>Storage — top items</div>
+          <div className={panel}>
+            <div className="mb-2.5 font-serif text-[15px] font-semibold text-[#D9CBB2]">Storage — top items</div>
             <ResponsiveContainer width="100%" height={230}>
               <LineChart data={chartData} margin={{ left: -14, right: 8, top: 4 }}>
                 <CartesianGrid stroke="rgba(255,255,255,.06)" vertical={false} />
@@ -130,8 +128,8 @@ export const Trends = () => {
           </div>
 
           {/* morale + injuries */}
-          <div style={panel}>
-            <div style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 600, color: '#D9CBB2', marginBottom: 10 }}>Morale & injuries</div>
+          <div className={panel}>
+            <div className="mb-2.5 font-serif text-[15px] font-semibold text-[#D9CBB2]">Morale & injuries</div>
             <ResponsiveContainer width="100%" height={230}>
               <LineChart data={chartData} margin={{ left: -14, right: 8, top: 4 }}>
                 <CartesianGrid stroke="rgba(255,255,255,.06)" vertical={false} />
@@ -147,8 +145,8 @@ export const Trends = () => {
           </div>
 
           {/* total XP */}
-          <div style={panel}>
-            <div style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 600, color: '#D9CBB2', marginBottom: 10 }}>Settlement XP (all villagers)</div>
+          <div className={panel}>
+            <div className="mb-2.5 font-serif text-[15px] font-semibold text-[#D9CBB2]">Settlement XP (all villagers)</div>
             <ResponsiveContainer width="100%" height={230}>
               <AreaChart data={chartData} margin={{ left: -6, right: 8, top: 4 }}>
                 <defs>
@@ -168,25 +166,25 @@ export const Trends = () => {
 
           {/* XP movers */}
           {deltas && deltas.xp_movers.length > 0 && (
-            <div style={panel}>
-              <div style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 600, color: '#D9CBB2', marginBottom: 4 }}>
+            <div className={panel}>
+              <div className="mb-1 font-serif text-[15px] font-semibold text-[#D9CBB2]">
                 Who trained ({deltas.hours_played.toFixed(1)}h window)
               </div>
               {deltas.idle_villagers.length > 0 && (
-                <div style={{ fontSize: 11, color: C.textFaint, marginBottom: 8 }}>
+                <div className="mb-2 text-[11px] text-sand-600">
                   No XP gained: {deltas.idle_villagers.join(', ')}
                 </div>
               )}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+              <div className="flex flex-col gap-[7px]">
                 {deltas.xp_movers.map(m => {
                   const max = deltas.xp_movers[0].gained;
                   return (
-                    <div key={m.name} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <span style={{ width: 130, flex: '0 0 auto', fontSize: 12, color: C.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.name}</span>
-                      <div style={{ flex: '1 1 auto', height: 7, borderRadius: 4, background: 'rgba(255,255,255,.07)', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: `${Math.max(3, (m.gained / max) * 100)}%`, background: '#E0A73C' }} />
+                    <div key={m.name} className="flex items-center gap-2.5">
+                      <span className="w-[130px] flex-none overflow-hidden text-ellipsis whitespace-nowrap text-xs text-sand-200">{m.name}</span>
+                      <div className="h-[7px] flex-1 overflow-hidden rounded-[4px] bg-white/[.07]">
+                        <div className="h-full bg-gold" style={{ width: `${Math.max(3, (m.gained / max) * 100)}%` }} />
                       </div>
-                      <span style={{ width: 64, textAlign: 'right', fontFamily: MONO, fontSize: 11.5, color: '#DCD2BE' }}>+{m.gained.toLocaleString()}</span>
+                      <span className="w-16 text-right font-mono text-[11.5px] text-[#DCD2BE]">+{m.gained.toLocaleString()}</span>
                     </div>
                   );
                 })}
@@ -197,17 +195,17 @@ export const Trends = () => {
 
         {/* storage movement table */}
         {deltas && (gainers.length > 0 || drainers.length > 0) && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(320px,1fr))', gap: 12 }}>
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-3">
             {[['Produced (net)', gainers, '#8FBF74'], ['Consumed (net)', drainers, '#E0997F']].map(([title, list, color]) => (
-              <div key={title as string} style={panel}>
-                <div style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 600, color: '#D9CBB2', marginBottom: 10 }}>{title as string}</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div key={title as string} className={panel}>
+                <div className="mb-2.5 font-serif text-[15px] font-semibold text-[#D9CBB2]">{title as string}</div>
+                <div className="flex flex-col gap-1.5">
                   {(list as [string, { delta: number; perHour: number | null; to: number }][]).map(([k, v]) => (
-                    <div key={k} style={{ display: 'flex', alignItems: 'baseline', gap: 10, fontSize: 12.5 }}>
-                      <span style={{ flex: '1 1 auto', color: C.text }}>{itemLabel(k)}</span>
-                      <span style={{ fontFamily: MONO, color: color as string }}>{v.delta > 0 ? '+' : ''}{v.delta}</span>
+                    <div key={k} className="flex items-baseline gap-2.5 text-[12.5px]">
+                      <span className="flex-1 text-sand-200">{itemLabel(k)}</span>
+                      <span className="font-mono" style={{ color: color as string }}>{v.delta > 0 ? '+' : ''}{v.delta}</span>
                       {v.perHour != null && (
-                        <span style={{ fontFamily: MONO, fontSize: 10.5, color: C.textFaint, width: 70, textAlign: 'right' }}>
+                        <span className="w-[70px] text-right font-mono text-[10.5px] text-sand-600">
                           {v.perHour > 0 ? '+' : ''}{v.perHour.toFixed(1)}/h
                         </span>
                       )}
