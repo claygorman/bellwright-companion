@@ -90,11 +90,11 @@ export const StorageTab = ({ containers }: { containers: ContainerVM[] }) => {
   ];
 
   return (
-    <div className="flex h-full">
-      {/* sidebar */}
-      <div className="bw-scroll w-[246px] flex-none overflow-y-auto border-r border-line bg-iron-850 py-3 px-2.5">
-        <div className="pt-1 px-2 pb-2 text-[10px] font-semibold uppercase tracking-[.7px] text-sand-400">Containers</div>
-        <div className="flex flex-col gap-[3px]">
+    <div className="flex h-full flex-col md:flex-row">
+      {/* sidebar (horizontal scroll strip on mobile, column on desktop) */}
+      <div className="bw-scroll w-full flex-none overflow-x-auto border-b border-line bg-iron-850 px-2.5 py-2 md:max-h-none md:w-[246px] md:overflow-x-visible md:overflow-y-auto md:border-b-0 md:border-r md:py-3">
+        <div className="hidden pt-1 px-2 pb-2 text-[10px] font-semibold uppercase tracking-[.7px] text-sand-400 md:block">Containers</div>
+        <div className="flex flex-row gap-[3px] md:flex-col">
           {[null, ...containers].map(c => {
             const isAll = c === null;
             const id = isAll ? 'all' : c.id;
@@ -105,7 +105,7 @@ export const StorageTab = ({ containers }: { containers: ContainerVM[] }) => {
             const hl = !isAll && highlight.includes(id);
             return (
               <button key={id} onClick={() => { setSel(id); setCat('all'); }} className={cn(
-                'flex w-full cursor-pointer flex-col gap-1.5 rounded-[9px] border py-2.5 px-[11px] text-left font-sans transition-[box-shadow,border-color] duration-200',
+                'flex min-w-[168px] flex-none cursor-pointer flex-col gap-1.5 rounded-[9px] border py-2.5 px-[11px] text-left font-sans transition-[box-shadow,border-color] duration-200 md:w-full md:min-w-0',
                 hl ? 'border-gold shadow-[0_0_0_1px_var(--color-gold),0_0_16px_rgba(224,167,60,.35)]'
                   : on ? 'border-[#4a3f2a] bg-gold/[.08]' : 'border-transparent',
               )}>
@@ -149,7 +149,7 @@ export const StorageTab = ({ containers }: { containers: ContainerVM[] }) => {
 
       {/* main */}
       <div className="bw-scroll flex-1 overflow-y-auto">
-        <div className="pt-5 px-6 pb-11">
+        <div className="pt-4 px-4 pb-11 md:pt-5 md:px-6">
           <div className="mb-3.5">
             <h2 className="font-serif text-xl font-semibold text-sand-100">
               {container ? container.name : 'All storage'}
@@ -184,7 +184,7 @@ export const StorageTab = ({ containers }: { containers: ContainerVM[] }) => {
             </div>
           )}
 
-          <div className="mb-4 grid grid-cols-4 gap-2.5">
+          <div className="mb-4 grid grid-cols-2 gap-2.5 md:grid-cols-4">
             {[
               { label: 'Total items', val: totalQty.toLocaleString(), color: C.textBright },
               { label: 'Unique items', val: String(agg.length), color: C.textBright },
@@ -216,13 +216,13 @@ export const StorageTab = ({ containers }: { containers: ContainerVM[] }) => {
                     <div key={h.name} className="flex items-center gap-[11px]">
                       <ItemImg cls={h.raw} size={20}
                         fallback={<span className="h-2 w-2 flex-none rounded-[2px]" style={{ background: catColor[h.cat] ?? C.textDim }} />} />
-                      <span className="w-[112px] flex-none overflow-hidden text-ellipsis whitespace-nowrap text-[13px] text-sand-200">{h.name}</span>
+                      <span className="w-[96px] flex-none overflow-hidden text-ellipsis whitespace-nowrap text-[13px] text-sand-200 md:w-[112px]">{h.name}</span>
                       <div className="h-[7px] min-w-[40px] flex-1 overflow-hidden rounded-[4px] bg-white/[.07]">
                         <div className="h-full" style={{ width: `${Math.min(100, p)}%`, background: p >= 20 ? '#C4553B' : p >= 12 ? '#E0A73C' : '#B08D57' }} />
                       </div>
                       <span className="w-[52px] flex-none text-right font-mono text-xs text-[#DCD2BE]">{h.qty.toLocaleString()}</span>
-                      <span className="w-[96px] flex-none text-[11px] text-sand-400">{p}% of capacity</span>
-                      <span className="flex-none whitespace-nowrap text-[11px] text-[#C9A85E]">{action}</span>
+                      <span className="hidden w-[96px] flex-none text-[11px] text-sand-400 sm:inline">{p}% of capacity</span>
+                      <span className="hidden flex-none whitespace-nowrap text-[11px] text-[#C9A85E] md:inline">{action}</span>
                     </div>
                   );
                 })}
@@ -259,6 +259,7 @@ export const StorageTab = ({ containers }: { containers: ContainerVM[] }) => {
                       <th key={h} className={cn(
                         'border-b border-line-2 bg-iron-700 py-[9px] px-3.5 text-[10.5px] font-semibold uppercase tracking-[.5px] text-sand-350',
                         i === 2 ? 'text-right' : 'text-left',
+                        h === 'Category' && 'hidden sm:table-cell',
                       )}>{h}</th>
                     ))}
                   </tr>
@@ -266,14 +267,14 @@ export const StorageTab = ({ containers }: { containers: ContainerVM[] }) => {
                 <tbody>
                   {items.map(it => (
                     <tr key={it.name} onClick={() => doHighlight(it.locs)} className="bw-row cursor-pointer">
-                      <td className="border-b border-row py-2 px-3.5 text-sand-200">
+                      <td className="border-b border-row py-2 px-2.5 text-sand-200 sm:px-3.5">
                         <span className="inline-flex items-center gap-[9px]">
                           <ItemImg cls={it.raw} size={22}
                             fallback={<span className="inline-block h-[22px] w-[22px] rounded bg-iron-650" />} />
                           {it.name}
                         </span>
                       </td>
-                      <td className="border-b border-row py-2 px-3.5">
+                      <td className="hidden border-b border-row py-2 px-3.5 sm:table-cell">
                         <span className="inline-flex items-center gap-1.5 text-[11.5px]" style={{ color: catColor[it.cat] ?? C.textDim }}>
                           <span className="h-2 w-2 rounded-[2px]" style={{ background: catColor[it.cat] ?? C.textDim }} />
                           {it.cat}
