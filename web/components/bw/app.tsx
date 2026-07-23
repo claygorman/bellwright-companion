@@ -344,7 +344,9 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
       )}
 
       {/* main */}
-      <main className="bw-scroll flex-1 overflow-auto relative min-h-0">
+      {/* fixed content pane — each tab body is the single scroll region (h-full
+          overflow-y-auto) so scrolling is consistent and never double-scrolls */}
+      <main className="flex-1 overflow-hidden relative min-h-0">
         {tab === 'me' && world.player && (
           <MeTab player={world.player} meta={world.meta} villagerCount={villagers.length}
             presetName={null} />
@@ -440,6 +442,10 @@ const SettingsMenu = ({ realtime, onRealtime }: { realtime: boolean; onRealtime:
           </span>
         </span>
       </button>
+      <div className="mt-1 pt-2 border-t border-line-2 px-2 flex items-center justify-between">
+        <span className="text-[10.5px] text-sand-600">Bellwright Companion</span>
+        <span className="font-mono text-[10.5px] text-sand-500">v{process.env.NEXT_PUBLIC_APP_VERSION ?? '—'}</span>
+      </div>
     </DropdownMenuContent>
   </DropdownMenu>
 );

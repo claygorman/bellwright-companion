@@ -274,7 +274,7 @@ const HireDiamonds = ({ v }: { v: Npc }) => {
 const MobileCards = ({ rows, npcCol, onOpen }: {
   rows: Npc[]; npcCol: boolean; onOpen: (g: string) => void;
 }) => (
-  <div className="flex flex-col gap-[9px] p-3.5">
+  <div className="bw-scroll h-full overflow-y-auto flex flex-col gap-[9px] p-3.5 pb-16">
     {rows.map(v => {
       const name = npcName(v);
       const first = v.first_name ?? name, last = v.last_name ?? '';
