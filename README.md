@@ -175,6 +175,10 @@ starter); counts are extra copies to keep in storage beyond assigned gear.
       recipes
 - [ ] Undecoded save fields: reservist/hold-ground toggles, housing/bed
       assignment, squad raised-state, village liberation status
+- [x] Live telemetry endpoint (`POST /api/telemetry`) + live map positions —
+      an optional companion mod can stream real-time villager/player positions
+      and village trust/prosperity (falls back to save data when idle)
+- [ ] Companion telemetry mod (Bellwright Modkit) to feed the endpoint
 - [ ] MCP server so AI assistants can query your settlement
 
 ## Contributing

@@ -95,6 +95,7 @@ const POI_DESC: Record<string, string> = {
 type Pin = {
   key: string; layer: LayerKey; u: number; v: number;
   label: string; sub: string; desc: string; guid: string | null; coords: string;
+  live?: boolean; // position is from live telemetry, not the save
 };
 
 const MIN_SCALE = 0.15;
@@ -150,6 +151,26 @@ export const MapTab = ({ world, region, onOpenProfile }: {
   const [wikiPois, setWikiPois] = useState<Record<string, { u: number; v: number; t?: string }[]>>({});
   useEffect(() => {
     fetch('/map/wiki-pois.json').then(r => (r.ok ? r.json() : {})).then(setWikiPois).catch(() => {});
+  }, []);
+
+  // live telemetry (from the companion mod): poll the latest and treat it as
+  // fresh for LIVE_TTL. When fresh, actor pins use live positions.
+  const LIVE_TTL = 8000;
+  const [live, setLive] = useState<{ actors: { id: string; name?: string; kind: string; x: number; y: number }[]; age: number } | null>(null);
+  useEffect(() => {
+    let stop = false;
+    const tick = async () => {
+      if (stop || document.hidden) return;
+      try {
+        const r = await fetch('/api/telemetry/latest', { cache: 'no-store' });
+        const j = (await r.json()) as { age_ms?: number; data?: { actors?: never[] } | null };
+        if (j.data?.actors && (j.age_ms ?? 1e9) < LIVE_TTL) setLive({ actors: j.data.actors, age: j.age_ms ?? 0 });
+        else setLive(null);
+      } catch { /* offline — no live layer */ }
+    };
+    void tick();
+    const t = setInterval(tick, 2000);
+    return () => { stop = true; clearInterval(t); };
   }, []);
 
   const pins = useMemo<Pin[]>(() => {
@@ -208,6 +229,24 @@ export const MapTab = ({ world, region, onOpenProfile }: {
         });
       }
     }
+    // overlay live telemetry: override matching actors' positions and add
+    // live-only actors — reuses the whole zoom/positioning pin machinery
+    if (live?.actors?.length) {
+      const byKey = new Map(out.map(pn => [pn.guid ?? pn.label, pn]));
+      const layerFor = (k: string): LayerKey => k === 'player' ? 'player' : k === 'hostile' ? 'hostiles' : 'villagers';
+      for (const a of live.actors) {
+        const pn = byKey.get(a.id) ?? (a.name ? byKey.get(a.name) : undefined);
+        const { u, v } = project(map, a.x, a.y);
+        if (pn) { pn.u = u; pn.v = v; pn.live = true; }
+        else {
+          const layer = layerFor(a.kind);
+          out.push({ key: `live-${a.id}`, layer, u, v, label: a.name ?? a.id,
+            sub: 'Live position', desc: 'Streaming live from the game.', guid: null,
+            coords: `[${Math.round(a.x)}, ${Math.round(a.y)}]`, live: true });
+        }
+      }
+    }
+
     for (const c of shapeContainers(world.storage)) {
       if (!c.position) continue;
       const { u, v } = project(map, c.position[0], c.position[1]);
@@ -218,7 +257,7 @@ export const MapTab = ({ world, region, onOpenProfile }: {
       });
     }
     return out;
-  }, [map, world, villagers, recruits, wikiPois]);
+  }, [map, world, villagers, recruits, wikiPois, live]);
 
   // viewport pan/zoom — imperative for performance: gestures write the
   // container transform + a --ps counter-scale CSS var directly (rAF-batched),
@@ -569,10 +608,13 @@ export const MapTab = ({ world, region, onOpenProfile }: {
                   onMouseLeave={() => setTip(null)}
                   className="pointer-events-auto absolute left-0 top-0 cursor-pointer"
                   style={{
-                    zIndex: sel2 ? 40 : hov ? 30 : lhl ? 25 : small ? 8 : 10,
+                    zIndex: p.live ? 35 : sel2 ? 40 : hov ? 30 : lhl ? 25 : small ? 8 : 10,
                     opacity: hoverLayer && !lhl ? 0.15 : 1,
                     transition: 'opacity .12s ease',
                   }}>
+                  {p.live && (
+                    <span className="pointer-events-none absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 h-[22px] w-[22px] rounded-full border-2 border-moss-bright [animation:bwpulse_1.6s_ease-in-out_infinite]" />
+                  )}
                   {m.iconImg ? (
                     // bare wiki icon straight on the terrain, like the game map
                     <div className="-translate-x-1/2 -translate-y-1/2">
@@ -623,7 +665,16 @@ export const MapTab = ({ world, region, onOpenProfile }: {
               className="h-[34px] w-[34px] cursor-pointer rounded-lg border border-[#3A3128] bg-[rgba(17,14,10,.85)] text-[17px] leading-none text-[#DCD2BE]">{lbl}</button>
           ))}
         </div>
-        <div className="pointer-events-none absolute bottom-4 left-4 z-40 font-serif text-[15px] tracking-[.5px] text-[#D8CBB0] [text-shadow:0_1px_6px_rgba(0,0,0,.8)]">{region}</div>
+        <div className="pointer-events-none absolute bottom-4 left-4 z-40 flex items-center gap-2.5">
+          <span className="font-serif text-[15px] tracking-[.5px] text-[#D8CBB0] [text-shadow:0_1px_6px_rgba(0,0,0,.8)]">{region}</span>
+          {live && (
+            <span data-tip="Streaming live positions from the game (telemetry mod)"
+              className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full border border-moss-bright/40 bg-moss-bright/15 py-[3px] px-2.5 text-[11px] font-semibold text-[#A9C293] [text-shadow:none]">
+              <span className="h-[7px] w-[7px] rounded-full bg-moss-bright shadow-[0_0_6px_#7FB05B] [animation:bwpulse_1.6s_ease-in-out_infinite]" />
+              LIVE
+            </span>
+          )}
+        </div>
 
         {selPin && (
           <div onClick={e => e.stopPropagation()}
