@@ -8,6 +8,7 @@ import { classifyRole, hireGateOf, insightsFor, npcName, playerNpcs, recruitNpcs
 import { shapeContainers } from '@/lib/bw/storage';
 import { CompareModal, CompareTray } from './compare';
 import { UploadButton } from './upload-modal';
+import { RaidWatcher } from './raid-alert';
 import { BwSelect } from '@/components/ui/dropdown-menu';
 import { Drawer } from './drawer';
 import { Insights } from './insights';
@@ -217,6 +218,7 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
     <div ref={rootRef}
       className="bg-iron-900 text-sand-200 h-dvh max-w-[100vw] overflow-x-hidden flex flex-col font-sans antialiased"
       style={{ '--accent': '#E0A73C', '--gold': '#F4C868', '--rowpad': '9px' } as React.CSSProperties}>
+      <RaidWatcher />
       {/* header */}
       <header className="flex items-center gap-[18px] h-14 px-[18px] min-w-0 overflow-hidden border-b border-line-2 bg-gradient-to-b from-[#1B1712] to-[#17130E] flex-none relative z-20">
         <div className="flex items-center gap-[11px]">

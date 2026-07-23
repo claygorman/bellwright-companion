@@ -15,10 +15,19 @@ export type LiveVillage = {
   prosperity?: number;
   liberated?: boolean;
 };
+// A raid the game has scheduled/spawned against your settlement (Conquest).
+export type RaidAlert = {
+  active: boolean;
+  village?: string;   // target settlement
+  eta_s?: number;     // seconds until it hits (if known)
+  party?: number;     // attacker count (if known)
+  message?: string;   // human summary
+};
 export type Telemetry = {
   t: number;                        // sender's clock (ms), informational
   actors?: LiveActor[];
   villages?: LiveVillage[];
+  raid?: RaidAlert;                 // AFK raid alert
 };
 
 type Stored = { received_at: number; data: Telemetry };

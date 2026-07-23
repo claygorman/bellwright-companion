@@ -17,15 +17,16 @@ export const POST = async (req: Request) => {
   } catch {
     return Response.json({ error: 'invalid JSON' }, { status: 400 });
   }
-  if (!Array.isArray(body.actors) && !Array.isArray(body.villages)) {
-    return Response.json({ error: 'expected { actors[] | villages[] }' }, { status: 400 });
+  if (!Array.isArray(body.actors) && !Array.isArray(body.villages) && !body.raid) {
+    return Response.json({ error: 'expected { actors[] | villages[] | raid }' }, { status: 400 });
   }
   // clamp to sane sizes so a runaway mod can't blow memory
   const data: Telemetry = {
     t: typeof body.t === 'number' ? body.t : Date.now(),
     actors: (body.actors ?? []).slice(0, 2000).filter(a => Number.isFinite(a.x) && Number.isFinite(a.y)),
     villages: (body.villages ?? []).slice(0, 64),
+    raid: body.raid,
   };
   setTelemetry(data);
-  return Response.json({ ok: true, actors: data.actors?.length ?? 0, villages: data.villages?.length ?? 0 });
+  return Response.json({ ok: true, actors: data.actors?.length ?? 0, villages: data.villages?.length ?? 0, raid: data.raid?.active ?? false });
 };
