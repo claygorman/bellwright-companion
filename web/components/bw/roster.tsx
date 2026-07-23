@@ -222,11 +222,6 @@ const Row = ({ v, npcCol, archCol, playtime, ingestedAt, compareMode, gearView, 
       {npcCol && (
         <td className="py-1.5 px-3 border-b border-row whitespace-nowrap">
           <div className="text-[11.5px] text-sand-350">{v.village ? `near ${v.village}` : '—'}</div>
-          {v.position && (
-            <div className="font-mono text-[10px] text-sand-700">
-              [{Math.round(v.position[0])}, {Math.round(v.position[1])}]
-            </div>
-          )}
         </td>
       )}
     </tr>

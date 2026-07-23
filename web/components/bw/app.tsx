@@ -279,14 +279,14 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
         </nav>
         <div className="flex-1" />
         {isTable && (
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <div className="flex items-center gap-2 px-[11px] h-[34px] bg-ink border border-line-3 rounded-lg">
+          <div className="flex items-center gap-2.5 flex-wrap w-full sm:w-auto">
+            <div className="flex items-center gap-2 px-[11px] h-[34px] bg-ink border border-line-3 rounded-lg flex-1 min-w-0 sm:flex-none">
               <SearchIcon />
               <input value={q} onChange={e => setQ(e.target.value)}
                 placeholder="Filter by name or archetype…"
-                className="bg-transparent border-none outline-none text-sand-200 text-[13px] w-[190px] font-sans" />
+                className="bg-transparent border-none outline-none text-sand-200 text-[13px] w-full sm:w-[190px] min-w-0 font-sans" />
             </div>
-            <BwSelect label="View" value={rosterView}
+            <BwSelect label="View" value={rosterView} align="start"
               options={[{ value: 'skills', label: 'Skills' }, { value: 'gear', label: 'Gear & inventory' }]}
               onChange={v => setRosterView(v as RosterView)} />
             <button onClick={() => setCompareMode(m => { if (m) setCompareSet([]); return !m; })} className={cn(
@@ -298,7 +298,7 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
               </svg>
               <span>Compare</span>
             </button>
-            <span className="text-xs text-sand-600 tabular-nums whitespace-nowrap">
+            <span className="hidden sm:inline text-xs text-sand-600 tabular-nums whitespace-nowrap">
               {rows.length} {tab === 'npcs' ? 'recruits' : 'villagers'}
             </span>
           </div>
@@ -306,26 +306,26 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
       </div>
 
       {isTable && (
-        <div className="flex items-center gap-1.5 py-[7px] px-[18px] flex-wrap border-b border-line bg-[#15110C] text-[11.5px]">
+        <div className="bw-scroll flex items-center gap-1.5 py-[7px] px-[18px] flex-nowrap overflow-x-auto sm:flex-wrap sm:overflow-visible border-b border-line bg-[#15110C] text-[11.5px]">
           {villages.length > 0 && (<>
             <FilterChips label="Village" all={villages} sel={villageFilter}
               onToggle={v => setVillageFilter(s2 => { const n = new Set(s2); n.has(v) ? n.delete(v) : n.add(v); return n; })} />
-            <span className="w-px h-4 bg-line-3" />
+            <span className="w-px h-4 bg-line-3 flex-none" />
           </>)}
           {specialistChips.length > 0 && (<>
             <FilterChips label="Specialist (liberated)" all={specialistChips} sel={profFilter}
               onToggle={v => setProfFilter(s2 => { const n = new Set(s2); n.has(v) ? n.delete(v) : n.add(v); return n; })} />
-            <span className="w-px h-4 bg-line-3" />
+            <span className="w-px h-4 bg-line-3 flex-none" />
           </>)}
           {commonChips.length > 0 && (<>
             <FilterChips label="Common" all={commonChips} sel={profFilter}
               onToggle={v => setProfFilter(s2 => { const n = new Set(s2); n.has(v) ? n.delete(v) : n.add(v); return n; })} />
-            <span className="w-px h-4 bg-line-3" />
+            <span className="w-px h-4 bg-line-3 flex-none" />
           </>)}
           {ranks.length > 0 && (<>
             <FilterChips label="Trust" all={ranks} sel={rankFilter}
               onToggle={v => setRankFilter(s2 => { const n = new Set(s2); n.has(v) ? n.delete(v) : n.add(v); return n; })} />
-            <span className="w-px h-4 bg-line-3" />
+            <span className="w-px h-4 bg-line-3 flex-none" />
           </>)}
           <FilterChips label="Role" all={['Fighter', 'Worker', 'Balanced']} sel={roleFilter as Set<string>}
             colors={ROLE_COLORS as Record<string, string>}
@@ -371,15 +371,15 @@ const FilterChips = ({ label, all, sel, onToggle, colors }: {
   label: string; all: string[]; sel: Set<string>;
   onToggle: (v: string) => void; colors?: Record<string, string>;
 }) => (
-  <span className="inline-flex items-center gap-[5px] flex-wrap">
-    <span className="text-[9.5px] tracking-[.5px] uppercase text-sand-600">{label}</span>
+  <span className="inline-flex items-center gap-[5px] flex-none flex-nowrap sm:flex-wrap">
+    <span className="text-[9.5px] tracking-[.5px] uppercase text-sand-600 whitespace-nowrap">{label}</span>
     {all.map(v => {
       const on = sel.has(v);
       const color = colors?.[v] ?? '#C6BBA4';
       return (
         <button key={v} onClick={() => onToggle(v)}
           className={cn(
-            'py-0.5 px-[9px] rounded-full cursor-pointer font-sans text-[11px] border',
+            'py-0.5 px-[9px] rounded-full cursor-pointer font-sans text-[11px] border flex-none whitespace-nowrap',
             on ? 'text-[#EDE4D2]' : 'border-line-3 bg-transparent text-sand-400',
           )}
           // active chip tint comes from the role/village color in data
