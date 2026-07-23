@@ -211,7 +211,7 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
     { key: 'villagers', label: 'Population', count: villagers.length, alert: villagerAlert },
     { key: 'npcs', label: 'Recruits', count: recruits.length, alert: false },
     { key: 'trends', label: 'Trends', count: null, alert: false },
-    { key: 'insights', label: 'Insights', count: insights.length, alert: false },
+    { key: 'insights', label: 'Insights', count: insights.length, alert: homeless > 0 },
     { key: 'storage', label: 'Storage', count: containers.length, alert: storageAlert },
     { key: 'map', label: 'Map', count: null, alert: false },
   ];
@@ -272,7 +272,9 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
                   )}>{t.count}</span>
                 )}
                 {t.alert && (
-                  <span data-tip={t.key === 'storage' ? 'Storage needs attention' : 'Villagers need attention'}
+                  <span data-tip={t.key === 'storage' ? 'Storage needs attention'
+                    : t.key === 'insights' ? `${homeless} villager${homeless === 1 ? '' : 's'} without a bed`
+                    : 'Villagers need attention'}
                     className="inline-flex items-center justify-center w-[15px] h-[15px] rounded-full bg-rust text-white text-[10px] font-bold leading-none">!</span>
                 )}
               </button>
