@@ -9,7 +9,10 @@ import { shapeContainers } from '@/lib/bw/storage';
 import { CompareModal, CompareTray } from './compare';
 import { UploadButton } from './upload-modal';
 import { RaidWatcher } from './raid-alert';
+import { EventsTab } from './events-tab';
+import { useRealtime } from './use-realtime';
 import { BwSelect } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from '@/components/ui/dropdown-menu';
 import { Drawer } from './drawer';
 import { Insights } from './insights';
 import { MapTab } from './map-tab';
@@ -29,13 +32,13 @@ const MAX_COMPARE = 3;
 // open drawer — only the world prop changes)
 const VERSION_POLL_MS = 30_000;
 
-type TabKey = 'me' | 'villagers' | 'npcs' | 'trends' | 'insights' | 'storage' | 'map';
+type TabKey = 'me' | 'villagers' | 'npcs' | 'trends' | 'insights' | 'storage' | 'map' | 'events';
 export type RosterView = 'skills' | 'gear';
 
 // tab <-> URL slug (deep-linkable routes served by app/[tab]/page.tsx)
 const TAB_SLUG: Record<TabKey, string> = {
   me: 'me', villagers: 'population', npcs: 'recruits',
-  trends: 'trends', insights: 'insights', storage: 'storage', map: 'map',
+  trends: 'trends', insights: 'insights', storage: 'storage', map: 'map', events: 'events',
 };
 const SLUG_TAB = Object.fromEntries(
   Object.entries(TAB_SLUG).map(([k, s]) => [s, k as TabKey]),
@@ -89,6 +92,7 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
   const [rankFilter, setRankFilter] = useState<Set<string>>(new Set());
   const [metaWide, setMetaWide] = useState(true);
   const [ago, setAgo] = useState<string | null>(null); // client-only (avoids hydration mismatch)
+  const [realtime, setRealtime] = useRealtime(); // opt-in live monitor (per-browser)
 
   useEffect(() => {
     const onResize = () => {
@@ -214,13 +218,14 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
     { key: 'insights', label: 'Insights', count: insights.length, alert: homeless > 0 },
     { key: 'storage', label: 'Storage', count: containers.length, alert: storageAlert },
     { key: 'map', label: 'Map', count: null, alert: false },
+    ...(realtime ? [{ key: 'events' as TabKey, label: 'Events', count: null, alert: false }] : []),
   ];
 
   return (
     <div ref={rootRef}
       className="bg-iron-900 text-sand-200 h-dvh max-w-[100vw] overflow-x-hidden flex flex-col font-sans antialiased"
       style={{ '--accent': '#E0A73C', '--gold': '#F4C868', '--rowpad': '9px' } as React.CSSProperties}>
-      <RaidWatcher />
+      {realtime && <RaidWatcher />}
       {/* header */}
       <header className="flex items-center gap-[18px] h-14 px-[18px] min-w-0 overflow-hidden border-b border-line-2 bg-gradient-to-b from-[#1B1712] to-[#17130E] flex-none relative z-20">
         <div className="flex items-center gap-[11px]">
@@ -252,6 +257,7 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
           </span>
         </div>
         <UploadButton onIngested={() => router.refresh()} />
+        <SettingsMenu realtime={realtime} onRealtime={setRealtime} />
       </header>
 
       {/* tabs + toolbar */}
@@ -353,10 +359,25 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
         {tab === 'insights' && <Insights cards={insights} upgrades={upgrades} villages={world.villages ?? []} housing={world.housing} villagerCount={villagers.length} snapshotId={world.snapshot_id} onOpen={setSelGuid} />}
         {tab === 'storage' && <StorageTab containers={containers} />}
         {tab === 'map' && (
-          <MapTab world={world}
+          <MapTab world={world} realtime={realtime}
             region={`${world.meta.map?.startsWith('Karvenia') ? 'Karvenia' : world.meta.map ?? ''} — ${world.meta.region ?? ''}`}
             onOpenProfile={setSelGuid} />
         )}
+        {tab === 'events' && (realtime
+          ? <EventsTab />
+          : (
+            <div className="flex flex-col items-center justify-center h-full text-center px-6 gap-3">
+              <div className="font-serif text-lg text-sand-200">Realtime monitor is off</div>
+              <p className="text-[13px] text-sand-600 max-w-[420px]">
+                The Events feed and live map need the realtime monitor, which reads from the
+                companion daemon. Enable it to view reader status and the live event log.
+              </p>
+              <button onClick={() => setRealtime(true)}
+                className="mt-1 inline-flex items-center gap-2 h-[34px] px-3.5 rounded-lg border border-gold bg-gold/[.14] text-gold-bright text-[12.5px] font-medium cursor-pointer">
+                Enable realtime monitor
+              </button>
+            </div>
+          ))}
       </main>
 
       {compareMode && compareNpcs.length > 0 && (
@@ -391,6 +412,36 @@ const FilterChips = ({ label, all, sel, onToggle, colors }: {
       );
     })}
   </span>
+);
+
+// Header settings menu — houses the per-browser Realtime monitor toggle.
+const SettingsMenu = ({ realtime, onRealtime }: { realtime: boolean; onRealtime: (v: boolean) => void }) => (
+  <DropdownMenu>
+    <DropdownMenuTrigger
+      data-tip="Settings"
+      className="inline-flex items-center justify-center w-[34px] h-[34px] rounded-lg border border-line-3 bg-ink text-sand-400 hover:border-[#4a4030] cursor-pointer outline-none flex-none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
+        <circle cx="12" cy="12" r="3" />
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+      </svg>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent align="end" className="min-w-[260px] p-2.5">
+      <button onClick={() => onRealtime(!realtime)}
+        className="flex items-start gap-2.5 w-full text-left rounded-md p-2 hover:bg-white/[.04] cursor-pointer">
+        <span className={cn('mt-0.5 w-[34px] h-[19px] rounded-full flex-none relative transition-colors',
+          realtime ? 'bg-gold' : 'bg-[#3a3327]')}>
+          <span className={cn('absolute top-[2px] w-[15px] h-[15px] rounded-full bg-white transition-all',
+            realtime ? 'left-[17px]' : 'left-[2px]')} />
+        </span>
+        <span className="min-w-0">
+          <span className="block text-[12.5px] text-sand-100 font-medium">Realtime monitor</span>
+          <span className="block text-[11px] text-sand-500 leading-snug">
+            Live map pins, raid alerts &amp; the Events tab — needs the companion reader daemon running.
+          </span>
+        </span>
+      </button>
+    </DropdownMenuContent>
+  </DropdownMenu>
 );
 
 const Meta = ({ k, v, mono = false }: { k: string; v: string; mono?: boolean }) => (

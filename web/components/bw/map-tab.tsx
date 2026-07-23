@@ -101,8 +101,8 @@ type Pin = {
 const MIN_SCALE = 0.15;
 const MAX_SCALE = 2;
 
-export const MapTab = ({ world, region, onOpenProfile }: {
-  world: World; region: string; onOpenProfile: (guid: string) => void;
+export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
+  world: World; region: string; onOpenProfile: (guid: string) => void; realtime?: boolean;
 }) => {
   const map = mapFor(world.meta.map);
   const ALL_ON = Object.fromEntries(Object.keys(LAYERS).map(k => [k, true])) as Record<LayerKey, boolean>;
@@ -158,6 +158,7 @@ export const MapTab = ({ world, region, onOpenProfile }: {
   const LIVE_TTL = 8000;
   const [live, setLive] = useState<{ actors: { id: string; name?: string; kind: string; x: number; y: number }[]; age: number } | null>(null);
   useEffect(() => {
+    if (!realtime) { setLive(null); return; } // live layer is opt-in (realtime monitor)
     let stop = false;
     const tick = async () => {
       if (stop || document.hidden) return;
@@ -171,7 +172,7 @@ export const MapTab = ({ world, region, onOpenProfile }: {
     void tick();
     const t = setInterval(tick, 2000);
     return () => { stop = true; clearInterval(t); };
-  }, []);
+  }, [realtime]);
 
   const pins = useMemo<Pin[]>(() => {
     if (!map) return [];

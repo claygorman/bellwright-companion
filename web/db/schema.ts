@@ -46,6 +46,24 @@ export const snapshots = sqliteTable(
   ],
 );
 
+// System event log — webhook-style feed from the reader daemon (and the
+// companion itself). Bounded ring buffer (pruned to a cap). Distinguishes
+// "reader dead" (no heartbeat) from "game off" (stale telemetry).
+export const events = sqliteTable(
+  'events',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    ts: integer('ts').notNull(), // producer clock (ms)
+    receivedAt: integer('received_at').notNull(), // server clock (ms)
+    source: text('source').notNull(), // reader | companion | publisher
+    level: text('level').notNull(), // info | warn | error
+    event: text('event').notNull(), // slug, e.g. offsets_invalid
+    message: text('message').notNull(),
+    meta: text('meta', { mode: 'json' }).$type<Record<string, string | number | boolean>>(),
+  },
+  t => [index('events_received').on(t.receivedAt), index('events_source').on(t.source)],
+);
+
 export const npcHistory = sqliteTable(
   'npc_history',
   {
