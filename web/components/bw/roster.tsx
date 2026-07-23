@@ -64,9 +64,12 @@ export const Roster = ({ rows, npcCol, archCol = false, playtime, ingestedAt, is
             {gearView && <th className={cn(TH, 'border-l border-[#2A231A]')}>Armor</th>}
             {gearView && <th className={cn(TH, 'border-l border-[#2A231A]')}>Inventory</th>}
             <th className={cn(TH, 'border-l border-[#2A231A]')}>Gear</th>
-            <th onClick={() => onSort('morale', 1)} className={cn(TH, 'cursor-pointer hover:text-sand-100')}>
-              Morale <span className="text-gold">{sort.key === 'morale' ? arrow : ''}</span>
-            </th>
+            {/* recruits carry no morale value — drop the empty column */}
+            {!npcCol && (
+              <th onClick={() => onSort('morale', 1)} className={cn(TH, 'cursor-pointer hover:text-sand-100')}>
+                Morale <span className="text-gold">{sort.key === 'morale' ? arrow : ''}</span>
+              </th>
+            )}
             <th className={TH}>Status</th>
             {npcCol && <th className={TH}>Location</th>}
           </tr>
@@ -194,16 +197,18 @@ const Row = ({ v, npcCol, archCol, playtime, ingestedAt, compareMode, gearView, 
           {v.equipment.offhand ? itemLabel(v.equipment.offhand) : 'No shield'}
         </div>
       </td>
-      <td className="py-1.5 px-3 border-b border-row">
-        {morale != null ? (
-          <div className="flex items-center gap-[7px]">
-            <div className="w-9 h-[5px] rounded-[3px] bg-white/[.08] overflow-hidden">
-              <div className="h-full" style={{ width: `${morale}%`, background: mc }} />
+      {!npcCol && (
+        <td className="py-1.5 px-3 border-b border-row">
+          {morale != null ? (
+            <div className="flex items-center gap-[7px]">
+              <div className="w-9 h-[5px] rounded-[3px] bg-white/[.08] overflow-hidden">
+                <div className="h-full" style={{ width: `${morale}%`, background: mc }} />
+              </div>
+              <span className="font-mono text-[11px]" style={{ color: mc }}>{morale}</span>
             </div>
-            <span className="font-mono text-[11px]" style={{ color: mc }}>{morale}</span>
-          </div>
-        ) : <span className="text-[11px] text-sand-800">—</span>}
-      </td>
+          ) : <span className="text-[11px] text-sand-800">—</span>}
+        </td>
+      )}
       <td className="py-1.5 px-3 border-b border-row">
         <div className="flex flex-wrap gap-1 items-center">
           {v.injuries.length > 0
