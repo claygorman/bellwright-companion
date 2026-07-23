@@ -178,7 +178,7 @@ const HousingPanel = ({ housing, villagerCount }: { housing: Housing; villagerCo
 export const Insights = ({ cards, upgrades, villages, housing, villagerCount, snapshotId, onOpen }: {
   cards: InsightCard[]; upgrades: UpgradeSuggestion[]; villages: VillageState[]; housing?: Housing; villagerCount: number; snapshotId?: number; onOpen: (guid: string) => void;
 }) => (
-  <div className="bw-scroll h-full overflow-y-auto">
+  <div>
     <div className="pt-[22px] px-6 pb-11">
       <GearPanel key={snapshotId ?? 0} onOpen={onOpen} />
       {housing && <HousingPanel housing={housing} villagerCount={villagerCount} />}

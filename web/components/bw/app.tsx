@@ -425,7 +425,7 @@ const SettingsMenu = ({ realtime, onRealtime }: { realtime: boolean; onRealtime:
         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
       </svg>
     </DropdownMenuTrigger>
-    <DropdownMenuContent align="end" className="w-[280px] p-2.5">
+    <DropdownMenuContent align="end" className="w-70 p-2.5">
       <button onClick={() => onRealtime(!realtime)}
         className="flex items-start gap-2.5 w-full text-left rounded-md p-2 hover:bg-white/[.04] cursor-pointer">
         <span className={cn('mt-0.5 w-[34px] h-[19px] rounded-full flex-none relative transition-colors',

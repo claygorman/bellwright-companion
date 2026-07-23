@@ -65,7 +65,7 @@ export const EventsTab = () => {
   const counts = feed.reduce<Record<string, number>>((a, e) => ((a[e.level] = (a[e.level] ?? 0) + 1), a), {});
 
   return (
-    <div className="bw-scroll h-full overflow-y-auto">
+    <div>
       <div className="pt-[22px] px-6 pb-11 max-w-[860px]">
         <div className="mb-3">
           <h2 className="font-serif text-xl font-semibold text-sand-100">Events</h2>
