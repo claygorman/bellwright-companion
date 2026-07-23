@@ -13,10 +13,12 @@ export const DropdownMenuRadioGroup = Menu.RadioGroup;
 
 export const DropdownMenuContent = ({ className, align = 'end', sideOffset = 6, children, ...props }: React.ComponentProps<typeof Menu.Popup> & { align?: 'start' | 'center' | 'end'; sideOffset?: number }) => (
   <Menu.Portal>
-    <Menu.Positioner align={align} sideOffset={sideOffset} className="z-[91] outline-none">
+    {/* collisionPadding keeps the panel off the viewport edges; the Popup caps
+        its own width so long content wraps instead of overflowing off-screen */}
+    <Menu.Positioner align={align} sideOffset={sideOffset} collisionPadding={8} className="z-[91] outline-none">
       <Menu.Popup
         className={cn(
-          'min-w-[184px] rounded-md border border-line-4 bg-[#1B1712] p-1',
+          'min-w-[184px] max-w-[calc(100vw-16px)] rounded-md border border-line-4 bg-[#1B1712] p-1',
           'shadow-[0_16px_40px_rgba(0,0,0,.5)] [animation:bwfade_.1s_ease] outline-none',
           className,
         )}

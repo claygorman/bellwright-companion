@@ -1,6 +1,6 @@
 {
   "name": "bellwright-companion",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "private": true,
   "description": "Self-hosted Bellwright save companion — monorepo (web, parser, publisher)",
   "scripts": {
