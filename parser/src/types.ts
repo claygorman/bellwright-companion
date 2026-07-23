@@ -33,6 +33,10 @@ export type Npc = {
   position: number[] | null;
   skills: Record<string, Skill>;
   injuries: Injury[];
+  // ACQUIRED trait statuses stored in the save (SlackerTrait, BlindTrait, …).
+  // Innate traits (Neurotic, Coward, …) are generated in-engine and are NOT
+  // persisted — verified by full recursive sweep 2026-07-22.
+  traits: string[];
   morale: number | null;
   equipment: Record<string, string>;
   // occupant of any house (null = undeterminable); meaningful for player NPCs

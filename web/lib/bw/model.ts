@@ -1,7 +1,7 @@
 // View-model layer: turns real World data into the shapes the design renders.
 // Pure functions — no React. Ported from the design prototype, with
 // mock-only features removed (only save-backed data is surfaced).
-import type { Npc, Skill, World } from '@/lib/types';
+import type { Npc, Skill, VillageState, World } from '@/lib/types';
 import { itemLabel, pctToNext, skillNumColor, tplLabel } from './format.ts';
 import { normalizeInjuries } from './injuries.ts';
 
@@ -163,6 +163,88 @@ import HIRE_GATES from './hire-gates.json';
 export type HireGate = { trust: string; diamonds: number; liberation: boolean; renown: number };
 export const hireGateOf = (v: Npc): HireGate | null =>
   (HIRE_GATES as Record<string, HireGate>)[v.template ?? ''] ?? null;
+
+// ---- upgrade suggestions --------------------------------------------------
+// "Who in my population could I replace with a better recruit?" Only
+// NON-SPECIALIZED villagers are replacement targets (profession villagers
+// are research unlocks — never suggest dropping them). A candidate must
+// dominate on BOTH cap sides (no sideways trades) with a meaningful total
+// gain. Specialists count as candidates. Trained levels shown as the cost
+// of switching. NOTE: innate traits aren't in save data — only acquired
+// statuses (Slacker etc.) can be flagged.
+const UPGRADE_MIN_DELTA = 8;
+// spotlight the single weakest villager — replace them and the next
+// weakest surfaces on the following save ingest
+const UPGRADE_MAX_ROWS = 1;
+const UPGRADE_MAX_CANDIDATES = 5;
+// negative acquired traits cost real output (Slacker ≈ −10%); score them as
+// −10% of cap total each, so trait-free sideways swaps count as upgrades and
+// Slacker candidates must be substantially better on paper to rank
+const TRAIT_PENALTY_PCT = 0.10;
+// a trait-hobbled villager loosens the per-side dominance requirement —
+// shedding the trait is worth a small caps step-down on one side
+const TRAIT_SIDE_SLACK = 4;
+export type UpgradeSuggestion = {
+  villager: Npc;
+  trainedLevels: number;
+  vCombat: number; vWork: number;
+  vPenalized: boolean;
+  candidates: { npc: Npc; combat: number; work: number; delta: number }[];
+};
+export const upgradeSuggestions = (mine: Npc[], recruits: Npc[], villages?: VillageState[]): UpgradeSuggestion[] => {
+  // hireability filter using EXACT per-village trust: a recruit is hireable
+  // when its home village's current trust level meets the gate's rank
+  // (diamonds = required rank index; liberation = Leader/level 4). Villages
+  // with no home (unique/quest NPCs) are left unfiltered.
+  const trustLevel = new Map((villages ?? []).map(v => [v.name, v.trust_level]));
+  const hireable = (r: Npc) => {
+    const g = hireGateOf(r);
+    if (!g) return true;
+    if (r.village == null) return true;
+    const lv = trustLevel.get(r.village) ?? 0;
+    if (g.liberation) return lv >= 4;
+    return lv >= g.diamonds;
+  };
+  recruits = villages ? recruits.filter(hireable) : recruits;
+  const capSum = (v: Npc, defs: SkillDef[]) => defs.reduce((a, [k]) => a + (v.skills[k]?.cap ?? 0), 0);
+  const lvlSum = (v: Npc) => ALL_SKILLS.reduce((a, [k]) => a + (v.skills[k]?.level ?? 0), 0);
+  const negCount = (v: Npc) => (v.traits ?? []).filter(t => NEGATIVE_TRAITS.has(t)).length;
+  const eff = (total: number, v: Npc) => total - Math.round(total * TRAIT_PENALTY_PCT) * negCount(v);
+  const rc = recruits.map(r => {
+    const combat = capSum(r, COMBAT), work = capSum(r, WORK);
+    return { npc: r, combat, work, eff: eff(combat + work, r) };
+  });
+  const out: UpgradeSuggestion[] = [];
+  for (const v of mine) {
+    if (v.profession) continue; // specialists are research unlocks — keep them
+    const vCombat = capSum(v, COMBAT), vWork = capSum(v, WORK);
+    const vEff = eff(vCombat + vWork, v);
+    const slack = negCount(v) > 0 ? TRAIT_SIDE_SLACK : 0;
+    const candidates = rc
+      .filter(r => r.combat >= vCombat - slack && r.work >= vWork - slack
+        && r.eff - vEff >= UPGRADE_MIN_DELTA)
+      .map(r => ({ npc: r.npc, combat: r.combat, work: r.work, delta: r.eff - vEff }))
+      .sort((a, b) => b.delta - a.delta);
+    if (candidates.length) out.push({ villager: v, trainedLevels: lvlSum(v), vCombat, vWork, vPenalized: negCount(v) > 0, candidates });
+  }
+  // weakest ceilings first — most worth replacing; then assign each recruit
+  // to at most ONE row (you can only hire a person once)
+  const rows = out.sort((a, b) => (a.vCombat + a.vWork) - (b.vCombat + b.vWork)).slice(0, UPGRADE_MAX_ROWS);
+  const used = new Set<string>();
+  for (const row of rows) {
+    row.candidates = row.candidates
+      .filter(c => !used.has(c.npc.guid ?? npcName(c.npc)))
+      .slice(0, UPGRADE_MAX_CANDIDATES);
+    for (const c of row.candidates) used.add(c.npc.guid ?? npcName(c.npc));
+  }
+  return rows.filter(r => r.candidates.length > 0);
+};
+
+// "SlackerTrait" -> "Slacker"
+export const traitLabel = (t: string): string => t.replace(/Trait$/, '').replace(/([a-z])([A-Z])/g, '$1 $2');
+// acquired statuses that hurt (warn-styled); others (ExemplarySoldier,
+// Marathoner) are buffs
+export const NEGATIVE_TRAITS = new Set(['SlackerTrait', 'BlindTrait', 'WeakGripTrait', 'OnearmedTrait']);
 
 // ---- insights (only cards the save can actually answer)
 export type InsightItem = { guid: string; npc: Npc; detail: string };

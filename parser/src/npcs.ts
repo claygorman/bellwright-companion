@@ -152,6 +152,7 @@ export function extractNpcs(p: Payload): Npc[] {
     // names + faction + template + job priorities from MistTownNpc
     let firstName: string | null = null, lastName: string | null = null, faction: string | null = null, template: string | null = null;
     let gearPreset: string | null = null;
+    const traits: string[] = [];
     const jobPriorities: Record<string, number> = {};
     if (comps.MistTownNpc) {
       const t = comps.MistTownNpc;
@@ -161,6 +162,17 @@ export function extractNpcs(p: Payload): Npc[] {
       if (gn.length) firstName = gn[0];
       if (gn.length > 1) lastName = gn[1];
       const tb = first(p.fields(t), 2, 'len');
+      // f2: acquired trait/status records — collect refs resolving to *Trait
+      const collectTraits = (region: Region, depth: number) => {
+        if (depth > 5) return;
+        for (const y of p.fields(region) ?? []) {
+          if (y.kind === 'v') {
+            const n = p.baseName(y.v);
+            if (n?.endsWith('Trait') && !traits.includes(n)) traits.push(n);
+          } else if (y.kind === 'len') collectTraits(y.v, depth + 1);
+        }
+      };
+      if (tb) collectTraits(tb.v, 0);
       for (const x of p.fields(tb?.v) ?? []) {
         if (x.f === 6 && x.kind === 'v') template = p.baseName(x.v);
         if (x.f === 7 && x.kind === 'v') faction = p.baseName(x.v);
@@ -199,7 +211,7 @@ export function extractNpcs(p: Payload): Npc[] {
       archetype, profession, tier, village,
       job_priorities: jobPriorities,
       gear_preset: gearPreset,
-      position: pos, skills, injuries,
+      position: pos, skills, injuries, traits,
       morale: ownerKey != null ? happinessByOwner.get(ownerKey) ?? null : null,
       equipment: ownerKey != null ? equipByOwner.get(ownerKey) ?? {} : {},
       housed: null, // real bed occupancy undecoded — see MistTownHouseComponent note

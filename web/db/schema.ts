@@ -9,6 +9,7 @@ import type { Npc, Storage, Meta, Group } from 'bellwright-parse/types';
 import type { GearPreset } from 'bellwright-parse/gearpresets';
 import type { PlayerState } from 'bellwright-parse/player';
 import type { Poi } from 'bellwright-parse/pois';
+import type { VillageState } from 'bellwright-parse/villages';
 
 export type World = {
   ingested_at: string;
@@ -20,7 +21,9 @@ export type World = {
   gear_presets?: GearPreset[]; // custom preset definitions (named)
   player?: PlayerState; // the player pawn (absent on old snapshots)
   carried?: Record<string, { item: string; qty: number }[]>; // actor guid -> inventory
-  pois?: Poi[]; // camps/chests/shrines/wildlife-spawner map points
+  pois?: Poi[];
+  // per-village trust/prosperity/liberation (MistNeutralVillageComponent)
+  villages?: VillageState[]; // per-village trust/prosperity/liberation
 };
 
 export const snapshots = sqliteTable(

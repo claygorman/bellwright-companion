@@ -4,7 +4,7 @@ import type { Npc } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { avatarColor, initials, itemLabel, moraleColor } from '@/lib/bw/format';
 import { normalizeInjuries } from '@/lib/bw/injuries';
-import { ALL_SKILLS, shapeCell, professionOf, combatTotal, classifyRole, ROLE_COLORS, NOTABLE_COMBAT_TOTAL, npcName, archetypeLabel, hireGateOf } from '@/lib/bw/model';
+import { ALL_SKILLS, shapeCell, professionOf, combatTotal, classifyRole, ROLE_COLORS, NOTABLE_COMBAT_TOTAL, npcName, archetypeLabel, hireGateOf, NEGATIVE_TRAITS, traitLabel } from '@/lib/bw/model';
 import { InjuryBadge } from './injury-badge';
 import { Avatar } from './avatar';
 import { Icon } from './icons';
@@ -205,13 +205,19 @@ const Row = ({ v, npcCol, archCol, playtime, ingestedAt, compareMode, gearView, 
         ) : <span className="text-[11px] text-sand-800">—</span>}
       </td>
       <td className="py-1.5 px-3 border-b border-row">
-        {v.injuries.length > 0 ? (
-          <div className="flex flex-wrap gap-1">
-            {normalizeInjuries(v.injuries).map(inj => (
+        <div className="flex flex-wrap gap-1 items-center">
+          {v.injuries.length > 0
+            ? normalizeInjuries(v.injuries).map(inj => (
               <InjuryBadge key={inj.type} inj={inj} playtime={playtime} ingestedAt={ingestedAt} />
-            ))}
-          </div>
-        ) : <span className="text-[11px] text-[#5f7a52]">Healthy</span>}
+            ))
+            : <span className="text-[11px] text-[#5f7a52]">Healthy</span>}
+          {v.traits?.map(t => (
+            <span key={t} data-tip="Acquired trait stored in the save"
+              className={NEGATIVE_TRAITS.has(t)
+                ? 'text-[9px] font-bold uppercase tracking-[.3px] text-rust-soft bg-rust/[.12] border border-rust/35 rounded-[4px] px-[5px] py-px'
+                : 'text-[9px] font-bold uppercase tracking-[.3px] text-moss-soft bg-moss/[.12] border border-moss/35 rounded-[4px] px-[5px] py-px'}>{traitLabel(t)}</span>
+          ))}
+        </div>
       </td>
       {npcCol && (
         <td className="py-1.5 px-3 border-b border-row whitespace-nowrap">

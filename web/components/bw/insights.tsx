@@ -1,17 +1,132 @@
 'use client';
 // Insights tab — automated triage cards (real-data subset of the design).
-import { npcName, type InsightCard } from '@/lib/bw/model';
+import { hireGateOf, NEGATIVE_TRAITS, npcName, traitLabel, type InsightCard, type UpgradeSuggestion } from '@/lib/bw/model';
+import { trustRankName } from 'bellwright-parse/villages';
+import type { VillageState } from '@/lib/types';
 import { Icon } from './icons';
 import { Avatar } from './avatar';
 import { GearPanel } from './gear';
 import { SEV } from './ui';
 
-export const Insights = ({ cards, villagerCount, snapshotId, onOpen }: {
-  cards: InsightCard[]; villagerCount: number; snapshotId?: number; onOpen: (guid: string) => void;
+// Upgrade candidates: weakest non-specialized villagers vs the recruit pool
+const UpgradePanel = ({ upgrades, onOpen }: {
+  upgrades: UpgradeSuggestion[]; onOpen: (guid: string) => void;
+}) => upgrades.length === 0 ? null : (
+  <div className="mb-7">
+    <div className="mb-3">
+      <h2 className="font-serif text-xl font-semibold text-sand-100">Upgrade candidate</h2>
+      <p className="mt-1 text-[12.5px] text-[#8a8069]">
+        Your weakest non-specialized villager, with recruits that beat them on both combat and
+        work ceilings — replace them and the next weakest takes this spot. Deltas are
+        trait-adjusted (a Slacker counts ≈10% weaker, so a clean sideways swap still rates as an
+        upgrade). Trained levels are lost on replacement — and innate traits aren&apos;t in save
+        data, so check a candidate&apos;s traits in game before hiring. Candidates are limited to who you can actually hire right now, based on each
+        village&apos;s current trust rank.
+      </p>
+    </div>
+    <div className="max-w-[620px]">
+      {upgrades.map(u => {
+        const vg = u.villager;
+        return (
+          <div key={vg.guid ?? npcName(vg)} className="rounded-xl border border-line-2 bg-[#1A160F] py-3 px-3.5">
+            <button onClick={() => vg.guid && onOpen(vg.guid)}
+              className="flex items-center gap-2.5 w-full text-left cursor-pointer bg-transparent border-none p-0">
+              <Avatar v={vg} size={30} radius={8} />
+              <span className="min-w-0 flex-auto">
+                <span className="block text-[13px] text-sand-100 font-medium">{npcName(vg)}</span>
+                <span className="block text-[10.5px] text-sand-500">
+                  caps {u.vCombat + u.vWork} (C{u.vCombat}/W{u.vWork}) · {u.trainedLevels} trained levels at stake
+                  {u.vPenalized && <span className="text-rust-soft"> · trait-hobbled</span>}
+                </span>
+              </span>
+              {vg.traits?.map(t => (
+                <span key={t} className={NEGATIVE_TRAITS.has(t)
+                  ? 'text-[9px] font-bold uppercase tracking-[.3px] text-rust-soft bg-rust/[.12] border border-rust/35 rounded-[4px] px-[5px] py-px'
+                  : 'text-[9px] font-bold uppercase tracking-[.3px] text-moss-soft bg-moss/[.12] border border-moss/35 rounded-[4px] px-[5px] py-px'}>{traitLabel(t)}</span>
+              ))}
+            </button>
+            <div className="mt-2.5 flex flex-col gap-1.5 border-t border-row pt-2.5">
+              {u.candidates.map(c => {
+                const g = hireGateOf(c.npc);
+                return (
+                  <button key={c.npc.guid ?? npcName(c.npc)} onClick={() => c.npc.guid && onOpen(c.npc.guid)}
+                    className="flex items-center gap-2 w-full text-left cursor-pointer bg-transparent border-none p-0">
+                    <Avatar v={c.npc} size={24} radius={6} />
+                    <span className="text-xs text-sand-200 whitespace-nowrap overflow-hidden text-ellipsis">{npcName(c.npc)}</span>
+                    {c.npc.traits?.map(t => (
+                      <span key={t} className={NEGATIVE_TRAITS.has(t)
+                        ? 'text-[8.5px] font-bold uppercase text-rust-soft bg-rust/[.12] border border-rust/35 rounded-[4px] px-1 py-px flex-none'
+                        : 'text-[8.5px] font-bold uppercase text-moss-soft bg-moss/[.12] border border-moss/35 rounded-[4px] px-1 py-px flex-none'}>{traitLabel(t)}</span>
+                    ))}
+                    <span className="font-mono text-[10.5px] text-moss-bright flex-none">+{c.delta}</span>
+                    <span className="text-[10.5px] text-sand-600 flex-none">C{c.combat}/W{c.work}</span>
+                    <span className="flex-auto" />
+                    {c.npc.village && <span className="text-[10.5px] text-sand-600 whitespace-nowrap flex-none">{c.npc.village}</span>}
+                    {g && (
+                      <span data-tip={`Hire: ${g.trust} trust${g.liberation ? ' + liberated' : ''} · base ${Math.round(g.renown)} renown`}
+                        className="inline-flex items-center gap-1 flex-none">
+                        <img src={`/icons/bw/trust-${g.trust.toLowerCase()}.png`} alt={g.trust}
+                          className="w-[15px] h-[15px] max-w-none object-contain" />
+                        {g.liberation && <span className="text-[7.5px] font-bold uppercase text-gold-bright/80">LIB</span>}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+);
+
+// Per-village trust + prosperity (from MistNeutralVillageComponent)
+const TRUST_TIERS = ['Stranger', 'Associate', 'Friend', 'Protector', 'Leader'];
+const TRUST_FLOOR: Record<string, number> = { Stranger: 0, Associate: 100, Friend: 500, Protector: 1200, Leader: 2400 };
+const VillagesPanel = ({ villages }: { villages: VillageState[] }) => villages.length === 0 ? null : (
+  <div className="mb-7">
+    <div className="mb-3">
+      <h2 className="font-serif text-xl font-semibold text-sand-100">Villages</h2>
+      <p className="mt-1 text-[12.5px] text-[#8a8069]">
+        Current trust rank per village (gates who you can recruit) and prosperity where liberated.
+      </p>
+    </div>
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(230px,1fr))] gap-2.5">
+      {[...villages].sort((a, b) => b.trust_level - a.trust_level || b.trust - a.trust).map(v => {
+        const rank = TRUST_TIERS[v.trust_level] ?? 'Stranger';
+        const next = TRUST_FLOOR[TRUST_TIERS[v.trust_level + 1]] ?? null;
+        const floor = TRUST_FLOOR[rank] ?? 0;
+        const pct = v.liberated ? 100 : next ? Math.min(100, Math.round(((v.trust - floor) / (next - floor)) * 100)) : 100;
+        return (
+          <div key={v.name} className="rounded-xl border border-line-2 bg-[#1A160F] py-2.5 px-3">
+            <div className="flex items-center gap-2">
+              <img src={`/icons/bw/trust-${rank.toLowerCase()}.png`} alt={rank} className="w-[18px] h-[18px] max-w-none object-contain" />
+              <span className="text-[13px] text-sand-100 font-medium flex-auto">{v.name}</span>
+              <span className="text-[10.5px] text-sand-500">{rank}</span>
+            </div>
+            <div className="mt-2 h-[4px] rounded-full bg-white/[.07] overflow-hidden">
+              <div className="h-full rounded-full" style={{ width: `${pct}%`, background: v.liberated ? '#F4C868' : '#C9A96A' }} />
+            </div>
+            <div className="mt-1.5 flex items-center justify-between text-[10.5px] text-sand-600">
+              <span>{v.liberated ? 'Liberated' : `${v.trust}${next ? ` / ${next}` : ''} trust`}</span>
+              {v.liberated && <span className="text-gold-bright/80">✦ {v.prosperity} prosperity</span>}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+);
+
+export const Insights = ({ cards, upgrades, villages, villagerCount, snapshotId, onOpen }: {
+  cards: InsightCard[]; upgrades: UpgradeSuggestion[]; villages: VillageState[]; villagerCount: number; snapshotId?: number; onOpen: (guid: string) => void;
 }) => (
   <div className="bw-scroll h-full overflow-y-auto">
     <div className="pt-[22px] px-6 pb-11">
       <GearPanel key={snapshotId ?? 0} onOpen={onOpen} />
+      <VillagesPanel villages={villages} />
+      <UpgradePanel upgrades={upgrades} onOpen={onOpen} />
       <div className="mb-4">
         <h2 className="font-serif text-xl font-semibold text-sand-100">Settlement insights</h2>
         <p className="mt-1 text-[12.5px] text-[#8a8069]">

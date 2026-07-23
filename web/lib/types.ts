@@ -21,6 +21,9 @@ export type Npc = {
   gear_preset?: string | null;
   position: number[] | null;
   skills: Record<string, Skill>;
+  // ACQUIRED trait statuses (SlackerTrait, BlindTrait, …) — innate traits are
+  // not persisted by the game. Absent on pre-2026-07-22 snapshots.
+  traits?: string[];
   // new snapshots: {type, since}; pre-2026-07-22 snapshots: plain strings
   injuries: (string | { type: string; since: number | null })[];
   morale: number | null;
@@ -78,7 +81,17 @@ export type World = {
   gear_presets?: GearPreset[]; // custom (player-named) preset definitions
   player?: PlayerState; // the player pawn (absent on old snapshots)
   carried?: Record<string, { item: string; qty: number }[]>; // actor guid -> inventory
-  pois?: Poi[]; // camps/chests/shrines/wildlife-spawner map points
+  pois?: Poi[];
+  // per-village trust/prosperity/liberation (MistNeutralVillageComponent)
+  villages?: VillageState[];
+};
+
+export type VillageState = {
+  name: string;
+  trust: number;
+  trust_level: number; // 0 Stranger .. 4 Leader
+  prosperity: number;
+  liberated: boolean;
 };
 
 export type Poi = { cls: string; layer: string; position: number[] };
@@ -87,6 +100,9 @@ export type PlayerState = {
   guid: string | null;
   position: number[] | null;
   skills: Record<string, Skill>;
+  // ACQUIRED trait statuses (SlackerTrait, BlindTrait, …) — innate traits are
+  // not persisted by the game. Absent on pre-2026-07-22 snapshots.
+  traits?: string[];
   equipment: Record<string, string>;
   carried: { item: string; qty: number }[];
   coins: number;

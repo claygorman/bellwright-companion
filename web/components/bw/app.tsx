@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Npc, World } from '@/lib/types';
 import { agoLabel, playtimeLabel } from '@/lib/bw/format';
-import { classifyRole, hireGateOf, insightsFor, npcName, playerNpcs, recruitNpcs, ROLE_COLORS, specialtyOf, type RecruitRole } from '@/lib/bw/model';
+import { classifyRole, hireGateOf, insightsFor, npcName, playerNpcs, recruitNpcs, ROLE_COLORS, specialtyOf, upgradeSuggestions, type RecruitRole } from '@/lib/bw/model';
 import { shapeContainers } from '@/lib/bw/storage';
 import { CompareModal, CompareTray } from './compare';
 import { UploadButton } from './upload-modal';
@@ -123,6 +123,9 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
   const villagers = useMemo(() => playerNpcs(world), [world]);
   const recruits = useMemo(() => recruitNpcs(world), [world]);
   const insights = useMemo(() => insightsFor(villagers), [villagers]);
+  const upgrades = useMemo(
+    () => upgradeSuggestions(villagers, recruits, world.villages),
+    [villagers, recruits, world.villages]);
   const containers = useMemo(() => shapeContainers(world.storage), [world.storage]);
   const storageAlert = useMemo(() => storagePressure(containers), [containers]);
   const villagerAlert = villagers.some(v => v.injuries.length > 0);
@@ -341,7 +344,7 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
             onOpen={setSelGuid} onToggleCompare={toggleCompare} />
         )}
         {tab === 'trends' && <Trends />}
-        {tab === 'insights' && <Insights cards={insights} villagerCount={villagers.length} snapshotId={world.snapshot_id} onOpen={setSelGuid} />}
+        {tab === 'insights' && <Insights cards={insights} upgrades={upgrades} villages={world.villages ?? []} villagerCount={villagers.length} snapshotId={world.snapshot_id} onOpen={setSelGuid} />}
         {tab === 'storage' && <StorageTab containers={containers} />}
         {tab === 'map' && (
           <MapTab world={world}

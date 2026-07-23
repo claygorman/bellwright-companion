@@ -12,6 +12,7 @@ import { extractGearSets } from 'bellwright-parse/gearsets';
 import { extractGearPresets } from 'bellwright-parse/gearpresets';
 import { extractPlayer, extractCarried } from 'bellwright-parse/player';
 import { extractPois } from 'bellwright-parse/pois';
+import { extractVillages } from 'bellwright-parse/villages';
 import { db, snapshots, npcHistory, pruneSnapshots, type World } from '@/db';
 import { eq } from 'drizzle-orm';
 
@@ -53,6 +54,7 @@ export const POST = async (req: Request) => {
     player: extractPlayer(p) ?? undefined,
     carried: extractCarried(p),
     pois: extractPois(p),
+    villages: extractVillages(p, npcs),
   };
   const mine = npcs.filter(n => n.is_player_npc);
 
