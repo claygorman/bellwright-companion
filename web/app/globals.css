@@ -119,9 +119,17 @@
 }
 
 /* ---- Bellwright Companion design chrome (Claude Design port) ---- */
-body { background: #100E0B; overflow-x: hidden; }
+/* Pin the shell to the real viewport. The desktop zoom (below) scales the whole
+   UI 10%, which makes 100dvh render 10% too tall and scroll the document. Using
+   height:100% cascades through the zoomed coordinate space so the app-shell
+   fills the viewport exactly; overflow:hidden keeps the document itself from
+   scrolling (each tab body is the single scroll region). */
+html, body { height: 100%; overflow: hidden; }
+body { background: #100E0B; }
 /* the design's 11-13px type runs small on desktop — scale the whole UI up a
-   notch (zoom keeps layout math intact, unlike transform). Phones keep 1:1. */
+   notch (zoom keeps layout math intact, unlike transform). Phones keep 1:1.
+   TODO(#1): replace this zoom hack with rem-based Tailwind sizing (text-sm/md,
+   root font-size) so viewport units aren't fought by the scale. */
 @media (min-width: 768px) {
   :root { zoom: 1.1; }
 }

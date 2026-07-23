@@ -223,7 +223,7 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
 
   return (
     <div ref={rootRef}
-      className="bg-iron-900 text-sand-200 h-dvh max-w-[100vw] overflow-x-hidden flex flex-col font-sans antialiased"
+      className="bg-iron-900 text-sand-200 h-full max-w-[100vw] overflow-hidden flex flex-col font-sans antialiased"
       style={{ '--accent': '#E0A73C', '--gold': '#F4C868', '--rowpad': '9px' } as React.CSSProperties}>
       {realtime && <RaidWatcher />}
       {/* header */}
