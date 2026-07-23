@@ -5,7 +5,7 @@
 //              cheap progression/diff queries ("what changed since yesterday")
 //              without exploding row counts (33 rows/snapshot, not 604).
 import { sqliteTable, integer, text, real, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
-import type { Npc, Storage, Meta, Group } from 'bellwright-parse/types';
+import type { Npc, Storage, Meta, Group, Housing } from 'bellwright-parse/types';
 import type { GearPreset } from 'bellwright-parse/gearpresets';
 import type { PlayerState } from 'bellwright-parse/player';
 import type { Poi } from 'bellwright-parse/pois';
@@ -16,6 +16,7 @@ export type World = {
   meta: Meta;
   npcs: Npc[];
   storage: Storage;
+  housing?: Housing; // villager sleeping quarters (absent on pre-2026-07-23 snapshots)
   groups?: Group[]; // absent on pre-2026-07-22 snapshots
   gear_sets?: Record<string, string[]>;
   gear_presets?: GearPreset[]; // custom preset definitions (named)

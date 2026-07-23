@@ -54,6 +54,14 @@ export type StorageData = {
   containers: ContainerRec[];
 };
 
+// Villager sleeping quarters: total beds + per-type breakdown (Player houses).
+export type HouseType = { cls: string; label: string; cap: number; count: number; beds: number };
+export type Housing = {
+  quarters: number;
+  houses: number;
+  byType: HouseType[];
+};
+
 export type WorldMeta = {
   character: string | null;
   map: string | null;
@@ -76,6 +84,7 @@ export type World = {
   meta: WorldMeta;
   npcs: Npc[];
   storage: StorageData;
+  housing?: Housing; // villager sleeping quarters (absent on pre-2026-07-23 snapshots)
   groups?: Group[]; // absent on pre-2026-07-22 snapshots
   gear_sets?: Record<string, string[]>; // npc guid -> assigned gear-preset item classes
   gear_presets?: GearPreset[]; // custom (player-named) preset definitions

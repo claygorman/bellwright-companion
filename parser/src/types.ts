@@ -77,6 +77,16 @@ export type Storage = {
   containers: ContainerRec[];
 };
 
+// Player villager housing: total sleeping quarters (beds) and a per-type
+// breakdown. Compare `quarters` against the Player-faction villager count to
+// surface a homelessness deficit (aggregate — not per-villager).
+export type HouseType = { cls: string; label: string; cap: number; count: number; beds: number };
+export type Housing = {
+  quarters: number;   // total beds across all player houses
+  houses: number;     // number of housing buildings
+  byType: HouseType[];
+};
+
 export type Meta = {
   character: string | null;
   map: string | null;

@@ -2,7 +2,7 @@
 // Insights tab — automated triage cards (real-data subset of the design).
 import { hireGateOf, NEGATIVE_TRAITS, npcName, traitLabel, type InsightCard, type UpgradeSuggestion } from '@/lib/bw/model';
 import { trustRankName } from 'bellwright-parse/villages';
-import type { VillageState } from '@/lib/types';
+import type { VillageState, Housing } from '@/lib/types';
 import { Icon } from './icons';
 import { Avatar } from './avatar';
 import { GearPanel } from './gear';
@@ -119,12 +119,69 @@ const VillagesPanel = ({ villages }: { villages: VillageState[] }) => villages.l
   </div>
 );
 
-export const Insights = ({ cards, upgrades, villages, villagerCount, snapshotId, onOpen }: {
-  cards: InsightCard[]; upgrades: UpgradeSuggestion[]; villages: VillageState[]; villagerCount: number; snapshotId?: number; onOpen: (guid: string) => void;
+// Villager housing: aggregate sleeping quarters vs. population. The save can't
+// name who's homeless, so this is a settlement-wide bed deficit (beds < people).
+const HousingPanel = ({ housing, villagerCount }: { housing: Housing; villagerCount: number }) => {
+  const { quarters, houses, byType } = housing;
+  const homeless = Math.max(0, villagerCount - quarters);
+  const free = Math.max(0, quarters - villagerCount);
+  const occupied = Math.min(villagerCount, quarters);
+  const pct = quarters > 0 ? Math.min(100, Math.round((occupied / quarters) * 100)) : 100;
+  const alert = homeless > 0;
+  return (
+    <div className="mb-7">
+      <div className="mb-3">
+        <h2 className="font-serif text-xl font-semibold text-sand-100">Housing</h2>
+        <p className="mt-1 text-[12.5px] text-[#8a8069]">
+          Total sleeping quarters across your houses vs. your {villagerCount} villagers.
+          Beds come from the building type (Housing Tent 2 · House 4 · Big House 7); the
+          save doesn&apos;t say who specifically lacks a bed, only the settlement-wide total.
+        </p>
+      </div>
+      <div className="max-w-[620px] rounded-xl border py-3 px-3.5"
+        style={{ borderColor: alert ? '#8B4A3966' : '#2A2319', background: alert ? 'linear-gradient(180deg,#3a1f1730,transparent)' : '#1A160F' }}>
+        <div className="flex items-baseline gap-2">
+          <span className="font-serif text-2xl font-semibold" style={{ color: alert ? '#EDA593' : '#8FBF74' }}>
+            {quarters}
+          </span>
+          <span className="text-[12.5px] text-sand-400">beds</span>
+          <span className="text-sand-700">·</span>
+          <span className="font-serif text-2xl font-semibold text-sand-100">{villagerCount}</span>
+          <span className="text-[12.5px] text-sand-400">villagers</span>
+          <span className="flex-auto" />
+          <span className="text-[12.5px] font-medium" style={{ color: alert ? '#EDA593' : '#8FBF74' }}>
+            {alert ? `${homeless} without a bed` : `${free} free bed${free === 1 ? '' : 's'}`}
+          </span>
+        </div>
+        <div className="mt-2.5 h-[6px] rounded-full bg-white/[.07] overflow-hidden">
+          <div className="h-full rounded-full" style={{ width: `${pct}%`, background: alert ? '#C4664F' : '#7FB05B' }} />
+        </div>
+        <div className="mt-2.5 flex flex-wrap gap-1.5">
+          {byType.map(t => (
+            <span key={t.cls} className="inline-flex items-center gap-1.5 text-[11px] py-1 px-2.5 rounded-full bg-iron-750 border border-line-3">
+              <span className="text-sand-200">{t.count}× {t.label}</span>
+              <span className="font-mono text-sand-600">{t.beds} beds</span>
+            </span>
+          ))}
+          {houses === 0 && <span className="text-[11.5px] text-sand-600">No houses detected.</span>}
+        </div>
+        {alert && (
+          <p className="mt-2.5 text-[11.5px] text-[#d69783]">
+            Build more housing (or upgrade tents to houses) — homeless villagers lose morale.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export const Insights = ({ cards, upgrades, villages, housing, villagerCount, snapshotId, onOpen }: {
+  cards: InsightCard[]; upgrades: UpgradeSuggestion[]; villages: VillageState[]; housing?: Housing; villagerCount: number; snapshotId?: number; onOpen: (guid: string) => void;
 }) => (
   <div className="bw-scroll h-full overflow-y-auto">
     <div className="pt-[22px] px-6 pb-11">
       <GearPanel key={snapshotId ?? 0} onOpen={onOpen} />
+      {housing && <HousingPanel housing={housing} villagerCount={villagerCount} />}
       <VillagesPanel villages={villages} />
       <UpgradePanel upgrades={upgrades} onOpen={onOpen} />
       <div className="mb-4">

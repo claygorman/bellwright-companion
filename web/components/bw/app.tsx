@@ -129,7 +129,9 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
     [villagers, recruits, world.villages]);
   const containers = useMemo(() => shapeContainers(world.storage), [world.storage]);
   const storageAlert = useMemo(() => storagePressure(containers), [containers]);
-  const villagerAlert = villagers.some(v => v.injuries.length > 0);
+  // homelessness: villagers beyond total sleeping quarters (aggregate deficit)
+  const homeless = world.housing ? Math.max(0, villagers.length - world.housing.quarters) : 0;
+  const villagerAlert = villagers.some(v => v.injuries.length > 0) || homeless > 0;
 
   const npcByRawGuid = useMemo(() => {
     const m = new Map<string, Npc>();
@@ -346,7 +348,7 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
             onOpen={setSelGuid} onToggleCompare={toggleCompare} />
         )}
         {tab === 'trends' && <Trends />}
-        {tab === 'insights' && <Insights cards={insights} upgrades={upgrades} villages={world.villages ?? []} villagerCount={villagers.length} snapshotId={world.snapshot_id} onOpen={setSelGuid} />}
+        {tab === 'insights' && <Insights cards={insights} upgrades={upgrades} villages={world.villages ?? []} housing={world.housing} villagerCount={villagers.length} snapshotId={world.snapshot_id} onOpen={setSelGuid} />}
         {tab === 'storage' && <StorageTab containers={containers} />}
         {tab === 'map' && (
           <MapTab world={world}

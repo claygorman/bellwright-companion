@@ -7,6 +7,7 @@ import path from 'node:path';
 import { Payload } from 'bellwright-parse/payload';
 import { extractNpcs } from 'bellwright-parse/npcs';
 import { extractStorage } from 'bellwright-parse/storage';
+import { extractHousing } from 'bellwright-parse/housing';
 import { extractGroups } from 'bellwright-parse/groups';
 import { extractGearSets } from 'bellwright-parse/gearsets';
 import { extractGearPresets } from 'bellwright-parse/gearpresets';
@@ -48,6 +49,7 @@ export const POST = async (req: Request) => {
     meta: p.meta,
     npcs,
     storage: extractStorage(p),
+    housing: extractHousing(p),
     groups: extractGroups(p),
     gear_sets: extractGearSets(p),
     gear_presets: extractGearPresets(p),
