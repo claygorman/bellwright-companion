@@ -49,13 +49,13 @@ export const Trends = () => {
     fetch('/api/trends', { cache: 'no-store' }).then(r => r.json()).then(setData).catch(() => {});
   }, []);
 
-  if (!data) return <div className="p-10 text-[13px] text-sand-600">Loading history…</div>;
+  if (!data) return <div className="p-10 text-[13px] md:text-[14.5px] text-sand-600">Loading history…</div>;
   const { points, top_items, deltas } = data;
   if (points.length < 2) {
     return (
       <div className="py-16 px-5 text-center">
-        <div className="mb-1.5 font-serif text-lg text-sand-400">Not enough history yet</div>
-        <div className="text-[13px] text-sand-600">Trends appear after a few saves have been ingested.</div>
+        <div className="mb-1.5 font-serif text-lg md:text-[20px] text-sand-400">Not enough history yet</div>
+        <div className="text-[13px] md:text-[14.5px] text-sand-600">Trends appear after a few saves have been ingested.</div>
       </div>
     );
   }
@@ -81,10 +81,10 @@ export const Trends = () => {
 
   return (
     <div className="bw-scroll h-full overflow-y-auto">
-      <div className="pt-[22px] px-6 pb-11">
+      <div className="pt-5.5 px-6 pb-11">
         <div className="mb-4">
-          <h2 className="font-serif text-xl font-semibold text-sand-100">Trends</h2>
-          <p className="mt-1 text-[12.5px] text-sand-400">
+          <h2 className="font-serif text-xl md:text-[22px] font-semibold text-sand-100">Trends</h2>
+          <p className="mt-1 text-[12.5px] md:text-[14px] text-sand-400">
             {points.length} snapshots · {deltas ? `${deltas.hours_played.toFixed(1)}h of tracked playtime` : ''}
           </p>
         </div>
@@ -92,20 +92,20 @@ export const Trends = () => {
         {/* runway alerts */}
         {runway.length > 0 && (
           <div className={cn(panel, 'mb-3.5', runway[0].hours < RUNWAY_WARN_HOURS && 'border-rust/40')}>
-            <div className="mb-2.5 font-serif text-[15px] font-semibold text-[#D9CBB2]">
+            <div className="mb-2.5 font-serif text-[15px] md:text-[16.5px] font-semibold text-[#D9CBB2]">
               Runway — consumables trending down
             </div>
-            <div className="flex flex-wrap gap-[18px]">
+            <div className="flex flex-wrap gap-4.5">
               {runway.map(r => (
                 <div key={r.item}>
-                  <div className={cn('font-mono text-[17px] font-semibold', r.hours < RUNWAY_WARN_HOURS ? 'text-rust-soft' : 'text-gold-bright')}>
+                  <div className={cn('font-mono text-[17px] md:text-[18.5px] font-semibold', r.hours < RUNWAY_WARN_HOURS ? 'text-rust-soft' : 'text-gold-bright')}>
                     ~{r.hours < 48 ? `${Math.round(r.hours)}h` : `${Math.round(r.hours / 24)}d`}
                   </div>
-                  <div className="text-[11px] text-sand-400">{r.item} ({r.to} left)</div>
+                  <div className="text-[11px] md:text-[12px] text-sand-400">{r.item} ({r.to} left)</div>
                 </div>
               ))}
             </div>
-            <div className="mt-2 text-[10.5px] text-sand-600">
+            <div className="mt-2 text-[10.5px] md:text-[11.5px] text-sand-600">
               Hours of playtime until empty at the current net rate.
             </div>
           </div>
@@ -114,7 +114,7 @@ export const Trends = () => {
         <div className="mb-3.5 grid grid-cols-[repeat(auto-fit,minmax(420px,1fr))] gap-3">
           {/* storage over time */}
           <div className={panel}>
-            <div className="mb-2.5 font-serif text-[15px] font-semibold text-[#D9CBB2]">Storage — top items</div>
+            <div className="mb-2.5 font-serif text-[15px] md:text-[16.5px] font-semibold text-[#D9CBB2]">Storage — top items</div>
             <ResponsiveContainer width="100%" height={230}>
               <LineChart data={chartData} margin={{ left: -14, right: 8, top: 4 }}>
                 <CartesianGrid stroke="rgba(255,255,255,.06)" vertical={false} />
@@ -133,7 +133,7 @@ export const Trends = () => {
 
           {/* morale + injuries */}
           <div className={panel}>
-            <div className="mb-2.5 font-serif text-[15px] font-semibold text-[#D9CBB2]">Morale & injuries</div>
+            <div className="mb-2.5 font-serif text-[15px] md:text-[16.5px] font-semibold text-[#D9CBB2]">Morale & injuries</div>
             <ResponsiveContainer width="100%" height={230}>
               <LineChart data={chartData} margin={{ left: -14, right: 8, top: 4 }}>
                 <CartesianGrid stroke="rgba(255,255,255,.06)" vertical={false} />
@@ -150,7 +150,7 @@ export const Trends = () => {
 
           {/* total XP */}
           <div className={panel}>
-            <div className="mb-2.5 font-serif text-[15px] font-semibold text-[#D9CBB2]">Settlement XP (all villagers)</div>
+            <div className="mb-2.5 font-serif text-[15px] md:text-[16.5px] font-semibold text-[#D9CBB2]">Settlement XP (all villagers)</div>
             <ResponsiveContainer width="100%" height={230}>
               <AreaChart data={chartData} margin={{ left: -6, right: 8, top: 4 }}>
                 <defs>
@@ -171,24 +171,24 @@ export const Trends = () => {
           {/* XP movers */}
           {deltas && deltas.xp_movers.length > 0 && (
             <div className={panel}>
-              <div className="mb-1 font-serif text-[15px] font-semibold text-[#D9CBB2]">
+              <div className="mb-1 font-serif text-[15px] md:text-[16.5px] font-semibold text-[#D9CBB2]">
                 Who trained ({deltas.hours_played.toFixed(1)}h window)
               </div>
               {deltas.idle_villagers.length > 0 && (
-                <div className="mb-2 text-[11px] text-sand-600">
+                <div className="mb-2 text-[11px] md:text-[12px] text-sand-600">
                   No XP gained: {deltas.idle_villagers.join(', ')}
                 </div>
               )}
-              <div className="flex flex-col gap-[7px]">
+              <div className="flex flex-col gap-1.75">
                 {deltas.xp_movers.map(m => {
                   const max = deltas.xp_movers[0].gained;
                   return (
                     <div key={m.name} className="flex items-center gap-2.5">
-                      <span className="w-[130px] flex-none overflow-hidden text-ellipsis whitespace-nowrap text-xs text-sand-200">{m.name}</span>
-                      <div className="h-[7px] flex-1 overflow-hidden rounded-[4px] bg-white/[.07]">
+                      <span className="w-32.5 flex-none overflow-hidden text-ellipsis whitespace-nowrap text-xs md:text-[13px] text-sand-200">{m.name}</span>
+                      <div className="h-1.75 flex-1 overflow-hidden rounded-[4px] bg-white/[.07]">
                         <div className="h-full bg-gold" style={{ width: `${Math.max(3, (m.gained / max) * 100)}%` }} />
                       </div>
-                      <span className="w-16 text-right font-mono text-[11.5px] text-[#DCD2BE]">+{m.gained.toLocaleString()}</span>
+                      <span className="w-16 text-right font-mono text-[11.5px] md:text-[12.5px] text-[#DCD2BE]">+{m.gained.toLocaleString()}</span>
                     </div>
                   );
                 })}
@@ -202,14 +202,14 @@ export const Trends = () => {
           <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-3">
             {[['Produced (net)', gainers, '#8FBF74'], ['Consumed (net)', drainers, '#E0997F']].map(([title, list, color]) => (
               <div key={title as string} className={panel}>
-                <div className="mb-2.5 font-serif text-[15px] font-semibold text-[#D9CBB2]">{title as string}</div>
+                <div className="mb-2.5 font-serif text-[15px] md:text-[16.5px] font-semibold text-[#D9CBB2]">{title as string}</div>
                 <div className="flex flex-col gap-1.5">
                   {(list as [string, { delta: number; perHour: number | null; to: number }][]).map(([k, v]) => (
-                    <div key={k} className="flex items-baseline gap-2.5 text-[12.5px]">
+                    <div key={k} className="flex items-baseline gap-2.5 text-[12.5px] md:text-[14px]">
                       <span className="flex-1 text-sand-200">{itemLabel(k)}</span>
                       <span className="font-mono" style={{ color: color as string }}>{v.delta > 0 ? '+' : ''}{v.delta}</span>
                       {v.perHour != null && (
-                        <span className="w-[70px] text-right font-mono text-[10.5px] text-sand-600">
+                        <span className="w-17.5 text-right font-mono text-[10.5px] md:text-[11.5px] text-sand-600">
                           {v.perHour > 0 ? '+' : ''}{v.perHour.toFixed(1)}/h
                         </span>
                       )}

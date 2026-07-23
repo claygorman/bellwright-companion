@@ -336,36 +336,36 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
 
   if (!map) {
     return (
-      <div className="flex h-full items-center justify-center text-[13px] text-sand-600">
+      <div className="flex h-full items-center justify-center text-[13px] md:text-[14.5px] text-sand-600">
         No map imagery for “{world.meta.map ?? 'unknown map'}” yet — pins need a calibrated base image.
       </div>
     );
   }
 
   return (
-    <div className="relative flex h-full min-h-[520px] bg-[#0C0B08]">
+    <div className="relative flex h-full min-h-130 bg-[#0C0B08]">
       {/* sidebar */}
-      <div className="bw-scroll z-10 w-[290px] flex-none overflow-y-auto border-r border-line bg-iron-850">
+      <div className="bw-scroll z-10 w-72.5 flex-none overflow-y-auto border-r border-line bg-iron-850">
         <div className="pt-3.5 px-3.5 pb-2.5">
-          <div className="flex items-center gap-2 rounded-lg border border-line-3 bg-ink py-2 px-[11px]">
+          <div className="flex items-center gap-2 rounded-lg border border-line-3 bg-ink py-2 px-2.75">
             <SearchIcon />
             <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search the map…"
-              className="w-full border-none bg-transparent font-sans text-[12.5px] text-sand-200 outline-none" />
+              className="w-full border-none bg-transparent font-sans text-[12.5px] md:text-[14px] text-sand-200 outline-none" />
           </div>
-          <div className="flex gap-[5px] mt-2">
+          <div className="flex gap-1.25 mt-2">
             {([
               ['Show all', () => setLayers(ALL_ON)],
               ['Hide all', () => setLayers(ALL_OFF)],
               ['Settlement', () => setLayers({ ...ALL_OFF, player: true, villagers: true, buildings: true })],
             ] as const).map(([label, act]) => (
               <button key={label} onClick={act}
-                className="flex-1 py-[7px] px-1 bg-ink border border-line-3 rounded-[7px] cursor-pointer font-sans text-[10.5px] tracking-[.3px] uppercase text-sand-400 hover:text-sand-200 hover:border-[#4a4030]">
+                className="flex-1 py-1.75 px-1 bg-ink border border-line-3 rounded-[7px] cursor-pointer font-sans text-[10.5px] md:text-[11.5px] tracking-[.3px] uppercase text-sand-400 hover:text-sand-200 hover:border-[#4a4030]">
                 {label}
               </button>
             ))}
           </div>
           {/* placement planner */}
-          <div className="mt-2 rounded-[9px] border border-[#2A231A] bg-gradient-to-b from-gold/[.06] to-transparent py-[9px] px-2.5">
+          <div className="mt-2 rounded-[9px] border border-[#2A231A] bg-gradient-to-b from-gold/[.06] to-transparent py-2.25 px-2.5">
             <button
               onClick={() => {
                 if (planner) { setPlanner(null); return; }
@@ -378,7 +378,7 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
                 });
               }}
               className={cn(
-                'w-full cursor-pointer rounded-[7px] border py-[7px] px-2 font-sans text-[10.5px] uppercase tracking-[.3px]',
+                'w-full cursor-pointer rounded-[7px] border py-1.75 px-2 font-sans text-[10.5px] md:text-[11.5px] uppercase tracking-[.3px]',
                 planner ? 'border-gold bg-gold/[.14] text-gold-bright' : 'border-line-3 bg-ink text-sand-400 hover:text-sand-200',
               )}>
               {planner ? 'Remove radius circle' : 'Place radius circle'}
@@ -387,7 +387,7 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
               <>
                 <div className="mt-2">
                   <BwSelect value={building} align="start"
-                    triggerClassName="w-full h-auto py-[5px] pl-1.5 pr-1.5 rounded-[7px] text-[11px]"
+                    triggerClassName="w-full h-auto py-1.25 pl-1.5 pr-1.5 rounded-[7px] text-[11px] md:text-[12px]"
                     options={[{ value: 'custom', label: 'Custom radius…' },
                       ...BUILDINGS.map(([n, r]) => ({ value: n, label: `${n} — ${r}m` }))]}
                     onChange={v => {
@@ -402,13 +402,13 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
                     step={5} value={planner.radius}
                     onChange={e => setPlanner(pl => pl && { ...pl, radius: Number(e.target.value) })}
                     className="h-1 flex-1 cursor-pointer accent-[#E0A73C]" />
-                  <span className="w-11 text-right font-mono text-[11px] text-gold-bright">{planner.radius}m</span>
+                  <span className="w-11 text-right font-mono text-[11px] md:text-[12px] text-gold-bright">{planner.radius}m</span>
                 </div>
                 <div className="mt-1.5 flex gap-1">
                   {[100, 150, 200, 300].map(r => (
                     <button key={r} onClick={() => setPlanner(pl => pl && { ...pl, radius: r })}
                       className={cn(
-                        'flex-1 cursor-pointer rounded-[5px] border py-0.5 font-mono text-[9.5px]',
+                        'flex-1 cursor-pointer rounded-[5px] border py-0.5 font-mono text-[9.5px] md:text-[10.5px]',
                         planner.radius === r ? 'border-gold text-gold-bright' : 'border-line-3 text-sand-600 hover:text-sand-300',
                       )}>{r}m</button>
                   ))}
@@ -424,13 +424,13 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
                   const rows = [...inside.entries()].sort((a, b) => b[1] - a[1]);
                   return (
                     <div className="mt-2 border-t border-[#2A231A] pt-1.5">
-                      <div className="mb-1 text-[9px] uppercase tracking-[.5px] text-sand-600">Inside radius (visible layers)</div>
-                      {rows.length === 0 && <div className="text-[10.5px] text-sand-700">Nothing in range — drag the circle.</div>}
+                      <div className="mb-1 text-[9px] md:text-[10px] uppercase tracking-[.5px] text-sand-600">Inside radius (visible layers)</div>
+                      {rows.length === 0 && <div className="text-[10.5px] md:text-[11.5px] text-sand-700">Nothing in range — drag the circle.</div>}
                       {rows.map(([k, n]) => (
-                        <div key={k} className="flex items-center gap-1.5 py-px text-[10.5px] text-sand-300">
-                          <span className="h-[6px] w-[6px] rounded-full" style={{ background: LAYERS[k].color }} />
+                        <div key={k} className="flex items-center gap-1.5 py-px text-[10.5px] md:text-[11.5px] text-sand-300">
+                          <span className="h-1.5 w-1.5 rounded-full" style={{ background: LAYERS[k].color }} />
                           <span className="flex-1">{LAYERS[k].label}</span>
-                          <span className="font-mono text-[10px] text-gold-bright">{n}</span>
+                          <span className="font-mono text-[10px] md:text-[11px] text-gold-bright">{n}</span>
                         </div>
                       ))}
                     </div>
@@ -450,15 +450,15 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
                     const allOn = keys.every(k => layers[k]);
                     setLayers(s => ({ ...s, ...Object.fromEntries(keys.map(k => [k, !allOn])) }));
                   }}
-                  className="flex w-full cursor-pointer items-center justify-between gap-2 border-none bg-transparent pt-[9px] px-2 pb-1.5 font-sans hover:opacity-80"
+                  className="flex w-full cursor-pointer items-center justify-between gap-2 border-none bg-transparent pt-2.25 px-2 pb-1.5 font-sans hover:opacity-80"
                 >
-                  <span className="text-[10px] font-semibold uppercase tracking-[.7px] text-sand-400">{g}</span>
+                  <span className="text-[10px] md:text-[11px] font-semibold uppercase tracking-[.7px] text-sand-400">{g}</span>
                   <span className="flex items-center gap-2">
-                    <span className="rounded-[5px] bg-row py-px px-[7px] font-mono text-[10.5px] text-sand-600">
+                    <span className="rounded-[5px] bg-row py-px px-1.75 font-mono text-[10.5px] md:text-[11.5px] text-sand-600">
                       {keys.reduce((a, k) => a + pins.filter(p => p.layer === k).length, 0)}
                     </span>
                     <span className={cn(
-                      'h-[15px] w-[15px] flex-none rounded-[4px] border',
+                      'h-3.75 w-3.75 flex-none rounded-[4px] border',
                       keys.every(k => layers[k]) ? 'border-gold bg-gold'
                         : keys.some(k => layers[k]) ? 'border-gold bg-gold/40'
                           : 'border-[#4a4030] bg-transparent',
@@ -474,10 +474,10 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
                       onMouseEnter={() => setHoverLayer(k)} onMouseLeave={() => setHoverLayer(null)}
                       data-tip={`${m.label} — ${srcOf(k) === 'save' ? 'live from your save' : 'static wiki data (community-curated)'}`}
                       className={cn(
-                        'flex w-full cursor-pointer items-center gap-1.5 rounded-md border-none bg-transparent py-[5px] px-1.5 text-left font-sans text-[11.5px] hover:bg-white/[.04]',
+                        'flex w-full cursor-pointer items-center gap-1.5 rounded-md border-none bg-transparent py-1.25 px-1.5 text-left font-sans text-[11.5px] md:text-[12.5px] hover:bg-white/[.04]',
                         on ? 'text-[#DCD2BE]' : 'text-sand-700 opacity-70',
                       )}>
-                      <span className="flex h-[18px] w-[18px] flex-none items-center justify-center rounded-[5px]"
+                      <span className="flex h-4.5 w-4.5 flex-none items-center justify-center rounded-[5px]"
                         style={{ background: on ? `${m.color}22` : '#201B15' }}>
                         {m.iconImg
                           // eslint-disable-next-line @next/next/no-img-element
@@ -485,10 +485,10 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
                           : <Icon name={m.icon} size={11} color={on ? m.color : C.textDisabled} />}
                       </span>
                       <span className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{m.label}</span>
-                      <span className="font-mono text-[10px] text-sand-600">{count}</span>
+                      <span className="font-mono text-[10px] md:text-[11px] text-sand-600">{count}</span>
                       {srcOf(k) === 'save'
-                        ? <span className="h-[5px] w-[5px] flex-none rounded-full bg-moss-bright" />
-                        : <span className="flex-none font-mono text-[8px] leading-none text-sand-700">W</span>}
+                        ? <span className="h-1.25 w-1.25 flex-none rounded-full bg-moss-bright" />
+                        : <span className="flex-none font-mono text-[8px] md:text-[9px] leading-none text-sand-700">W</span>}
                     </button>
                   );
                 })}
@@ -497,14 +497,14 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
             );
           })}
         </div>
-        <div className="px-4 pb-[18px] text-[10px] leading-[1.45] text-sand-800">
+        <div className="px-4 pb-4.5 text-[10px] md:text-[11px] leading-[1.45] text-sand-800">
           <div>Map imagery: Bellwright game asset via the community wiki (fetched per-install, not redistributed).</div>
           <div className="mt-1.5 flex items-center gap-1.5 whitespace-nowrap">
-            <span className="h-[5px] w-[5px] flex-none rounded-full bg-moss-bright" />
+            <span className="h-1.25 w-1.25 flex-none rounded-full bg-moss-bright" />
             <span>live from your save</span>
           </div>
           <div className="mt-0.5 flex items-center gap-1.5 whitespace-nowrap">
-            <span className="w-[5px] flex-none text-center font-mono text-[8px] leading-none">W</span>
+            <span className="w-1.25 flex-none text-center font-mono text-[8px] md:text-[9px] leading-none">W</span>
             <span>static wiki data (CC-BY-SA)</span>
           </div>
         </div>
@@ -589,7 +589,7 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
             {map.labels.map(l => (
               // outer wrapper transform is set imperatively via data-u/data-v — no transform classes here
               <div key={l.name} data-u={l.u} data-v={l.v} className="absolute left-0 top-0">
-                <div className="pointer-events-none -translate-x-1/2 -translate-y-1/2 whitespace-nowrap font-serif text-[15px] uppercase tracking-[3px] text-[rgba(28,22,14,.8)] [text-shadow:0_0_6px_rgba(240,230,210,.55)]">{l.name}</div>
+                <div className="pointer-events-none -translate-x-1/2 -translate-y-1/2 whitespace-nowrap font-serif text-[15px] md:text-[16.5px] uppercase tracking-[3px] text-[rgba(28,22,14,.8)] [text-shadow:0_0_6px_rgba(240,230,210,.55)]">{l.name}</div>
               </div>
             ))}
             {visible.map(p => {
@@ -614,7 +614,7 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
                     transition: 'opacity .12s ease',
                   }}>
                   {p.live && (
-                    <span className="pointer-events-none absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 h-[22px] w-[22px] rounded-full border-2 border-moss-bright [animation:bwpulse_1.6s_ease-in-out_infinite]" />
+                    <span className="pointer-events-none absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 h-5.5 w-5.5 rounded-full border-2 border-moss-bright [animation:bwpulse_1.6s_ease-in-out_infinite]" />
                   )}
                   {m.iconImg ? (
                     // bare wiki icon straight on the terrain, like the game map
@@ -632,7 +632,7 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
                   <div
                     className={cn(
                       'flex items-center justify-center rounded-[50%_50%_50%_0] border-2 border-[rgba(0,0,0,.45)] transition-transform duration-100',
-                      small ? 'h-[18px] w-[18px]' : 'h-[26px] w-[26px]',
+                      small ? 'h-4.5 w-4.5' : 'h-6.5 w-6.5',
                     )}
                     style={{
                       transform: `rotate(-45deg) scale(${sel2 ? 1.2 : hov ? 1.1 : lhl ? 1.25 : 1})`,
@@ -654,8 +654,8 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
         {tip && selKey !== tip.key && (
           <div className="pointer-events-none absolute z-50 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-lg border border-[#3A3128] bg-ink py-1.5 px-2.5 shadow-[0_8px_24px_rgba(0,0,0,.6)] [animation:bwfade_.1s_ease]"
             style={{ left: tip.x, top: tip.y - 8 }}>
-            <div className="text-xs font-semibold text-sand-100">{tip.label}</div>
-            <div className="text-[10.5px] text-sand-400">{tip.sub}</div>
+            <div className="text-xs md:text-[13px] font-semibold text-sand-100">{tip.label}</div>
+            <div className="text-[10.5px] md:text-[11.5px] text-sand-400">{tip.sub}</div>
           </div>
         )}
 
@@ -663,15 +663,15 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
         <div className="absolute bottom-4 right-4 z-[45] flex flex-col gap-1.5">
           {[['+', 1.35] as const, ['−', 1 / 1.35] as const].map(([lbl, f]) => (
             <button key={lbl} onClick={e => { e.stopPropagation(); zoomAt(f); }}
-              className="h-[34px] w-[34px] cursor-pointer rounded-lg border border-[#3A3128] bg-[rgba(17,14,10,.85)] text-[17px] leading-none text-[#DCD2BE]">{lbl}</button>
+              className="h-8.5 w-8.5 cursor-pointer rounded-lg border border-[#3A3128] bg-[rgba(17,14,10,.85)] text-[17px] md:text-[18.5px] leading-none text-[#DCD2BE]">{lbl}</button>
           ))}
         </div>
         <div className="pointer-events-none absolute bottom-4 left-4 z-40 flex items-center gap-2.5">
-          <span className="font-serif text-[15px] tracking-[.5px] text-[#D8CBB0] [text-shadow:0_1px_6px_rgba(0,0,0,.8)]">{region}</span>
+          <span className="font-serif text-[15px] md:text-[16.5px] tracking-[.5px] text-[#D8CBB0] [text-shadow:0_1px_6px_rgba(0,0,0,.8)]">{region}</span>
           {live && (
             <span data-tip="Streaming live positions from the game (telemetry mod)"
-              className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full border border-moss-bright/40 bg-moss-bright/15 py-[3px] px-2.5 text-[11px] font-semibold text-[#A9C293] [text-shadow:none]">
-              <span className="h-[7px] w-[7px] rounded-full bg-moss-bright shadow-[0_0_6px_#7FB05B] [animation:bwpulse_1.6s_ease-in-out_infinite]" />
+              className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full border border-moss-bright/40 bg-moss-bright/15 py-0.75 px-2.5 text-[11px] md:text-[12px] font-semibold text-[#A9C293] [text-shadow:none]">
+              <span className="h-1.75 w-1.75 rounded-full bg-moss-bright shadow-[0_0_6px_#7FB05B] [animation:bwpulse_1.6s_ease-in-out_infinite]" />
               LIVE
             </span>
           )}
@@ -679,27 +679,27 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
 
         {selPin && (
           <div onClick={e => e.stopPropagation()}
-            className="absolute top-4 right-4 z-[55] w-[274px] overflow-hidden rounded-xl border border-line-4 bg-[#14110C] shadow-[0_16px_40px_rgba(0,0,0,.55)] [animation:bwfade_.14s_ease]">
+            className="absolute top-4 right-4 z-[55] w-68.5 overflow-hidden rounded-xl border border-line-4 bg-[#14110C] shadow-[0_16px_40px_rgba(0,0,0,.55)] [animation:bwfade_.14s_ease]">
             <div className="relative h-28" style={{ background: `radial-gradient(circle at 42% 32%, ${LAYERS[selPin.layer].color}2e, #0c0a07)` }}>
               <div className="absolute inset-0 flex items-center justify-center opacity-55">
                 <Icon name={LAYERS[selPin.layer].icon} size={40} color={LAYERS[selPin.layer].color} />
               </div>
-              <span className="absolute top-[9px] left-[11px] rounded-[5px] bg-black/40 py-0.5 px-[7px] text-[9.5px] uppercase tracking-[.5px] text-sand-350">{LAYERS[selPin.layer].label}</span>
+              <span className="absolute top-2.25 left-2.75 rounded-[5px] bg-black/40 py-0.5 px-1.75 text-[9.5px] md:text-[10.5px] uppercase tracking-[.5px] text-sand-350">{LAYERS[selPin.layer].label}</span>
               <span className={cn(
-                'absolute top-[9px] right-10 rounded-[5px] py-0.5 px-[7px] text-[9px] uppercase tracking-[.5px]',
+                'absolute top-2.25 right-10 rounded-[5px] py-0.5 px-1.75 text-[9px] md:text-[10px] uppercase tracking-[.5px]',
                 srcOf(selPin.layer) === 'save' ? 'bg-moss-bright/15 text-[#A9C293]' : 'bg-white/10 text-sand-400',
               )}>{srcOf(selPin.layer) === 'save' ? 'Live save data' : 'Wiki data'}</span>
               <button onClick={() => setSelKey(null)}
-                className="absolute top-2 right-2 h-6 w-6 cursor-pointer rounded-md border-none bg-black/45 text-sm leading-none text-[#DCD2BE]">×</button>
+                className="absolute top-2 right-2 h-6 w-6 cursor-pointer rounded-md border-none bg-black/45 text-sm md:text-[15.5px] leading-none text-[#DCD2BE]">×</button>
             </div>
-            <div className="pt-[13px] px-[15px] pb-[15px]">
-              <div className="font-serif text-[17px] font-semibold leading-[1.15] text-sand-50">{selPin.label}</div>
-              <div className="mt-0.5 text-[11.5px]" style={{ color: LAYERS[selPin.layer].color }}>{selPin.sub}</div>
-              <p className="mt-[9px] text-xs leading-[1.5] text-sand-350">{selPin.desc}</p>
-              <div className="mt-[9px] font-mono text-[10.5px] text-sand-700">{selPin.coords}</div>
+            <div className="pt-3.25 px-3.75 pb-3.75">
+              <div className="font-serif text-[17px] md:text-[18.5px] font-semibold leading-[1.15] text-sand-50">{selPin.label}</div>
+              <div className="mt-0.5 text-[11.5px] md:text-[12.5px]" style={{ color: LAYERS[selPin.layer].color }}>{selPin.sub}</div>
+              <p className="mt-2.25 text-xs md:text-[13px] leading-[1.5] text-sand-350">{selPin.desc}</p>
+              <div className="mt-2.25 font-mono text-[10.5px] md:text-[11.5px] text-sand-700">{selPin.coords}</div>
               {selPin.guid && (
                 <button onClick={() => { onOpenProfile(selPin.guid!); setSelKey(null); }}
-                  className="mt-3 w-full cursor-pointer rounded-lg border border-gold bg-gold/[.13] p-[9px] font-sans text-[12.5px] font-semibold text-gold-bright">Open profile</button>
+                  className="mt-3 w-full cursor-pointer rounded-lg border border-gold bg-gold/[.13] p-2.25 font-sans text-[12.5px] md:text-[14px] font-semibold text-gold-bright">Open profile</button>
               )}
             </div>
           </div>

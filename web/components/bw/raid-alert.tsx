@@ -64,7 +64,7 @@ export const RaidWatcher = () => {
     if (perm === 'default') {
       return (
         <button onClick={askPerm}
-          className="fixed bottom-3 right-3 z-[95] inline-flex items-center gap-2 rounded-full border border-line-4 bg-iron-850 py-1.5 px-3 text-[11.5px] text-sand-300 shadow-[0_8px_24px_rgba(0,0,0,.5)] hover:border-[#4a4030]">
+          className="fixed bottom-3 right-3 z-[95] inline-flex items-center gap-2 rounded-full border border-line-4 bg-iron-850 py-1.5 px-3 text-[11.5px] md:text-[12.5px] text-sand-300 shadow-[0_8px_24px_rgba(0,0,0,.5)] hover:border-[#4a4030]">
           <span className="text-rust-bright">⚔️</span> Enable raid alerts
         </button>
       );
@@ -75,10 +75,10 @@ export const RaidWatcher = () => {
   const eta = raid.eta_s != null ? `${Math.max(0, Math.round(raid.eta_s / 60))} min` : null;
   return (
     <div className="fixed inset-x-0 top-0 z-[100] flex items-center gap-3 px-5 py-2.5 bg-gradient-to-r from-rust/95 to-rust-bright/90 text-white shadow-[0_6px_24px_rgba(0,0,0,.5)] [animation:bwfade_.18s_ease]">
-      <span className="text-lg [animation:bwpulse_1s_ease-in-out_infinite]">⚔️</span>
+      <span className="text-lg md:text-[20px] [animation:bwpulse_1s_ease-in-out_infinite]">⚔️</span>
       <div className="flex-auto min-w-0">
-        <div className="font-serif font-semibold text-[15px] leading-tight">Raid incoming</div>
-        <div className="text-[12px] text-white/90 truncate">
+        <div className="font-serif font-semibold text-[15px] md:text-[16.5px] leading-tight">Raid incoming</div>
+        <div className="text-[12px] md:text-[13px] text-white/90 truncate">
           {raid.message || [raid.village && `heading for ${raid.village}`,
             raid.party && `${raid.party} attackers`, eta && `ETA ${eta}`].filter(Boolean).join(' · ')
             || 'A raid is heading for your settlement.'}
@@ -86,12 +86,12 @@ export const RaidWatcher = () => {
       </div>
       {perm !== 'granted' && (
         <button onClick={askPerm}
-          className="flex-none rounded-md border border-white/40 bg-white/10 py-1 px-2.5 text-[11.5px] font-medium hover:bg-white/20">
+          className="flex-none rounded-md border border-white/40 bg-white/10 py-1 px-2.5 text-[11.5px] md:text-[12.5px] font-medium hover:bg-white/20">
           Notify me
         </button>
       )}
       <button onClick={() => setDismissed(true)}
-        className="flex-none rounded-md border border-white/30 py-1 px-2.5 text-[11.5px] hover:bg-white/15">Dismiss</button>
+        className="flex-none rounded-md border border-white/30 py-1 px-2.5 text-[11.5px] md:text-[12.5px] hover:bg-white/15">Dismiss</button>
     </div>
   );
 };

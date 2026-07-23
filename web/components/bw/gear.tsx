@@ -29,10 +29,10 @@ const Card = ({ title, badge, badgeColor, children }: {
   title: string; badge?: string | number; badgeColor?: string; children: React.ReactNode;
 }) => (
   <div className="border border-line-2 bg-iron-750 rounded-xl py-3.5 px-4">
-    <div className="flex items-center gap-[9px] mb-2.5">
-      <span className="font-serif text-[15px] font-semibold text-sand-100 flex-auto">{title}</span>
+    <div className="flex items-center gap-2.25 mb-2.5">
+      <span className="font-serif text-[15px] md:text-[16.5px] font-semibold text-sand-100 flex-auto">{title}</span>
       {badge != null && (
-        <span className="font-mono text-[11px] font-semibold py-px px-2 rounded-full border border-line-4 bg-[#1A160F]"
+        <span className="font-mono text-[11px] md:text-[12px] font-semibold py-px px-2 rounded-full border border-line-4 bg-[#1A160F]"
           style={{ color: badgeColor ?? C.textDim }}>{badge}</span>
       )}
     </div>
@@ -56,11 +56,11 @@ export const GearPanel = ({ onOpen }: { onOpen: (guid: string) => void }) => {
   return (
     <div className="mb-5">
       <div className="mb-3">
-        <h2 className="font-serif text-xl font-semibold text-sand-100">Gear &amp; kits</h2>
-        <p className="mt-1 text-[12.5px] text-[#8a8069]">
+        <h2 className="font-serif text-xl md:text-[22px] font-semibold text-sand-100">Gear &amp; kits</h2>
+        <p className="mt-1 text-[12.5px] md:text-[14px] text-[#8a8069]">
           Kit coverage from your gear presets — what to craft, and who can gear up from storage.
           {!data.has_reserves && (
-            <> Set flat spare targets in <span className="font-mono text-[11.5px]">kits.json</span> to plan for breakage.</>
+            <> Set flat spare targets in <span className="font-mono text-[11.5px] md:text-[12.5px]">kits.json</span> to plan for breakage.</>
           )}
         </p>
       </div>
@@ -70,13 +70,13 @@ export const GearPanel = ({ onOpen }: { onOpen: (guid: string) => void }) => {
           <Card title="Craft list" badge={data.craft.reduce((s, x) => s + x.deficit, 0)} badgeColor={C.redText}>
             <div className="flex flex-col gap-1.5">
               {data.craft.map(x => (
-                <div key={x.item} className="flex items-center gap-[9px]">
+                <div key={x.item} className="flex items-center gap-2.25">
                   <ItemImg cls={x.item} size={22} fallback={<Icon name="pouch" size={16} color={C.textFaint} />} />
-                  <span className="flex-auto text-[12.5px] text-sand-200 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{itemLabel(x.item)}</span>
-                  <span className="font-mono text-[10.5px] text-sand-600 whitespace-nowrap">
+                  <span className="flex-auto text-[12.5px] md:text-[14px] text-sand-200 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{itemLabel(x.item)}</span>
+                  <span className="font-mono text-[10.5px] md:text-[11.5px] text-sand-600 whitespace-nowrap">
                     {x.have}/{x.target}{x.reserve > 0 ? ` (+${x.reserve} spare)` : ''}
                   </span>
-                  <span className="font-mono text-[11px] font-semibold text-[#EDA593] px-[7px] rounded-full bg-rust/[.12] border border-rust/30">+{x.deficit}</span>
+                  <span className="font-mono text-[11px] md:text-[12px] font-semibold text-[#EDA593] px-1.75 rounded-full bg-rust/[.12] border border-rust/30">+{x.deficit}</span>
                 </div>
               ))}
             </div>
@@ -87,9 +87,9 @@ export const GearPanel = ({ onOpen }: { onOpen: (guid: string) => void }) => {
           <Card title="Gear up from storage" badge={data.reequip.length} badgeColor={C.blueText}>
             <div className="flex flex-col gap-1.5">
               {data.reequip.map((r, i) => (
-                <div key={i} className="flex items-center gap-2 text-xs">
+                <div key={i} className="flex items-center gap-2 text-xs md:text-[13px]">
                   <span className="text-sand-200 whitespace-nowrap">{r.name}</span>
-                  <span className="font-mono text-[10px] text-sand-700 uppercase">{r.slot}</span>
+                  <span className="font-mono text-[10px] md:text-[11px] text-sand-700 uppercase">{r.slot}</span>
                   <span className="flex-auto min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-sand-400 text-right">
                     {r.worn ? itemLabel(r.worn) : 'empty'} → <span className="text-sky-bright">{itemLabel(r.pick)}</span>
                   </span>
@@ -102,7 +102,7 @@ export const GearPanel = ({ onOpen }: { onOpen: (guid: string) => void }) => {
 
         {data.presets.map(p => (
           <Card key={p.key} title={p.name} badge={p.members.length} badgeColor={C.gold as string}>
-            <div className={cn('flex flex-col gap-[5px]', p.members.length > 0 && 'mb-2.5')}>
+            <div className={cn('flex flex-col gap-1.25', p.members.length > 0 && 'mb-2.5')}>
               {SLOT_ORDER.filter(s => p.picks[s]).map(s => {
                 // the preset's full ranked chain (top preference → fallback):
                 // gold ring = effective pick (in use / craft planning),
@@ -111,7 +111,7 @@ export const GearPanel = ({ onOpen }: { onOpen: (guid: string) => void }) => {
                 const eff = p.picks[s];
                 return (
                   <div key={s} className="flex items-center gap-1.5 min-w-0">
-                    <span className="font-mono text-[10px] text-sand-700 uppercase w-[62px] flex-none">{s}</span>
+                    <span className="font-mono text-[10px] md:text-[11px] text-sand-700 uppercase w-15.5 flex-none">{s}</span>
                     <span className="flex items-center gap-1 min-w-0 flex-wrap">
                       {chain.map((r, i) => {
                         const a = data.avail?.[r.item];
@@ -120,9 +120,9 @@ export const GearPanel = ({ onOpen }: { onOpen: (guid: string) => void }) => {
                           a?.unlocked ? `stored ${a.stored} · equipped ${a.equipped}` : 'not fielded yet'}`;
                         return (
                           <span key={r.item} className="inline-flex items-center gap-1">
-                            {i > 0 && <span className="text-[10px] text-sand-700">›</span>}
+                            {i > 0 && <span className="text-[10px] md:text-[11px] text-sand-700">›</span>}
                             <span data-tip={tip} className={cn(
-                              'inline-flex items-center justify-center w-[24px] h-[24px] rounded-md border flex-none',
+                              'inline-flex items-center justify-center w-6 h-6 rounded-md border flex-none',
                               inUse ? 'border-gold bg-gold/[.14]'
                                 : a?.unlocked ? 'border-line-3 bg-[#1A160F]'
                                   : 'border-line-2 bg-transparent opacity-40 grayscale',
@@ -133,17 +133,17 @@ export const GearPanel = ({ onOpen }: { onOpen: (guid: string) => void }) => {
                         );
                       })}
                     </span>
-                    <span className="text-[11px] text-sand-300 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap ml-auto pl-1">{itemLabel(eff)}</span>
+                    <span className="text-[11px] md:text-[12px] text-sand-300 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap ml-auto pl-1">{itemLabel(eff)}</span>
                   </div>
                 );
               })}
             </div>
             {p.members.length > 0 && (
-              <div className="flex flex-wrap gap-[5px] border-t border-row pt-[9px]">
+              <div className="flex flex-wrap gap-1.25 border-t border-row pt-2.25">
                 {p.members.map(m => (
                   <button key={m.guid ?? m.name} onClick={() => m.guid && onOpen(m.guid)}
                     className={cn(
-                      'text-[11px] text-sand-400 bg-[#1A160F] border border-line-2 rounded-full py-0.5 px-[9px]',
+                      'text-[11px] md:text-[12px] text-sand-400 bg-[#1A160F] border border-line-2 rounded-full py-0.5 px-2.25',
                       m.guid ? 'cursor-pointer' : 'cursor-default',
                     )}>{m.name}</button>
                 ))}

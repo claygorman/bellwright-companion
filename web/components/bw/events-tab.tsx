@@ -66,17 +66,17 @@ export const EventsTab = () => {
 
   return (
     <div className="bw-scroll h-full overflow-y-auto">
-      <div className="pt-[22px] px-6 pb-16 max-w-[860px]">
+      <div className="pt-5.5 px-6 pb-16 max-w-215">
         <div className="mb-3">
-          <h2 className="font-serif text-xl font-semibold text-sand-100">Events</h2>
-          <p className="mt-1 text-[12.5px] text-[#8a8069]">
+          <h2 className="font-serif text-xl md:text-[22px] font-semibold text-sand-100">Events</h2>
+          <p className="mt-1 text-[12.5px] md:text-[14px] text-[#8a8069]">
             System log from the memory-reader daemon and the companion. Heartbeats let this tell
             &ldquo;reader is down&rdquo; apart from &ldquo;game is off.&rdquo;
           </p>
         </div>
 
-        <div className={cn('rounded-lg border px-3.5 py-2.5 mb-4 text-[12.5px] flex items-center gap-2.5', STATUS_TONE[status.tone])}>
-          <span className={cn('w-[9px] h-[9px] rounded-full flex-none',
+        <div className={cn('rounded-lg border px-3.5 py-2.5 mb-4 text-[12.5px] md:text-[14px] flex items-center gap-2.5', STATUS_TONE[status.tone])}>
+          <span className={cn('w-2.25 h-2.25 rounded-full flex-none',
             status.tone === 'ok' ? 'bg-moss-bright [animation:bwpulse_2.4s_ease-in-out_infinite]' : status.tone === 'error' ? 'bg-rust' : 'bg-sand-600')} />
           <span className="font-medium">{status.label}</span>
         </div>
@@ -84,37 +84,37 @@ export const EventsTab = () => {
         <div className="flex items-center gap-1.5 mb-3">
           {(['error', 'warn', 'info'] as const).map(l => (
             <button key={l} onClick={() => setFilter(f => (f === l ? null : l))}
-              className={cn('inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full border text-[11px] cursor-pointer',
+              className={cn('inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full border text-[11px] md:text-[12px] cursor-pointer',
                 filter === l ? LEVEL[l].chip + ' ' + LEVEL[l].text : 'border-line-3 bg-transparent text-sand-500')}>
               <span className={cn('w-1.5 h-1.5 rounded-full', LEVEL[l].dot)} />
               {l} <span className="font-mono text-sand-600">{counts[l] ?? 0}</span>
             </button>
           ))}
-          {filter && <button onClick={() => setFilter(null)} className="text-[11px] text-sand-600 hover:text-sand-300 cursor-pointer">clear</button>}
+          {filter && <button onClick={() => setFilter(null)} className="text-[11px] md:text-[12px] text-sand-600 hover:text-sand-300 cursor-pointer">clear</button>}
           <span className="flex-auto" />
-          {err && <span className="text-[11px] text-rust-soft">feed unreachable</span>}
+          {err && <span className="text-[11px] md:text-[12px] text-rust-soft">feed unreachable</span>}
         </div>
 
         {shown.length === 0 ? (
-          <div className="text-center py-16 text-[13px] text-sand-600">No events{filter ? ` at level "${filter}"` : ' yet'}.</div>
+          <div className="text-center py-16 text-[13px] md:text-[14.5px] text-sand-600">No events{filter ? ` at level "${filter}"` : ' yet'}.</div>
         ) : (
           <div className="rounded-xl border border-line-2 overflow-hidden">
             {shown.map((e, i) => {
               const lv = LEVEL[e.level] ?? LEVEL.info;
               return (
                 <div key={e.id} className={cn('flex items-start gap-3 px-3.5 py-2', i > 0 && 'border-t border-row')}>
-                  <span className={cn('mt-[6px] w-2 h-2 rounded-full flex-none', lv.dot)} />
-                  <span className="font-mono text-[10.5px] text-sand-600 mt-[2px] flex-none w-[62px]">{hhmmss(e.received_at)}</span>
+                  <span className={cn('mt-1.5 w-2 h-2 rounded-full flex-none', lv.dot)} />
+                  <span className="font-mono text-[10.5px] md:text-[11.5px] text-sand-600 mt-0.5 flex-none w-15.5">{hhmmss(e.received_at)}</span>
                   <div className="min-w-0 flex-auto">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[9px] font-bold uppercase tracking-[.4px] text-sand-500 border border-line-3 rounded px-1 py-px">{e.source}</span>
-                      <span className={cn('font-mono text-[10.5px]', lv.text)}>{e.event}</span>
+                      <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[.4px] text-sand-500 border border-line-3 rounded px-1 py-px">{e.source}</span>
+                      <span className={cn('font-mono text-[10.5px] md:text-[11.5px]', lv.text)}>{e.event}</span>
                     </div>
-                    <div className="text-[12.5px] text-sand-200 mt-0.5 break-words">{e.message}</div>
+                    <div className="text-[12.5px] md:text-[14px] text-sand-200 mt-0.5 break-words">{e.message}</div>
                     {e.meta && Object.keys(e.meta).length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-1">
                         {Object.entries(e.meta).map(([k, v]) => (
-                          <span key={k} className="font-mono text-[10px] text-sand-600 bg-white/[.03] border border-line-3 rounded px-1.5 py-px">
+                          <span key={k} className="font-mono text-[10px] md:text-[11px] text-sand-600 bg-white/[.03] border border-line-3 rounded px-1.5 py-px">
                             {k}={String(v)}
                           </span>
                         ))}

@@ -18,7 +18,7 @@ export const DropdownMenuContent = ({ className, align = 'end', sideOffset = 6, 
     <Menu.Positioner align={align} sideOffset={sideOffset} collisionPadding={8} className="z-[91] outline-none">
       <Menu.Popup
         className={cn(
-          'min-w-[184px] max-w-[calc(100vw-16px)] rounded-md border border-line-4 bg-[#1B1712] p-1',
+          'min-w-46 max-w-[calc(100vw-16px)] rounded-md border border-line-4 bg-[#1B1712] p-1',
           'shadow-[0_16px_40px_rgba(0,0,0,.5)] [animation:bwfade_.1s_ease] outline-none',
           className,
         )}
@@ -32,7 +32,7 @@ export const DropdownMenuContent = ({ className, align = 'end', sideOffset = 6, 
 export const DropdownMenuItem = ({ className, ...props }: React.ComponentProps<typeof Menu.Item>) => (
   <Menu.Item
     className={cn(
-      'relative flex items-center w-full gap-2 rounded-sm py-1.5 pl-8 pr-3 text-[12.5px] text-sand-200',
+      'relative flex items-center w-full gap-2 rounded-sm py-1.5 pl-8 pr-3 text-[12.5px] md:text-[14px] text-sand-200',
       'cursor-pointer font-sans text-left outline-none select-none',
       'data-[highlighted]:bg-white/[.06]',
       className,
@@ -43,7 +43,7 @@ export const DropdownMenuItem = ({ className, ...props }: React.ComponentProps<t
 export const DropdownMenuRadioItem = ({ className, children, ...props }: React.ComponentProps<typeof Menu.RadioItem>) => (
   <Menu.RadioItem
     className={cn(
-      'relative flex items-center w-full gap-2 rounded-sm py-1.5 pl-8 pr-3 text-[12.5px] text-sand-200',
+      'relative flex items-center w-full gap-2 rounded-sm py-1.5 pl-8 pr-3 text-[12.5px] md:text-[14px] text-sand-200',
       'cursor-pointer font-sans text-left outline-none select-none',
       'data-[highlighted]:bg-white/[.06]',
       className,
@@ -61,7 +61,7 @@ export const DropdownMenuRadioItem = ({ className, children, ...props }: React.C
 
 export const DropdownMenuLabel = ({ className, ...props }: React.ComponentProps<typeof Menu.GroupLabel>) => (
   <Menu.GroupLabel
-    className={cn('py-1.5 pl-3 pr-3 text-[10px] tracking-[.5px] uppercase text-sand-600 font-sans', className)}
+    className={cn('py-1.5 pl-3 pr-3 text-[10px] md:text-[11px] tracking-[.5px] uppercase text-sand-600 font-sans', className)}
     {...props} />
 );
 
@@ -90,12 +90,12 @@ export const BwSelect = ({ label, value, options, onChange, triggerClassName, va
   <DropdownMenu>
     <DropdownMenuTrigger
       className={cn(
-        'inline-flex items-center gap-2 h-[34px] pl-3 pr-2.5 bg-ink border border-line-3 rounded-lg',
+        'inline-flex items-center gap-2 h-8.5 pl-3 pr-2.5 bg-ink border border-line-3 rounded-lg',
         'cursor-pointer font-sans hover:border-[#4a4030] outline-none',
         triggerClassName,
       )}>
-      {label && <span className="text-[10.5px] tracking-[.4px] uppercase text-sand-600">{label}</span>}
-      <span className="text-[12.5px] text-sand-200 truncate">
+      {label && <span className="text-[10.5px] md:text-[11.5px] tracking-[.4px] uppercase text-sand-600">{label}</span>}
+      <span className="text-[12.5px] md:text-[14px] text-sand-200 truncate">
         {valueLabel ?? options.find(o => o.value === value)?.label ?? value}
       </span>
       <span className="ml-auto inline-flex"><ChevronDown /></span>

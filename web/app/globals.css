@@ -126,13 +126,9 @@
    scrolling (each tab body is the single scroll region). */
 html, body { height: 100%; overflow: hidden; }
 body { background: #100E0B; }
-/* the design's 11-13px type runs small on desktop — scale the whole UI up a
-   notch (zoom keeps layout math intact, unlike transform). Phones keep 1:1.
-   TODO(#1): replace this zoom hack with rem-based Tailwind sizing (text-sm/md,
-   root font-size) so viewport units aren't fought by the scale. */
-@media (min-width: 768px) {
-  :root { zoom: 1.1; }
-}
+/* Desktop up-scaling is now done with proper responsive md: text sizes on each
+   element (the design's small type gets a ~1.1x bump ≥md) instead of a global
+   `zoom`, which broke viewport-height math and floating-ui dropdown collision. */
 ::selection { background: rgba(224, 167, 60, .3); color: #fff; }
 .bw-scroll::-webkit-scrollbar { width: 10px; height: 10px; }
 .bw-scroll::-webkit-scrollbar-track { background: transparent; }

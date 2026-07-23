@@ -227,32 +227,32 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
       style={{ '--accent': '#E0A73C', '--gold': '#F4C868', '--rowpad': '9px' } as React.CSSProperties}>
       {realtime && <RaidWatcher />}
       {/* header */}
-      <header className="flex items-center gap-[18px] h-14 px-[18px] min-w-0 overflow-hidden border-b border-line-2 bg-gradient-to-b from-[#1B1712] to-[#17130E] flex-none relative z-20">
-        <div className="flex items-center gap-[11px]">
-          <div className="w-[30px] h-[30px] rounded-[7px] bg-[radial-gradient(circle_at_32%_28%,#F4C868,#C6892C)] flex items-center justify-center shadow-[0_0_0_1px_rgba(244,200,104,.25),0_2px_8px_rgba(0,0,0,.4)]">
+      <header className="flex items-center gap-4.5 h-14 px-4.5 min-w-0 overflow-hidden border-b border-line-2 bg-gradient-to-b from-[#1B1712] to-[#17130E] flex-none relative z-20">
+        <div className="flex items-center gap-2.75">
+          <div className="w-7.5 h-7.5 rounded-[7px] bg-[radial-gradient(circle_at_32%_28%,#F4C868,#C6892C)] flex items-center justify-center shadow-[0_0_0_1px_rgba(244,200,104,.25),0_2px_8px_rgba(0,0,0,.4)]">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
               <path d="M12 2 L14 8 L20 8 L15 12 L17 19 L12 15 L7 19 L9 12 L4 8 L10 8 Z" fill="#2a1e08" />
             </svg>
           </div>
           <div className="flex flex-col leading-[1.05]">
-            <span className="font-serif font-semibold text-base tracking-[.3px] text-sand-100">
+            <span className="font-serif font-semibold text-base md:text-[17.5px] tracking-[.3px] text-sand-100">
               Bellwright<span className="text-gold"> · Companion</span>
             </span>
-            <span className="text-[10.5px] text-sand-500 tracking-[.4px]">
+            <span className="text-[10.5px] md:text-[11.5px] text-sand-500 tracking-[.4px]">
               {world.meta.character ?? 'Player'}&apos;s settlement ledger
             </span>
           </div>
         </div>
-        <div className="w-px h-[26px] bg-line-3" />
-        <div className="flex items-center gap-[14px] text-[11.5px] flex-1 min-w-0 flex-wrap max-h-10 overflow-hidden">
+        <div className="w-px h-6.5 bg-line-3" />
+        <div className="flex items-center gap-3.5 text-[11.5px] md:text-[12.5px] flex-1 min-w-0 flex-wrap max-h-10 overflow-hidden">
           <Meta k="save" v={world.meta.saveName ?? '—'} />
           <Meta k="build" v={world.meta.savedBuild ?? '—'} mono />
           {metaWide && <Meta k="region" v={world.meta.region ?? '—'} />}
           {metaWide && <Meta k="played" v={playtimeLabel(world.meta.playtimeSeconds)} mono />}
         </div>
-        <div className="flex items-center gap-2 py-[5px] px-[11px] rounded-full bg-moss-bright/10 border border-moss-bright/30 flex-none">
-          <span className="w-[7px] h-[7px] rounded-full bg-moss-bright shadow-[0_0_6px_#7FB05B] [animation:bwpulse_2.4s_ease-in-out_infinite]" />
-          <span className="text-[11.5px] text-[#A9C293] whitespace-nowrap">
+        <div className="flex items-center gap-2 py-1.25 px-2.75 rounded-full bg-moss-bright/10 border border-moss-bright/30 flex-none">
+          <span className="w-1.75 h-1.75 rounded-full bg-moss-bright shadow-[0_0_6px_#7FB05B] [animation:bwpulse_2.4s_ease-in-out_infinite]" />
+          <span className="text-[11.5px] md:text-[12.5px] text-[#A9C293] whitespace-nowrap">
             {ago ? `Fresh · ingested ${ago}` : 'Fresh'}
           </span>
         </div>
@@ -261,19 +261,19 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
       </header>
 
       {/* tabs + toolbar */}
-      <div className="flex items-center gap-1.5 py-[9px] px-[18px] border-b border-line bg-iron-800 flex-none flex-wrap relative z-[15]">
-        <nav className="bw-scroll flex gap-[3px] bg-ink p-[3px] rounded-[9px] border border-[#2A2319] max-w-full overflow-x-auto flex-nowrap">
+      <div className="flex items-center gap-1.5 py-2.25 px-4.5 border-b border-line bg-iron-800 flex-none flex-wrap relative z-[15]">
+        <nav className="bw-scroll flex gap-0.75 bg-ink p-0.75 rounded-[9px] border border-[#2A2319] max-w-full overflow-x-auto flex-nowrap">
           {tabs.map(t => {
             const active = tab === t.key;
             return (
               <button key={t.key} onClick={() => openTab(t.key)} className={cn(
-                'inline-flex items-center gap-[7px] py-1.5 px-[13px] border-none flex-none whitespace-nowrap rounded-[7px] cursor-pointer font-sans text-[13px] transition-all duration-100',
+                'inline-flex items-center gap-1.75 py-1.5 px-3.25 border-none flex-none whitespace-nowrap rounded-[7px] cursor-pointer font-sans text-[13px] md:text-[14.5px] transition-all duration-100',
                 active ? 'font-semibold text-[#1a150c] bg-gold' : 'font-medium text-sand-400 bg-transparent hover:text-[#EFE6D4] hover:bg-white/[.03]',
               )}>
                 <span>{t.label}</span>
                 {t.count != null && (
                   <span className={cn(
-                    'font-mono text-[11px] py-px px-1.5 rounded-[5px]',
+                    'font-mono text-[11px] md:text-[12px] py-px px-1.5 rounded-[5px]',
                     active ? 'text-[#1a150c] bg-black/[.16]' : 'text-sand-400 bg-[#221D16]',
                   )}>{t.count}</span>
                 )}
@@ -281,7 +281,7 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
                   <span data-tip={t.key === 'storage' ? 'Storage needs attention'
                     : t.key === 'insights' ? `${homeless} villager${homeless === 1 ? '' : 's'} without a bed`
                     : 'Villagers need attention'}
-                    className="inline-flex items-center justify-center w-[15px] h-[15px] rounded-full bg-rust text-white text-[10px] font-bold leading-none">!</span>
+                    className="inline-flex items-center justify-center w-3.75 h-3.75 rounded-full bg-rust text-white text-[10px] md:text-[11px] font-bold leading-none">!</span>
                 )}
               </button>
             );
@@ -290,17 +290,17 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
         <div className="flex-1" />
         {isTable && (
           <div className="flex items-center gap-2.5 flex-wrap w-full sm:w-auto">
-            <div className="flex items-center gap-2 px-[11px] h-[34px] bg-ink border border-line-3 rounded-lg flex-1 min-w-0 sm:flex-none">
+            <div className="flex items-center gap-2 px-2.75 h-8.5 bg-ink border border-line-3 rounded-lg flex-1 min-w-0 sm:flex-none">
               <SearchIcon />
               <input value={q} onChange={e => setQ(e.target.value)}
                 placeholder="Filter by name or archetype…"
-                className="bg-transparent border-none outline-none text-sand-200 text-[13px] w-full sm:w-[190px] min-w-0 font-sans" />
+                className="bg-transparent border-none outline-none text-sand-200 text-[13px] md:text-[14.5px] w-full sm:w-47.5 min-w-0 font-sans" />
             </div>
             <BwSelect label="View" value={rosterView} align="start"
               options={[{ value: 'skills', label: 'Skills' }, { value: 'gear', label: 'Gear & inventory' }]}
               onChange={v => setRosterView(v as RosterView)} />
             <button onClick={() => setCompareMode(m => { if (m) setCompareSet([]); return !m; })} className={cn(
-              'inline-flex items-center gap-[7px] h-[34px] px-[13px] rounded-lg cursor-pointer font-sans text-[12.5px] font-medium border transition-colors',
+              'inline-flex items-center gap-1.75 h-8.5 px-3.25 rounded-lg cursor-pointer font-sans text-[12.5px] md:text-[14px] font-medium border transition-colors',
               compareMode ? 'border-gold bg-gold/[.14] text-gold-bright' : 'border-line-3 bg-ink text-sand-400 hover:border-[#4a4030]',
             )}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -308,7 +308,7 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
               </svg>
               <span>Compare</span>
             </button>
-            <span className="hidden sm:inline text-xs text-sand-600 tabular-nums whitespace-nowrap">
+            <span className="hidden sm:inline text-xs md:text-[13px] text-sand-600 tabular-nums whitespace-nowrap">
               {rows.length} {tab === 'npcs' ? 'recruits' : 'villagers'}
             </span>
           </div>
@@ -316,7 +316,7 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
       </div>
 
       {isTable && (
-        <div className="bw-scroll flex items-center gap-1.5 py-[7px] px-[18px] flex-nowrap overflow-x-auto sm:flex-wrap sm:overflow-visible border-b border-line bg-[#15110C] text-[11.5px]">
+        <div className="bw-scroll flex items-center gap-1.5 py-1.75 px-4.5 flex-nowrap overflow-x-auto sm:flex-wrap sm:overflow-visible border-b border-line bg-[#15110C] text-[11.5px] md:text-[12.5px]">
           {villages.length > 0 && (<>
             <FilterChips label="Village" all={villages} sel={villageFilter}
               onToggle={v => setVillageFilter(s2 => { const n = new Set(s2); n.has(v) ? n.delete(v) : n.add(v); return n; })} />
@@ -369,13 +369,13 @@ export const CompanionApp = ({ world, initialSlug }: { world: World; initialSlug
           ? <EventsTab />
           : (
             <div className="flex flex-col items-center justify-center h-full text-center px-6 gap-3">
-              <div className="font-serif text-lg text-sand-200">Realtime monitor is off</div>
-              <p className="text-[13px] text-sand-600 max-w-[420px]">
+              <div className="font-serif text-lg md:text-[20px] text-sand-200">Realtime monitor is off</div>
+              <p className="text-[13px] md:text-[14.5px] text-sand-600 max-w-105">
                 The Events feed and live map need the realtime monitor, which reads from the
                 companion daemon. Enable it to view reader status and the live event log.
               </p>
               <button onClick={() => setRealtime(true)}
-                className="mt-1 inline-flex items-center gap-2 h-[34px] px-3.5 rounded-lg border border-gold bg-gold/[.14] text-gold-bright text-[12.5px] font-medium cursor-pointer">
+                className="mt-1 inline-flex items-center gap-2 h-8.5 px-3.5 rounded-lg border border-gold bg-gold/[.14] text-gold-bright text-[12.5px] md:text-[14px] font-medium cursor-pointer">
                 Enable realtime monitor
               </button>
             </div>
@@ -398,15 +398,15 @@ const FilterChips = ({ label, all, sel, onToggle, colors }: {
   label: string; all: string[]; sel: Set<string>;
   onToggle: (v: string) => void; colors?: Record<string, string>;
 }) => (
-  <span className="inline-flex items-center gap-[5px] flex-none flex-nowrap sm:flex-wrap">
-    <span className="text-[9.5px] tracking-[.5px] uppercase text-sand-600 whitespace-nowrap">{label}</span>
+  <span className="inline-flex items-center gap-1.25 flex-none flex-nowrap sm:flex-wrap">
+    <span className="text-[9.5px] md:text-[10.5px] tracking-[.5px] uppercase text-sand-600 whitespace-nowrap">{label}</span>
     {all.map(v => {
       const on = sel.has(v);
       const color = colors?.[v] ?? '#C6BBA4';
       return (
         <button key={v} onClick={() => onToggle(v)}
           className={cn(
-            'py-0.5 px-[9px] rounded-full cursor-pointer font-sans text-[11px] border flex-none whitespace-nowrap',
+            'py-0.5 px-2.25 rounded-full cursor-pointer font-sans text-[11px] md:text-[12px] border flex-none whitespace-nowrap',
             on ? 'text-[#EDE4D2]' : 'border-line-3 bg-transparent text-sand-400',
           )}
           // active chip tint comes from the role/village color in data
@@ -421,7 +421,7 @@ const SettingsMenu = ({ realtime, onRealtime }: { realtime: boolean; onRealtime:
   <DropdownMenu>
     <DropdownMenuTrigger
       data-tip="Settings"
-      className="inline-flex items-center justify-center w-[34px] h-[34px] rounded-lg border border-line-3 bg-ink text-sand-400 hover:border-[#4a4030] cursor-pointer outline-none flex-none">
+      className="inline-flex items-center justify-center w-8.5 h-8.5 rounded-lg border border-line-3 bg-ink text-sand-400 hover:border-[#4a4030] cursor-pointer outline-none flex-none">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
         <circle cx="12" cy="12" r="3" />
         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
@@ -430,21 +430,21 @@ const SettingsMenu = ({ realtime, onRealtime }: { realtime: boolean; onRealtime:
     <DropdownMenuContent align="end" className="w-70 p-2.5">
       <button onClick={() => onRealtime(!realtime)}
         className="flex items-start gap-2.5 w-full text-left rounded-md p-2 hover:bg-white/[.04] cursor-pointer">
-        <span className={cn('mt-0.5 w-[34px] h-[19px] rounded-full flex-none relative transition-colors',
+        <span className={cn('mt-0.5 w-8.5 h-4.75 rounded-full flex-none relative transition-colors',
           realtime ? 'bg-gold' : 'bg-[#3a3327]')}>
-          <span className={cn('absolute top-[2px] w-[15px] h-[15px] rounded-full bg-white transition-all',
-            realtime ? 'left-[17px]' : 'left-[2px]')} />
+          <span className={cn('absolute top-0.5 w-3.75 h-3.75 rounded-full bg-white transition-all',
+            realtime ? 'left-4.25' : 'left-0.5')} />
         </span>
         <span className="min-w-0">
-          <span className="block text-[12.5px] text-sand-100 font-medium">Realtime monitor</span>
-          <span className="block text-[11px] text-sand-500 leading-snug">
+          <span className="block text-[12.5px] md:text-[14px] text-sand-100 font-medium">Realtime monitor</span>
+          <span className="block text-[11px] md:text-[12px] text-sand-500 leading-snug">
             Live map pins, raid alerts &amp; the Events tab — needs the companion reader daemon running.
           </span>
         </span>
       </button>
       <div className="mt-1 pt-2 border-t border-line-2 px-2 flex items-center justify-between">
-        <span className="text-[10.5px] text-sand-600">Bellwright Companion</span>
-        <span className="font-mono text-[10.5px] text-sand-500">v{process.env.NEXT_PUBLIC_APP_VERSION ?? '—'}</span>
+        <span className="text-[10.5px] md:text-[11.5px] text-sand-600">Bellwright Companion</span>
+        <span className="font-mono text-[10.5px] md:text-[11.5px] text-sand-500">v{process.env.NEXT_PUBLIC_APP_VERSION ?? '—'}</span>
       </div>
     </DropdownMenuContent>
   </DropdownMenu>

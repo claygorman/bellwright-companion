@@ -54,7 +54,7 @@ export const UploadButton = ({ onIngested }: { onIngested: () => void }) => {
     <>
       <button onClick={() => { setOpen(true); setFile(null); setError(''); }}
         data-tip="Upload a Bellwright save file"
-        className="flex items-center gap-2 h-[34px] px-3 rounded-lg border border-gold/50 bg-gold/[.12] text-gold-bright text-xs font-semibold cursor-pointer flex-none hover:bg-gold/[.2] hover:border-gold">
+        className="flex items-center gap-2 h-8.5 px-3 rounded-lg border border-gold/50 bg-gold/[.12] text-gold-bright text-xs md:text-[13px] font-semibold cursor-pointer flex-none hover:bg-gold/[.2] hover:border-gold">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
           strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 16V4" /><path d="M7 9l5-5 5 5" /><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
@@ -65,11 +65,11 @@ export const UploadButton = ({ onIngested }: { onIngested: () => void }) => {
         <div onClick={close}
           className="fixed inset-0 bg-[rgba(8,7,5,.65)] backdrop-blur-[2px] z-[80] flex items-center justify-center p-6 [animation:bwfade_.16s_ease]">
           <div onClick={e => e.stopPropagation()}
-            className="w-full max-w-[440px] bg-iron-850 border border-line-4 rounded-[14px] overflow-hidden shadow-[0_24px_60px_rgba(0,0,0,.6)]">
-            <div className="flex items-center justify-between py-[15px] px-5 border-b border-[#2A231A] bg-[#1B1712]">
-              <h3 className="font-serif text-[17px] font-semibold text-sand-50">Upload save file</h3>
+            className="w-full max-w-110 bg-iron-850 border border-line-4 rounded-[14px] overflow-hidden shadow-[0_24px_60px_rgba(0,0,0,.6)]">
+            <div className="flex items-center justify-between py-3.75 px-5 border-b border-[#2A231A] bg-[#1B1712]">
+              <h3 className="font-serif text-[17px] md:text-[18.5px] font-semibold text-sand-50">Upload save file</h3>
               <button onClick={close}
-                className="bg-none border border-[#342C22] text-sand-400 w-[30px] h-[30px] rounded-lg cursor-pointer text-base hover:border-[#4a4030] hover:text-[#EDA593]">×</button>
+                className="bg-none border border-[#342C22] text-sand-400 w-7.5 h-7.5 rounded-lg cursor-pointer text-base md:text-[17.5px] hover:border-[#4a4030] hover:text-[#EDA593]">×</button>
             </div>
             <div className="p-5">
               <label
@@ -85,21 +85,21 @@ export const UploadButton = ({ onIngested }: { onIngested: () => void }) => {
                 <span className="text-gold mb-2.5"><UpArrow size={30} /></span>
                 {file ? (
                   <>
-                    <div className="text-sand-100 font-semibold text-[13px]">{file.name}</div>
-                    <div className="text-[11.5px] text-sand-400 mt-0.5">{fmtSize(file.size)} · ready to ingest</div>
+                    <div className="text-sand-100 font-semibold text-[13px] md:text-[14.5px]">{file.name}</div>
+                    <div className="text-[11.5px] md:text-[12.5px] text-sand-400 mt-0.5">{fmtSize(file.size)} · ready to ingest</div>
                   </>
                 ) : (
                   <>
-                    <div className="text-sand-200 font-medium text-[13px]">
+                    <div className="text-sand-200 font-medium text-[13px] md:text-[14.5px]">
                       Drop your save here, or <span className="text-gold-bright underline">browse</span>
                     </div>
-                    <div className="text-[11.5px] text-sand-500 mt-1">
+                    <div className="text-[11.5px] md:text-[12.5px] text-sand-500 mt-1">
                       Bellwright save files — usually named <span className="font-mono text-sand-400">Save.sav</span>
                     </div>
                   </>
                 )}
               </label>
-              <div className="flex items-center gap-2 mt-3 text-[11px] text-sand-600">
+              <div className="flex items-center gap-2 mt-3 text-[11px] md:text-[12px] text-sand-600">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                   strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="9" /><path d="M12 8v4M12 16h.01" />
@@ -107,18 +107,18 @@ export const UploadButton = ({ onIngested }: { onIngested: () => void }) => {
                 <span>Parsed locally on your server — nothing leaves your network.</span>
               </div>
               {error && (
-                <div className="mt-3 text-[12px] text-rust-soft bg-rust/[.12] border border-rust/40 rounded-lg py-2 px-3">{error}</div>
+                <div className="mt-3 text-[12px] md:text-[13px] text-rust-soft bg-rust/[.12] border border-rust/40 rounded-lg py-2 px-3">{error}</div>
               )}
               <div className="flex justify-end gap-2 mt-5">
                 <button onClick={close}
-                  className="py-[9px] px-4 rounded-lg border border-line-3 bg-ink text-sand-400 text-[12.5px] font-medium cursor-pointer hover:border-[#4a4030]">Cancel</button>
+                  className="py-2.25 px-4 rounded-lg border border-line-3 bg-ink text-sand-400 text-[12.5px] md:text-[14px] font-medium cursor-pointer hover:border-[#4a4030]">Cancel</button>
                 <button onClick={ingest} disabled={!file || ingesting}
                   className={cn(
-                    'inline-flex items-center gap-2 py-[9px] px-4 rounded-lg border border-gold bg-gold text-[#1a150c] text-[12.5px] font-semibold font-sans',
+                    'inline-flex items-center gap-2 py-2.25 px-4 rounded-lg border border-gold bg-gold text-[#1a150c] text-[12.5px] md:text-[14px] font-semibold font-sans',
                     file && !ingesting ? 'cursor-pointer opacity-100' : 'cursor-not-allowed opacity-50',
                   )}>
                   {ingesting && (
-                    <span className="w-[13px] h-[13px] rounded-full border-2 border-[#1a150c]/40 border-t-[#1a150c] [animation:bwspin_.7s_linear_infinite]" />
+                    <span className="w-3.25 h-3.25 rounded-full border-2 border-[#1a150c]/40 border-t-[#1a150c] [animation:bwspin_.7s_linear_infinite]" />
                   )}
                   <span>{ingesting ? 'Ingesting…' : 'Ingest save'}</span>
                 </button>
