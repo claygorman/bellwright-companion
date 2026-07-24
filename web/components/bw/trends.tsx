@@ -9,6 +9,16 @@ import {
 } from 'recharts';
 import { itemLabel } from '@/lib/bw/format';
 import { cn } from '@/lib/utils';
+import { BwSelect } from '@/components/ui/dropdown-menu';
+
+// playtime windows for the "last X hours" filter (0 = all history)
+const WINDOWS: { value: string; label: string; h: number }[] = [
+  { value: '0', label: 'All history', h: 0 },
+  { value: '6', label: 'Last 6h', h: 6 },
+  { value: '12', label: 'Last 12h', h: 12 },
+  { value: '24', label: 'Last 24h', h: 24 },
+  { value: '48', label: 'Last 48h', h: 48 },
+];
 
 const SERIES_COLORS = ['#E0A73C', '#7FA8C9', '#7DB068', '#D9614A', '#B08D57', '#9AD0E6', '#C99A4B', '#A6836A'];
 const RUNWAY_WARN_HOURS = 24;
@@ -30,7 +40,7 @@ type TrendsData = {
 
 // "Item over time" — chart the stored quantity of ANY single item (not just the
 // top-8), with a searchable picker. Fetches its own /api/trends/item series.
-const ItemHistory = ({ allItems }: { allItems: string[] }) => {
+const ItemHistory = ({ allItems, windowH }: { allItems: string[]; windowH: number }) => {
   const [sel, setSel] = useState<string>(() => allItems.find(i => i.toLowerCase() === 'wheat') ?? allItems[0] ?? '');
   const [q, setQ] = useState('');
   const [open, setOpen] = useState(false);
@@ -44,7 +54,9 @@ const ItemHistory = ({ allItems }: { allItems: string[] }) => {
   }, [sel]);
 
   const filtered = (q ? allItems.filter(i => itemLabel(i).toLowerCase().includes(q.toLowerCase())) : allItems).slice(0, 50);
-  const chart = series ?? [];
+  const all = series ?? [];
+  const maxPt = all.length ? all[all.length - 1].playtime : 0;
+  const chart = windowH ? all.filter(p => p.playtime >= maxPt - windowH * 3600) : all;
   const peak = chart.reduce((a, p) => Math.max(a, p.qty), 0);
 
   return (
@@ -121,6 +133,7 @@ const hoursFmt = (s: number) => `${Math.floor(s / 3600)}h`;
 
 export const Trends = () => {
   const [data, setData] = useState<TrendsData | null>(null);
+  const [windowH, setWindowH] = useState(0); // 0 = all playtime; else last N playtime-hours
   useEffect(() => {
     fetch('/api/trends', { cache: 'no-store' }).then(r => r.json()).then(setData).catch(() => {});
   }, []);
@@ -136,7 +149,10 @@ export const Trends = () => {
     );
   }
 
-  const chartData = points.map(p => ({
+  // "last X hours" window (by cumulative playtime, matching the X axis)
+  const maxPt = points[points.length - 1].playtime;
+  const fpts = windowH ? points.filter(p => p.playtime >= maxPt - windowH * 3600) : points;
+  const chartData = fpts.map(p => ({
     playtime: p.playtime,
     hours: p.playtime / 3600,
     morale: p.avg_morale != null ? Math.round(p.avg_morale * 10) / 10 : null,
@@ -158,11 +174,17 @@ export const Trends = () => {
   return (
     <div className="bw-scroll h-full overflow-y-auto">
       <div className="pt-5.5 px-6 pb-11">
-        <div className="mb-4">
-          <h2 className="font-serif text-xl md:text-[22px] font-semibold text-sand-100">Trends</h2>
-          <p className="mt-1 text-[12.5px] md:text-[14px] text-sand-400">
-            {points.length} snapshots · {deltas ? `${deltas.hours_played.toFixed(1)}h of tracked playtime` : ''}
-          </p>
+        <div className="mb-4 flex items-start justify-between gap-3">
+          <div>
+            <h2 className="font-serif text-xl md:text-[22px] font-semibold text-sand-100">Trends</h2>
+            <p className="mt-1 text-[12.5px] md:text-[14px] text-sand-400">
+              {points.length} snapshots · {deltas ? `${deltas.hours_played.toFixed(1)}h of tracked playtime` : ''}
+            </p>
+          </div>
+          <BwSelect value={String(windowH)} align="end"
+            triggerClassName="h-8 py-1.25 text-[12px] md:text-[13px]"
+            options={WINDOWS.map(w => ({ value: w.value, label: w.label }))}
+            onChange={v => setWindowH(Number(v))} />
         </div>
 
         {/* runway alerts */}
@@ -208,7 +230,7 @@ export const Trends = () => {
           </div>
 
           {/* single item over time (searchable — e.g. Wheat) */}
-          <ItemHistory allItems={data.all_items ?? []} />
+          <ItemHistory allItems={data.all_items ?? []} windowH={windowH} />
 
           {/* morale + injuries */}
           <div className={panel}>

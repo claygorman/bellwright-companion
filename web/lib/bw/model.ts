@@ -19,6 +19,28 @@ export const WORK: SkillDef[] = [
 ];
 export const ALL_SKILLS: SkillDef[] = [...COMBAT, ...WORK];
 
+// Player-facing job categories (EMistJobCategory) — the Population job-priority
+// list. Keys match the parser's job_priorities keys. This is a SUPERSET of the
+// work skills (jobs like Hunting/Woodcutting/Smelting have no matching skill).
+export const JOBS: { key: string; label: string; icon: string }[] = [
+  { key: 'harvesting', label: 'Harvesting', icon: 'berry' },
+  { key: 'woodcutting', label: 'Woodcutting', icon: 'leaf' },
+  { key: 'hunting', label: 'Hunting', icon: 'bow' },
+  { key: 'farming', label: 'Farming', icon: 'wheat' },
+  { key: 'animal', label: 'Animal Handling', icon: 'paw' },
+  { key: 'cooking', label: 'Cooking', icon: 'pot' },
+  { key: 'smelting', label: 'Smelting', icon: 'anvil' },
+  { key: 'crafting', label: 'Crafting', icon: 'anvil' },
+  { key: 'construction', label: 'Construction', icon: 'home' },
+  { key: 'research', label: 'Research', icon: 'scroll' },
+  { key: 'delivery', label: 'Labour', icon: 'hammer' },
+];
+// work-skill key -> its job-priority key (for skill-driven insights)
+export const SKILL_TO_JOB: Record<string, string> = {
+  harvest: 'harvesting', farm: 'farming', animal: 'animal', cook: 'cooking',
+  craft: 'crafting', research: 'research', labour: 'delivery',
+};
+
 export const SKILL_ICON: Record<string, string> = {
   strength: 'strength', agility: 'agility', one_handed: 'sword', two_handed: 'sword',
   polearm: 'spear', block: 'shield', archery: 'bow', harvest: 'berry', farm: 'wheat',
@@ -300,11 +322,12 @@ export const insightsFor = (mine: Npc[]): InsightCard[] => {
       return `${hit[2]} ${pctToNext(s)}% to ${s.level + 1}`;
     });
 
+  const jobPri = (v: Npc, skillKey: string) => v.job_priorities[SKILL_TO_JOB[skillKey] ?? skillKey] ?? DEFAULT_PRIORITY;
   const priMatch = (v: Npc) => WORK
     .filter(([k]) => {
       const s = v.skills[k];
       return s && (s.level > UNDERPRIORITISED_MIN_SKILL || s.cap > UNDERPRIORITISED_MIN_SKILL)
-        && (v.job_priorities[k] ?? DEFAULT_PRIORITY) >= DEFAULT_PRIORITY
+        && jobPri(v, k) >= DEFAULT_PRIORITY
         && Object.keys(v.job_priorities).length > 0; // non-workers have no priorities at all
     })
     .sort((a, b) => (v.skills[b[0]]?.level ?? 0) - (v.skills[a[0]]?.level ?? 0));
@@ -315,7 +338,7 @@ export const insightsFor = (mine: Npc[]): InsightCard[] => {
     v => {
       const hit = priMatch(v)[0];
       const s = v.skills[hit[0]];
-      return `${hit[2]} ${s.level}/${s.cap} · priority ${v.job_priorities[hit[0]] ?? DEFAULT_PRIORITY}`;
+      return `${hit[2]} ${s.level}/${s.cap} · priority ${jobPri(v, hit[0])}`;
     });
 
   return cards;

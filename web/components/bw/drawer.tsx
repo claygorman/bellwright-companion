@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { itemLabel, moraleColor } from '@/lib/bw/format';
 import { normalizeInjuries } from '@/lib/bw/injuries';
 import { InjuryBadge } from './injury-badge';
-import { COMBAT, WORK, SKILL_ICON, shapeCell, presetFor, professionOf, npcName, archetypeLabel } from '@/lib/bw/model';
+import { COMBAT, WORK, JOBS, SKILL_ICON, shapeCell, presetFor, professionOf, npcName, archetypeLabel } from '@/lib/bw/model';
 import { Icon, PinIcon } from './icons';
 import { ItemImg } from './item-img';
 import { Avatar } from './avatar';
@@ -192,14 +192,14 @@ export const Drawer = ({ v, playtime, ingestedAt, squads, onOpen, isMobile, onCl
                 Lower number = takes the job first · {DEFAULT_PRIORITY} is the default · 0 = disabled
               </p>
               <div className="flex flex-col gap-1.75 mb-6.5">
-                {WORK.map(([key, , label]) => {
+                {JOBS.map(({ key, label, icon }) => {
                   const p = v.job_priorities[key] ?? DEFAULT_PRIORITY;
                   const disabled = p === 0;
                   const emphasised = !disabled && p < DEFAULT_PRIORITY;
                   return (
                     <div key={key} className="flex items-center gap-2.25 text-xs md:text-[13px]">
                       <span className="flex opacity-80">
-                        <Icon name={SKILL_ICON[key]} size={13} color={C.textDim2} />
+                        <Icon name={icon} size={13} color={C.textDim2} />
                       </span>
                       <span className={cn('flex-auto', disabled ? 'text-sand-800' : 'text-sand-300')}>{label}</span>
                       <span className={cn(

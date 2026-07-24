@@ -24,6 +24,15 @@ const classify = (template: string | null, faction: string | null, hasTrader: bo
   return { archetype: 'unique', profession: null, tier: null };
 };
 
+// EMistJobCategory — the game's job-priority enum (values = declaration order,
+// read straight from the shipping exe; verified 7=Hunting, 11=AnimalHandling
+// against a known save). Training(9)/Caravan(12,13) aren't player job
+// priorities, so they're intentionally omitted.
+const JOB_CATEGORY: Record<number, string> = {
+  0: 'crafting', 1: 'smelting', 2: 'harvesting', 3: 'farming', 4: 'woodcutting',
+  5: 'delivery', 6: 'cooking', 7: 'hunting', 8: 'construction', 10: 'research', 11: 'animal',
+};
+
 export function extractNpcs(p: Payload): Npc[] {
   const { buf } = p;
 
@@ -186,14 +195,18 @@ export function extractNpcs(p: Payload): Npc[] {
           const gv = (p.fields(x.v) ?? []).filter(y => y.kind === 'v').map(y => y.v);
           if (gv.length === 4) gearPreset = gv.join(',');
         }
-        if (x.f === 34 && x.kind === 'len') {
+        // f20: repeated {f1: EMistJobCategory, f2: raw weight} — the Population
+        // screen's per-NPC job priorities. VERIFIED (game exe enum order +
+        // Gawin Hawyse ground truth): only NON-default jobs are stored, and the
+        // raw weight is INVERTED for display (the UI's "lower number = takes the
+        // job first" 0-9 value is 10 - raw; raw 9 -> shown 1 = do first;
+        // default = shown 5). The old decode read f34 (which is skill data, not
+        // jobs) with a skill-enum map — that's why "Farming 9" showed wrongly.
+        if (x.f === 20 && x.kind === 'len') {
           const rec = Object.fromEntries((p.fields(x.v) ?? [])
             .filter(y => y.kind === 'v').map(y => [y.f, y.v]));
-          if (rec[1] != null) {
-            const JOB: Record<number, string> = { 8: 'harvest', 9: 'farm', 10: 'animal', 11: 'cook',
-                          12: 'craft', 13: 'research', 14: 'labour' };
-            jobPriorities[JOB[rec[1]] ?? `job_${rec[1]}`] = rec[2] ?? 0;
-          }
+          const job = rec[1] != null ? JOB_CATEGORY[rec[1]] : null;
+          if (job) jobPriorities[job] = 10 - (rec[2] ?? 5);
         }
       }
     }
