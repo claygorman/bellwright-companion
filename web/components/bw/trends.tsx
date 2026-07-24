@@ -19,12 +19,88 @@ type TrendsData = {
     items: Record<string, number>; skill_xp_total: number;
   }[];
   top_items: string[];
+  all_items: string[];
   deltas: {
     hours_played: number;
     items: Record<string, { from: number; to: number; delta: number; perHour: number | null }>;
     xp_movers: { name: string; gained: number }[];
     idle_villagers: string[];
   } | null;
+};
+
+// "Item over time" — chart the stored quantity of ANY single item (not just the
+// top-8), with a searchable picker. Fetches its own /api/trends/item series.
+const ItemHistory = ({ allItems }: { allItems: string[] }) => {
+  const [sel, setSel] = useState<string>(() => allItems.find(i => i.toLowerCase() === 'wheat') ?? allItems[0] ?? '');
+  const [q, setQ] = useState('');
+  const [open, setOpen] = useState(false);
+  const [series, setSeries] = useState<{ playtime: number; qty: number }[] | null>(null);
+
+  useEffect(() => {
+    if (!sel) { setSeries([]); return; }
+    setSeries(null);
+    fetch(`/api/trends/item?name=${encodeURIComponent(sel)}`, { cache: 'no-store' })
+      .then(r => r.json()).then(d => setSeries(d.points ?? [])).catch(() => setSeries([]));
+  }, [sel]);
+
+  const filtered = (q ? allItems.filter(i => itemLabel(i).toLowerCase().includes(q.toLowerCase())) : allItems).slice(0, 50);
+  const chart = series ?? [];
+  const peak = chart.reduce((a, p) => Math.max(a, p.qty), 0);
+
+  return (
+    <div className={panel}>
+      <div className="mb-2.5 flex items-center justify-between gap-3">
+        <div className="font-serif text-[15px] md:text-[16.5px] font-semibold text-[#D9CBB2]">Item over time</div>
+        <div className="relative w-40 md:w-44">
+          <input
+            value={open ? q : itemLabel(sel)}
+            onChange={e => { setQ(e.target.value); setOpen(true); }}
+            onFocus={() => { setQ(''); setOpen(true); }}
+            onBlur={() => setTimeout(() => setOpen(false), 120)}
+            placeholder="Search item…"
+            className="w-full rounded-lg border border-line-3 bg-ink py-1.5 px-2.5 text-[12px] md:text-[13px] text-sand-200 outline-none focus:border-[#4a4030]" />
+          {open && filtered.length > 0 && (
+            <div className="bw-scroll absolute right-0 z-50 mt-1 max-h-64 w-56 overflow-y-auto rounded-lg border border-line-3 bg-[#17130E] py-1 shadow-[0_12px_32px_rgba(0,0,0,.6)]">
+              {filtered.map(i => (
+                <button key={i} onMouseDown={() => { setSel(i); setOpen(false); }}
+                  className={cn('block w-full px-3 py-1.5 text-left text-[12px] md:text-[13px] hover:bg-white/[.05]',
+                    i === sel ? 'text-gold-bright' : 'text-sand-300')}>
+                  {itemLabel(i)}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+      {!series ? (
+        <div className="flex h-[230px] items-center justify-center text-[12.5px] text-sand-600">Loading…</div>
+      ) : chart.length < 2 ? (
+        <div className="flex h-[230px] items-center justify-center text-center text-[12.5px] text-sand-600">
+          {sel ? `Not enough history for ${itemLabel(sel)} yet.` : 'No items stored yet.'}
+        </div>
+      ) : (
+        <ResponsiveContainer width="100%" height={230}>
+          <AreaChart data={chart} margin={{ left: -14, right: 8, top: 4 }}>
+            <defs>
+              <linearGradient id="itemgrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#E0A73C" stopOpacity={0.35} />
+                <stop offset="100%" stopColor="#E0A73C" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid stroke="rgba(255,255,255,.06)" vertical={false} />
+            <XAxis dataKey="playtime" tickFormatter={hoursFmt} tick={{ fill: '#7a7060', fontSize: 10 }} stroke="#39311F" />
+            <YAxis tick={{ fill: '#7a7060', fontSize: 10 }} stroke="#39311F" allowDecimals={false} />
+            <Tooltip {...chartTooltip} labelFormatter={v => `${(Number(v) / 3600).toFixed(1)}h played`}
+              formatter={val => [String(val), itemLabel(sel)]} />
+            <Area dataKey="qty" stroke="#E0A73C" strokeWidth={1.8} fill="url(#itemgrad)" isAnimationActive={false} />
+          </AreaChart>
+        </ResponsiveContainer>
+      )}
+      <div className="mt-1.5 h-4 text-[10.5px] md:text-[11.5px] text-sand-600">
+        {chart.length >= 2 && `Peak ${peak} · now ${chart[chart.length - 1].qty}`}
+      </div>
+    </div>
+  );
 };
 
 const panel = 'rounded-xl border border-line-2 bg-[#1A160F] py-3.5 px-4';
@@ -130,6 +206,9 @@ export const Trends = () => {
               </LineChart>
             </ResponsiveContainer>
           </div>
+
+          {/* single item over time (searchable — e.g. Wheat) */}
+          <ItemHistory allItems={data.all_items ?? []} />
 
           {/* morale + injuries */}
           <div className={panel}>

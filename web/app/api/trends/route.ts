@@ -31,6 +31,12 @@ export const GET = async () => {
     .slice(0, TOP_ITEMS)
     .map(([k]) => k);
 
+  // every item that has EVER been in storage — powers the "item over time"
+  // picker so you can chart something outside the top-8 (e.g. Wheat)
+  const allItemsSet = new Set<string>();
+  for (const r of rows) for (const k of Object.keys(r.world.storage?.totals ?? {})) allItemsSet.add(k);
+  const all_items = [...allItemsSet].sort();
+
   const stride = Math.max(1, Math.ceil(rows.length / MAX_POINTS));
   const sampled = rows.filter((_, i) => i % stride === 0 || i === rows.length - 1);
 
@@ -94,6 +100,7 @@ export const GET = async () => {
   return Response.json({
     points,
     top_items: topItems,
+    all_items,
     deltas: {
       from_snapshot: first.id,
       to_snapshot: last.id,
