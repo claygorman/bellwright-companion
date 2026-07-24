@@ -22,18 +22,21 @@ export const ALL_SKILLS: SkillDef[] = [...COMBAT, ...WORK];
 // Player-facing job categories (EMistJobCategory) — the Population job-priority
 // list. Keys match the parser's job_priorities keys. This is a SUPERSET of the
 // work skills (jobs like Hunting/Woodcutting/Smelting have no matching skill).
+// order + labels match the in-game "Job priorities" screen exactly
 export const JOBS: { key: string; label: string; icon: string }[] = [
-  { key: 'harvesting', label: 'Harvesting', icon: 'berry' },
-  { key: 'woodcutting', label: 'Woodcutting', icon: 'leaf' },
-  { key: 'hunting', label: 'Hunting', icon: 'bow' },
-  { key: 'farming', label: 'Farming', icon: 'wheat' },
-  { key: 'animal', label: 'Animal Handling', icon: 'paw' },
-  { key: 'cooking', label: 'Cooking', icon: 'pot' },
-  { key: 'smelting', label: 'Smelting', icon: 'anvil' },
   { key: 'crafting', label: 'Crafting', icon: 'anvil' },
+  { key: 'smelting', label: 'Smelting', icon: 'anvil' },
+  { key: 'harvesting', label: 'Harvesting', icon: 'berry' },
+  { key: 'farming', label: 'Farming', icon: 'wheat' },
+  { key: 'woodcutting', label: 'Woodcutting', icon: 'leaf' },
+  { key: 'delivery', label: 'Delivery', icon: 'hammer' },
+  { key: 'cooking', label: 'Cooking', icon: 'pot' },
+  { key: 'hunting', label: 'Hunting', icon: 'bow' },
   { key: 'construction', label: 'Construction', icon: 'home' },
+  { key: 'animal', label: 'Animal Handling', icon: 'paw' },
   { key: 'research', label: 'Research', icon: 'scroll' },
-  { key: 'delivery', label: 'Labour', icon: 'hammer' },
+  { key: 'caravanCarrier', label: 'Caravan Carrier', icon: 'pack' },
+  { key: 'caravanGuard', label: 'Caravan Guard', icon: 'shield' },
 ];
 // work-skill key -> its job-priority key (for skill-driven insights)
 export const SKILL_TO_JOB: Record<string, string> = {

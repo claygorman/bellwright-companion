@@ -25,12 +25,13 @@ const classify = (template: string | null, faction: string | null, hasTrader: bo
 };
 
 // EMistJobCategory — the game's job-priority enum (values = declaration order,
-// read straight from the shipping exe; verified 7=Hunting, 11=AnimalHandling
-// against a known save). Training(9)/Caravan(12,13) aren't player job
-// priorities, so they're intentionally omitted.
+// read straight from the shipping exe; verified against Gawin Hawyse's in-game
+// Job priorities screen: 7=Hunting=3, 11=AnimalHandling=1, rest=5, and the
+// screen lists Caravan Carrier/Guard too). Only Training(9) is not a shown job.
 const JOB_CATEGORY: Record<number, string> = {
   0: 'crafting', 1: 'smelting', 2: 'harvesting', 3: 'farming', 4: 'woodcutting',
-  5: 'delivery', 6: 'cooking', 7: 'hunting', 8: 'construction', 10: 'research', 11: 'animal',
+  5: 'delivery', 6: 'cooking', 7: 'hunting', 8: 'construction', 10: 'research',
+  11: 'animal', 12: 'caravanCarrier', 13: 'caravanGuard',
 };
 
 export function extractNpcs(p: Payload): Npc[] {
