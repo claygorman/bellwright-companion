@@ -156,7 +156,11 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
 
   // live telemetry (from the companion mod): poll the latest and treat it as
   // fresh for LIVE_TTL. When fresh, actor pins use live positions.
-  const LIVE_TTL = 8000;
+  // "fresh" window must exceed the daemon's post cadence (20s) or the map goes
+  // stale BETWEEN posts and oscillates back to save positions every cycle. 40s
+  // = ~2 posts of margin (tolerates a dropped post); after the game closes the
+  // pins hold last-known for 40s, then revert to save data.
+  const LIVE_TTL = 40000;
   const [live, setLive] = useState<{ actors: LiveActor[]; raidParties: RaidParty[]; age: number } | null>(null);
   useEffect(() => {
     if (!realtime) { setLive(null); return; } // live layer is opt-in (realtime monitor)
