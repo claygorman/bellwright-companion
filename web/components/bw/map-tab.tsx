@@ -5,6 +5,7 @@
 // Falls back to dark placeholder terrain when no imagery exists for the map.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Npc, World } from '@/lib/types';
+import type { LiveActor, RaidParty, Telemetry } from '@/lib/bw/telemetry';
 import { tplLabel } from '@/lib/bw/format';
 import { combatTotal, npcName, playerNpcs, professionOf, recruitNpcs, archetypeLabel } from '@/lib/bw/model';
 import { mapFor, project } from '@/lib/bw/map';
@@ -156,7 +157,7 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
   // live telemetry (from the companion mod): poll the latest and treat it as
   // fresh for LIVE_TTL. When fresh, actor pins use live positions.
   const LIVE_TTL = 8000;
-  const [live, setLive] = useState<{ actors: { id: string; name?: string; kind: string; x: number; y: number }[]; age: number } | null>(null);
+  const [live, setLive] = useState<{ actors: LiveActor[]; raidParties: RaidParty[]; age: number } | null>(null);
   useEffect(() => {
     if (!realtime) { setLive(null); return; } // live layer is opt-in (realtime monitor)
     let stop = false;
@@ -164,8 +165,9 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
       if (stop || document.hidden) return;
       try {
         const r = await fetch('/api/telemetry/latest', { cache: 'no-store' });
-        const j = (await r.json()) as { age_ms?: number; data?: { actors?: never[] } | null };
-        if (j.data?.actors && (j.age_ms ?? 1e9) < LIVE_TTL) setLive({ actors: j.data.actors, age: j.age_ms ?? 0 });
+        const j = (await r.json()) as { age_ms?: number; data?: Telemetry | null };
+        const age = j.age_ms ?? 1e9;
+        if (j.data && age < LIVE_TTL) setLive({ actors: j.data.actors ?? [], raidParties: j.data.raidParties ?? [], age });
         else setLive(null);
       } catch { /* offline — no live layer */ }
     };
@@ -234,6 +236,10 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
     // live-only actors — reuses the whole zoom/positioning pin machinery
     if (live?.actors?.length) {
       const byKey = new Map(out.map(pn => [pn.guid ?? pn.label, pn]));
+      // the save player pin is keyed by character name; the live player actor
+      // has id 'player' — index it so it MERGES instead of adding a 2nd pin
+      const playerPin = out.find(pn => pn.layer === 'player');
+      if (playerPin) byKey.set('player', playerPin);
       const layerFor = (k: string): LayerKey => k === 'player' ? 'player' : k === 'hostile' ? 'hostiles' : 'villagers';
       for (const a of live.actors) {
         const pn = byKey.get(a.id) ?? (a.name ? byKey.get(a.name) : undefined);
@@ -259,6 +265,17 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
     }
     return out;
   }, [map, world, villagers, recruits, wikiPois, live]);
+
+  // live raid-army "red blobs" — the reclamation parties the daemon isolates
+  // (a MistVillagePatrolParty running a settlement-attack task chain). Projected
+  // from the same world frame as everything else.
+  const raidBlobs = useMemo(() => {
+    if (!map || !live?.raidParties?.length) return [];
+    return live.raidParties.map(p => {
+      const { u, v } = project(map, p.x, p.y);
+      return { id: p.id, u, v, count: p.count, faction: p.faction, label: p.label || `${p.faction ?? 'Raid'} party` };
+    });
+  }, [map, live]);
 
   // viewport pan/zoom — imperative for performance: gestures write the
   // container transform + a --ps counter-scale CSS var directly (rAF-batched),
@@ -580,6 +597,19 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
                 </div>
               );
             })()}
+            {/* raid-army blobs live in the SCALED stage so their footprint grows
+                with zoom (a world-area), like the in-game red mass */}
+            {raidBlobs.map(b => {
+              const r = 55 * pxPerM;
+              return (
+                <div key={`blob-${b.id}`}
+                  className="pointer-events-none absolute rounded-full [animation:bwpulse_1.9s_ease-in-out_infinite]"
+                  style={{
+                    left: b.u - r, top: b.v - r, width: r * 2, height: r * 2,
+                    background: 'radial-gradient(circle, rgba(226,66,48,.6) 0%, rgba(196,40,30,.34) 46%, rgba(196,40,30,0) 72%)',
+                  }} />
+              );
+            })}
           </div>
         )}
         {/* pin-layer transform/size/willChange are imperative (apply()) — keep inline */}
@@ -648,6 +678,17 @@ export const MapTab = ({ world, region, onOpenProfile, realtime = false }: {
                 </div>
               );
             })}
+            {/* raid-army labels: crisp badge in the translate-only pin layer,
+                positioned imperatively via data-u/data-v like every other pin */}
+            {raidBlobs.map(b => (
+              <div key={`blob-lbl-${b.id}`} data-u={b.u} data-v={b.v}
+                className="pointer-events-none absolute left-0 top-0" style={{ zIndex: 44 }}>
+                <div className="flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 whitespace-nowrap rounded-full border border-rust-bright/60 bg-[#230b08]/90 px-2 py-0.5 text-[10px] md:text-[11px] font-semibold text-rust-soft shadow-[0_2px_10px_rgba(0,0,0,.6)]">
+                  <span className="[animation:bwpulse_1.4s_ease-in-out_infinite]">⚔</span>
+                  <span>{b.label}{b.count ? ` · ${b.count}` : ''}</span>
+                </div>
+              </div>
+            ))}
         </div>
 
         {/* screen-space pin tooltip (crisp at any zoom) */}

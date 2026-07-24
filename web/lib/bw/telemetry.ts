@@ -23,11 +23,26 @@ export type RaidAlert = {
   party?: number;     // attacker count (if known)
   message?: string;   // human summary
 };
+// A physically-spawned raiding army ("the big red blob"). The daemon clusters
+// the hostile party's live actors into a single centroid + count so the map can
+// draw ONE blob per army instead of scattering pins. Only emitted while a raid
+// is live (faction-matched to the raid's PartyFaction), so ordinary bandit
+// camps/patrols never show up here.
+export type RaidParty = {
+  id: string;         // stable-ish key (faction/settlement) so React can diff
+  faction?: string;
+  x: number;          // centroid, UE world cm (same frame as save/actor positions)
+  y: number;
+  count: number;      // actors in the party → blob size + badge
+  spread?: number;    // approx radius in UE cm (furthest actor from centroid) → blob footprint
+  label?: string;     // human label, e.g. "Reclamation party"
+};
 export type Telemetry = {
   t: number;                        // sender's clock (ms), informational
   actors?: LiveActor[];
   villages?: LiveVillage[];
-  raid?: RaidAlert;                 // AFK raid alert
+  raid?: RaidAlert;                 // AFK raid alert (text)
+  raidParties?: RaidParty[];        // spawned raid armies (map blobs)
 };
 
 type Stored = { received_at: number; data: Telemetry };

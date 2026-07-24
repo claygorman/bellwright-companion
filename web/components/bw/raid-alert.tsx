@@ -74,7 +74,9 @@ export const RaidWatcher = () => {
 
   const eta = raid.eta_s != null ? `${Math.max(0, Math.round(raid.eta_s / 60))} min` : null;
   return (
-    <div className="fixed inset-x-0 top-0 z-[100] flex items-center gap-3 px-5 py-2.5 bg-gradient-to-r from-rust/95 to-rust-bright/90 text-white shadow-[0_6px_24px_rgba(0,0,0,.5)] [animation:bwfade_.18s_ease]">
+    // in-flow bar (first child of the app shell's flex-col) so it PUSHES the
+    // header + nav down instead of a fixed overlay covering them
+    <div className="relative z-[60] flex flex-none items-center gap-3 px-5 py-2.5 bg-gradient-to-r from-rust/95 to-rust-bright/90 text-white shadow-[0_6px_24px_rgba(0,0,0,.5)] [animation:bwfade_.18s_ease]">
       <span className="text-lg md:text-[20px] [animation:bwpulse_1s_ease-in-out_infinite]">⚔️</span>
       <div className="flex-auto min-w-0">
         <div className="font-serif font-semibold text-[15px] md:text-[16.5px] leading-tight">Raid incoming</div>
